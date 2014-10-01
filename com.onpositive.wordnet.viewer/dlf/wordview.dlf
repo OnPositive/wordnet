@@ -1,0 +1,7 @@
+<form xmlns="http://jetface.org/JetFace1.0/" caption="WordForms">
+	<model class="com.onpositive.wordnet.viewer.views.WordFormView"  modelExtension="false"/>
+	<string  bindTo="$$.WordForm" caption="Wordform"/>
+	<list bindTo="$$.Relations">
+		
+	</list>
+</form>
