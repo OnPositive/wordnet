@@ -32,6 +32,9 @@ public abstract class StringTrie<T> extends StringCoder {
 		if (position==length){
 			//we need to decode value;
 			if (childCount<=0){
+				if (childCount < 0) {
+					i = i - getDataSize(i);
+				}
 				return decodeValue(i);
 			}
 			return null;
@@ -55,7 +58,7 @@ public abstract class StringTrie<T> extends StringCoder {
 					i++;
 					byte vl=byteBuffer[i];
 					if (vl==Byte.MIN_VALUE){
-						i+=3;
+						i+=4;
 					}
 					else{
 						i++;
@@ -83,9 +86,7 @@ public abstract class StringTrie<T> extends StringCoder {
 							//decode address
 							byte vl=byteBuffer[i];
 							if (vl==Byte.MIN_VALUE){
-								i++;
-								int next=makeInt(byteBuffer[i+2], byteBuffer[i+1],byteBuffer[i]);
-								i=i+next;
+								i = makeMultibyteShift(i);
 								continue l1;
 							}
 							else{
@@ -100,13 +101,25 @@ public abstract class StringTrie<T> extends StringCoder {
 								//we are at the end of string
 								if (onChar){
 									//end of constant segment
-									return decodeValue(i+2);			
+									if (byteBuffer[i] == Byte.MIN_VALUE) {
+										return decodeValue(i+5);
+									} else {  
+										return decodeValue(i+2);
+									}
 								}
 								return null;
 							}
 							if (onChar){
 								//end of constant segment
-								return find(search,charIndex,i + 1);			
+								//read next address;
+								byte vl=byteBuffer[i];
+								if (vl==Byte.MIN_VALUE){
+									i+=4;
+								}
+								else{
+									i++;
+								}
+								return find(search,charIndex,i);			
 							}
 						}
 					}
@@ -122,9 +135,7 @@ public abstract class StringTrie<T> extends StringCoder {
 					i++;
 					byte vl=byteBuffer[i];
 					if (vl==Byte.MIN_VALUE){
-						i++;
-						int next=makeInt(byteBuffer[i+2], byteBuffer[i+1],byteBuffer[i]);
-						i=i+next;
+						i = makeMultibyteShift(i);
 						continue l1;
 					}
 					else{
@@ -139,9 +150,7 @@ public abstract class StringTrie<T> extends StringCoder {
 					//decode address
 					byte vl=byteBuffer[i];
 					if (vl==Byte.MIN_VALUE){
-						i++;
-						int next=makeInt(byteBuffer[i+2], byteBuffer[i+1],byteBuffer[i]);
-						i=i+next;
+						i = makeMultibyteShift(i);
 						continue l1;
 					}
 					else{
@@ -155,6 +164,13 @@ public abstract class StringTrie<T> extends StringCoder {
 			}
 		}
 		
+	}
+
+	private int makeMultibyteShift(int i) {
+		i++;
+		int next=makeInt(byteBuffer[i+2], byteBuffer[i+1],byteBuffer[i]);
+		i=i + 2 + next;
+		return i;
 	}
 	
 	protected abstract int getDataSize(int i);
@@ -183,6 +199,9 @@ public abstract class StringTrie<T> extends StringCoder {
 
 			protected void store(ByteArrayList list) {
 				int size = children.size();
+				if (size > 127) {
+					System.out.println("PREVED");
+				}
 				if (associatedData != null) {
 					size = -size;
 				}
@@ -200,7 +219,7 @@ public abstract class StringTrie<T> extends StringCoder {
 			}
 
 			private void encodeLength(int length, ByteArrayList list) {
-				if (length < 255) {
+				if (length < 128) {
 					list.add(int0(length));
 				} else {
 					list.add(Byte.MIN_VALUE);
