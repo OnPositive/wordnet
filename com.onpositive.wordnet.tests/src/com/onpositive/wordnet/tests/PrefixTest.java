@@ -41,6 +41,49 @@ public class PrefixTest extends TestCase{
 		findTest(MapBuilder.create().entryOf("aaabb",(byte) 7).entryOf("aaaaa",(byte) 49).get());
 	}
 	
+	public void test05() {
+		StringToByteTrie trieGrammarStore = new StringToByteTrie();
+		StringTrie<Byte>.TrieBuilder newBuilder = trieGrammarStore.newBuilder();
+		int i = 35;
+		
+		String[] tst = {"םאהדנûחאוע",
+						"םאהדנûחאכא",
+						"םאהדנûחאכט",
+						"םאהדנûחאכמ",
+						"םאהדנûחאעü",
+						"םאהדנûחא‏ע",
+						"םאהדנûחוםא",
+						"םאהדנûחוםמ",
+						"םאהדנûחוםû",
+						"םאהדנûח¸עו",
+						"םאהדנûח¸רü",
+						"םאהדנûחטעו",
+						"םאהדנûחאועוסü",
+						"םאהדנûחראÿ",
+						"םאהדנûחרוו",
+						"םאהדנûחרוי",
+						"םאהדנûחרול",
+						"םאהדנûחרו‏",
+						"םאהדנûחרטו",
+						"םאהדנûחרטי",
+						"םאהדנûחרטל",
+						"םאהדנûחרטץ",
+						"םאהדנûחרף‏",
+						"םאהדנûח"};
+		
+		for (String string : tst) {
+			newBuilder.append(string, Byte.valueOf((byte)i++));
+		}
+		
+		trieGrammarStore.commit(newBuilder);
+        int k = 35;
+		for (String string : tst) {
+			Byte find = trieGrammarStore.find(string);
+			assertEquals(find.byteValue(), (byte)k++);
+		}
+
+	}
+	
 	private void findTest(Map<String, Byte> data) {
 		StringToByteTrie trieGrammarStore = new StringToByteTrie();
 		StringTrie<Byte>.TrieBuilder newBuilder = trieGrammarStore.newBuilder();

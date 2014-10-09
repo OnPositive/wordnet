@@ -20,20 +20,25 @@ public abstract class StringTrie<T> extends StringCoder {
 		return find(element, 0, 0);
 	}
 
-	private T find(String search, int position, int cAddress) {
+	private T findRecursive(String search, int position, int cAddress) {
+		int length = search.length();
 		int childCount = byteBuffer[cAddress];
 		
-		int i = cAddress + 1;
-		if (childCount < 0) { //Skip associated data
-			i = i + getDataSize(i);
+		if (childCount == 0 && position < length) { //if we have no children, but still have chars to search - return null
+			return null;
 		}
 		
-		int length = search.length();
+		int i = cAddress + 1;
+		int dataPos = i;
+		if (childCount < 0) { //Skip associated data
+			i = i + getDataSize(dataPos);
+		}
+		
 		if (position==length){
 			//we need to decode value;
 			if (childCount<=0){
 				if (childCount < 0) {
-					i = i - getDataSize(i);
+					i = i - getDataSize(dataPos);
 				}
 				return decodeValue(i);
 			}
@@ -63,7 +68,7 @@ public abstract class StringTrie<T> extends StringCoder {
 					else{
 						i++;
 					}
-					return find(search,position+1,i);
+					return findRecursive(search,position+1,i);
 				}
 				else{
 					i++;
@@ -119,14 +124,14 @@ public abstract class StringTrie<T> extends StringCoder {
 								else{
 									i++;
 								}
-								return find(search,charIndex,i);			
+								return findRecursive(search,charIndex,i);			
 							}
 						}
 					}
 				}
 			}
 			else{
-				if (currentItem==childCount-1){
+				if (currentItem==childCount-1 || childCount == 0){
 					return null;
 				}
 				currentItem++;
@@ -164,6 +169,162 @@ public abstract class StringTrie<T> extends StringCoder {
 			}
 		}
 		
+	}
+	
+	private T find(String search, int position, int cAddress) {
+		int i = cAddress;
+		outerLoop:while (position <= search.length()) {
+			int childCount = byteBuffer[i];
+			if (childCount == 0 && position < search.length()) { //if we have no children, but still have chars to search - return null
+				return null;
+			}
+			i++;
+			int dataPos = i;
+			if (childCount < 0) { //Skip associated data
+				i = i + getDataSize(dataPos);
+			}
+			
+			int length = search.length();
+			if (position==length){
+				//we need to decode value;
+				if (childCount<=0){
+					if (childCount < 0) {
+						i = i - getDataSize(dataPos);
+					}
+					return decodeValue(i);
+				}
+				return null;
+			}
+			char nextChar = search.charAt(position);
+			if (childCount<0){
+				childCount=-childCount;
+			}
+			int currentItem=0;
+			l1:while (true) {
+				byte b = byteBuffer[i];
+				boolean onChar=false;
+				if (b<0){
+					b=(byte) -b;
+					onChar=true;
+				}
+				char curentChar = byteToCharTable[b];
+				if (curentChar == nextChar) {
+					if (onChar){
+						//read next address;
+						i++;
+						byte vl=byteBuffer[i];
+						if (vl==Byte.MIN_VALUE){
+							i+=4;
+						}
+						else{
+							i++;
+						}
+						position++;
+						continue outerLoop;
+//						return find(search,position+1,i);
+					}
+					else{
+						i++;
+						int charIndex=position+1;
+						
+						while (true){
+							b = byteBuffer[i++];
+							if (b<0){
+								b=(byte) -b;
+								onChar=true;
+							}
+							curentChar = byteToCharTable[b];
+							if (charIndex>=length|| curentChar!=search.charAt(charIndex)){
+								//no we can skip to end of string and go next;
+								while (byteBuffer[i++]>=0);//skip string
+								if (currentItem==childCount-1){
+									return null;
+								}
+								currentItem++;
+								//decode address
+								byte vl=byteBuffer[i];
+								if (vl==Byte.MIN_VALUE){
+									i = makeMultibyteShift(i);
+									continue l1;
+								}
+								else{
+									int next=vl;
+									i=i+next;
+									continue l1;
+								}
+							}
+							else{
+								charIndex++;
+								if (charIndex==length){
+									//we are at the end of string
+									if (onChar){
+										//end of constant segment
+										if (byteBuffer[i] == Byte.MIN_VALUE) {
+											return decodeValue(i+5);
+										} else {  
+											return decodeValue(i+2);
+										}
+									}
+									return null;
+								}
+								if (onChar){
+									//end of constant segment
+									//read next address;
+									byte vl=byteBuffer[i];
+									if (vl==Byte.MIN_VALUE){
+										i+=4;
+									}
+									else{
+										i++;
+									}
+									position = charIndex;
+									continue outerLoop;
+//									return find(search,charIndex,i);			
+								}
+							}
+						}
+					}
+				}
+				else{
+					if (currentItem==childCount-1 || childCount == 0){
+						return null;
+					}
+					currentItem++;
+					if (onChar){
+						//read next address;
+						i++;
+						byte vl=byteBuffer[i];
+						if (vl==Byte.MIN_VALUE){
+							i = makeMultibyteShift(i);
+							continue l1;
+						}
+						else{
+							int next=vl;
+							i=i+next;
+							continue l1;
+						}
+					}
+					else{
+						i++;
+						while (byteBuffer[i++]>=0);//skip string
+						//decode address
+						byte vl=byteBuffer[i];
+						if (vl==Byte.MIN_VALUE){
+							i = makeMultibyteShift(i);
+							continue l1;
+						}
+						else{
+							int next=vl;
+							i=i+next;
+							continue l1;
+						}
+						
+					}
+					//we need to read next sibling position;				
+				}
+			}
+		}
+		return null;
 	}
 
 	private int makeMultibyteShift(int i) {
