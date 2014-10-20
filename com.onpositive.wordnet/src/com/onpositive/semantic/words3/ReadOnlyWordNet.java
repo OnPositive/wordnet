@@ -1,10 +1,5 @@
 package com.onpositive.semantic.words3;
 
-import static com.onpositive.semantic.words3.hds.StringCoder.int0;
-import static com.onpositive.semantic.words3.hds.StringCoder.int1;
-import static com.onpositive.semantic.words3.hds.StringCoder.int2;
-import static com.onpositive.semantic.words3.hds.StringCoder.makeInt;
-
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.ByteArrayInputStream;
@@ -16,7 +11,8 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.Serializable;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -28,7 +24,6 @@ import com.onpositive.semantic.wordnet.AbstractRelation;
 import com.onpositive.semantic.wordnet.AbstractWordNet;
 import com.onpositive.semantic.wordnet.GrammarRelation;
 import com.onpositive.semantic.wordnet.MeaningElement;
-import com.onpositive.semantic.wordnet.MorphologicalRelation;
 import com.onpositive.semantic.wordnet.RelationTarget;
 import com.onpositive.semantic.wordnet.SemanticRelation;
 import com.onpositive.semantic.wordnet.TextElement;
@@ -39,21 +34,19 @@ import com.onpositive.semantic.words3.dto.ConceptInfo;
 import com.onpositive.semantic.words3.dto.SenseElementInfo;
 import com.onpositive.semantic.words3.dto.SequenceInfo;
 import com.onpositive.semantic.words3.dto.WordInfo;
+import com.onpositive.semantic.words3.hds.IStringToDataStorage;
 import com.onpositive.semantic.words3.hds.StringCoder;
 import com.onpositive.semantic.words3.hds.StringToDataHashMap;
+import com.onpositive.semantic.words3.hds.TrieStorage;
 
 public class ReadOnlyWordNet extends AbstractWordNet {
 
-	protected GrammarRelationsStore relations;
+	protected IStringToDataStorage<GrammarRelation[]> relations;
 	
-	public String[] getAllGrammarKeys() {
-		return relations.getAllKeys();
-	}
-
 	protected WordStore wordsData;
 	protected IntIntOpenHashMap sequences = new IntIntOpenHashMap();
 	protected byte[] store;
-	
+	private static final boolean USE_TRIE = false; 
 	
 
 	/**
@@ -62,32 +55,18 @@ public class ReadOnlyWordNet extends AbstractWordNet {
 	 * @author kor
 	 * 
 	 */
-	public final class GrammarRelationsStore extends
-			StringToDataHashMap<GrammarRelation[]> implements Serializable {
-		private static final long serialVersionUID = 1L;
-
-		public GrammarRelationsStore(int sz) {
-			super(sz);
-		}
-
-		@Override
-		protected final GrammarRelation[] decodeValue(byte[] buffer, int addr) {
-			return decodeGrammarRelations(addr, buffer);
-		}
-
-		@Override
-		protected byte[] encodeValue(GrammarRelation[] value) {
-			byte[] encodeRelations = encodeRelations(value);
-			GrammarRelation[] decodeGrammarRelations = decodeGrammarRelations(0, encodeRelations);
-			if (!Arrays.equals(decodeGrammarRelations, value)){
-				throw new IllegalStateException();
-			}
-			return encodeRelations;
+	public final class GrammarRelationsStorage extends TrieStorage<GrammarRelation[]>{
+		
+//		private static final long serialVersionUID = 1L;
+		
+		public GrammarRelationsStorage() {
+			store.setEncoder(new GrammarRelationEncoder());
 		}
 
 		public int size() {
-			return usedCount;
+			return store.size();
 		}
+
 	}
 
 	public final class WordStore extends StringToDataHashMap<SenseElementInfo> {
@@ -99,20 +78,30 @@ public class ReadOnlyWordNet extends AbstractWordNet {
 		protected int[] wordIdToOffset;
 		protected int[] conceptIdToOffet;
 
+		int smallPath;
+
+		int smallPathLength;
+
+		int otherPath;
+
+		int otherPathLength;
+
 		protected final byte[] buffer() {
 			return this.byteBuffer;
 		}
 
 		@Override
-		public void write(DataOutputStream ds) throws IOException {
-			super.write(ds);
+		public void write(OutputStream stream) throws IOException {
+			super.write(stream);
+			DataOutputStream ds = (stream instanceof DataOutputStream) ? (DataOutputStream) stream : new DataOutputStream(stream);
 			writeIntArray(wordIdToOffset, ds);
 			writeIntArray(conceptIdToOffet, ds);
 		}
 
 		@Override
-		public void read(DataInputStream is) throws IOException {
-			super.read(is);
+		public void read(InputStream stream) throws IOException {
+			super.read(stream);
+			DataInputStream is =  (stream instanceof DataInputStream) ? (DataInputStream)stream : new DataInputStream(stream);
 			wordIdToOffset = readIntArray(is);
 			conceptIdToOffet = readIntArray(is);
 		}
@@ -269,10 +258,10 @@ public class ReadOnlyWordNet extends AbstractWordNet {
 				if (noRelations) {
 					rels = new SemanticRelation[0];
 				} else
-					rels = decodeMeaningRelations(pos, buffer);
+					rels = CodingUtils.decodeMeaningRelations(pos, buffer);
 				ConceptInfo conceptInfo = new ConceptInfo(id, id, (short) kind, rels);
 				infos = new ConceptInfo[] { conceptInfo };
-				pos += length(rels);
+				pos += CodingUtils.length(rels);
 			}
 			byte c = buffer[pos++];
 			String wordName = getStringBeforeData(buffer, addr);
@@ -302,11 +291,6 @@ public class ReadOnlyWordNet extends AbstractWordNet {
 			String wordName = decode(stOff + 1);
 			return wordName;
 		}
-
-		int smallPath;
-		int smallPathLength;
-		int otherPath;
-		int otherPathLength;
 
 		@Override
 		protected byte[] encodeValue(SenseElementInfo value) {
@@ -397,13 +381,32 @@ public class ReadOnlyWordNet extends AbstractWordNet {
 		public ReadOnlyWordNet getWordNet() {
 			return ReadOnlyWordNet.this;
 		}
+
+		@Override
+		public void commit() {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public int size() {
+			// TODO Auto-generated method stub
+			return 0;
+		}
+	}
+
+	public String[] getAllGrammarKeys() {
+		if (relations instanceof StringToDataHashMap) {
+			return ((StringToDataHashMap<GrammarRelation[]>) relations).getAllKeys();
+		}
+		return new String[] {};
 	}
 
 	public ReadOnlyWordNet(SimpleWordNet original) {
 		Set<String> formsSet = original.getFormsSet();
 		this.iset=original.iset();
 		this.set=original.gset();
-		relations = new GrammarRelationsStore(formsSet.size() * 4 / 3 + 10);
+		relations = createStorage(formsSet.size() * 4 / 3 + 10);
 		WordStore store = new WordStore(original.size(),
 				original.conceptCount());
 		this.wordsData = store;
@@ -414,6 +417,7 @@ public class ReadOnlyWordNet extends AbstractWordNet {
 		for (String q : original.getFormsSet()) {
 			relations.store(q, original.getPosibleWords(q));
 		}
+		relations.commit();
 		HashMap<Integer,ArrayList<Integer>> sequenceMap = original
 				.getSequenceMap();
 		ByteArrayList mm = new ByteArrayList();
@@ -443,7 +447,7 @@ public class ReadOnlyWordNet extends AbstractWordNet {
 	}
 
 	public ReadOnlyWordNet(DataInputStream is) throws IOException {
-		relations = new GrammarRelationsStore(10);
+		relations = createStorage(10);
 		relations.read(is);
 		wordsData = new WordStore(5, 5);
 		wordsData.read(is);
@@ -452,6 +456,14 @@ public class ReadOnlyWordNet extends AbstractWordNet {
 		is.readFully(this.store);
 		sequences=StringToDataHashMap.readMap(is);
 		readGrammems(is);
+	}
+
+	private IStringToDataStorage<GrammarRelation[]> createStorage(int size) {
+		if (USE_TRIE) {
+			return new GrammarRelationsStorage();
+		} else {
+			return new GrammarRelationsHashMap(size);
+		}
 	}
 
 	public static ReadOnlyWordNet load(String file) throws IOException {
@@ -485,7 +497,7 @@ public class ReadOnlyWordNet extends AbstractWordNet {
 	}
 
 	public void trim() {
-		relations.trim();
+//		relations.trim();
 		wordsData.trim();
 	}
 
@@ -511,233 +523,6 @@ public class ReadOnlyWordNet extends AbstractWordNet {
 		byte[] byteArray2 = out.toByteArray();
 		if (!Arrays.equals(byteArray2, byteArray)){
 			throw new IllegalStateException();
-		}
-	}
-
-	public static int estimateRelationsLength(int offset, byte[] source) {
-		int len = source[offset];
-		int ad = 1;
-		boolean oneWord = false;
-		if (len == Byte.MIN_VALUE) {
-			oneWord = false;
-			offset++;
-			len = makeInt((byte) 0, (byte) 0, source[offset + 1],
-					source[offset]);
-			ad = 3;
-		}
-		if (len < 0) {
-			oneWord = true;
-			len = -len;
-		}
-		if (oneWord) {
-			return len*2 + 4;
-		} else {
-			return len * 5 +  ad;
-		}
-	}
-
-	public static GrammarRelation[] decodeGrammarRelations(int offset,
-			byte[] source) {
-		int len = source[offset];
-		boolean oneWord = false;
-		if (len == Byte.MIN_VALUE) {
-			oneWord = false;
-			offset++;
-			len = makeInt((byte) 0, (byte) 0, source[offset + 1],
-					source[offset]);
-			offset++;
-		}
-		if (len < 0) {
-			oneWord = true;
-			len = -len;
-		}
-
-		GrammarRelation[] result = new GrammarRelation[len];
-		offset++;
-		if (oneWord) {
-			byte b0 = source[offset++];
-			byte b1 = source[offset++];
-			byte b2 = source[offset++];
-			int word = makeInt((byte) 0, b2, b1, b0);
-			for (int a = 0; a < result.length; a++) {
-				byte rel = source[offset++];
-				byte rel1 = source[offset++];
-				result[a] = new GrammarRelation(null, word, makeInt((byte)0,(byte) 0, rel1,rel));
-			}
-		} else {
-			for (int a = 0; a < result.length; a++) {
-				byte b0 = source[offset++];
-				byte b1 = source[offset++];
-				byte b2 = source[offset++];
-				int word = makeInt((byte) 0, b2, b1, b0);
-				byte rel = source[offset++];
-				byte rel1 = source[offset++];
-				result[a] = new GrammarRelation(null, word, makeInt((byte)0,(byte) 0, rel1,rel));
-			}
-		}
-		return result;
-	}
-
-	@SuppressWarnings("unchecked")
-	public static AbstractRelation<MeaningElement>[] decodeMeaningRelations(int offset,
-			byte[] source) {
-		int len = source[offset];
-		boolean oneWord = false;
-		if (len == Byte.MIN_VALUE) {
-			oneWord = false;
-			offset++;
-			len = makeInt((byte) 0, (byte) 0, source[offset + 1],
-					source[offset]);
-			offset++;
-		}
-		if (len < 0) {
-			oneWord = true;
-			len = -len;
-		}
-
-		AbstractRelation<MeaningElement>[] result = new AbstractRelation[len];
-		offset++;
-		if (oneWord) {
-			byte b0 = source[offset++];
-			byte b1 = source[offset++];
-			byte b2 = source[offset++];
-			int word = makeInt((byte) 0, b2, b1, b0);
-			for (int a = 0; a < result.length; a++) {
-				byte rel = source[offset++];
-				byte rel1 = source[offset++];
-				result[a] = createRelation(word, rel, rel1);
-			}
-		} else {
-			for (int a = 0; a < result.length; a++) {
-				byte b0 = source[offset++];
-				byte b1 = source[offset++];
-				byte b2 = source[offset++];
-				int word = makeInt((byte) 0, b2, b1, b0);
-				byte rel = source[offset++];
-				byte rel1 = source[offset++];
-				result[a] = createRelation(word, rel, rel1);				
-			}
-		}
-		return result;
-	}
-
-	private static AbstractRelation<MeaningElement> createRelation(int word, byte rel, byte rel1) {
-		int makeInt = makeInt((byte)0,(byte) 0, rel1,rel);
-		if (makeInt>=MorphologicalRelation.MORPHOLOGICAL_OFFSET){
-			return new MorphologicalRelation(null, word, makeInt);
-		}
-		return new SemanticRelation(null, word, makeInt);
-	}
-
-	public static int length(AbstractRelation<?>[] relations) {
-		int w = -1;
-		boolean oneWord = true;
-		boolean customCase = false;
-		if (relations.length >= Byte.MAX_VALUE) {
-			oneWord = false;
-			customCase = true;
-		}
-		for (int a = 0; a < relations.length; a++) {
-			if (w != -1 && w != relations[a].conceptId) {
-				oneWord = false;
-			}
-			if (w == -1) {
-				w = relations[a].conceptId;
-			}
-		}
-		if (relations.length == 0) {
-			oneWord = false;
-		}
-		int delta = 0;
-		if (oneWord) {
-			delta = relations.length*2 + 3 + 1;
-		} else {
-			delta = relations.length * 5 + 1;
-			if (customCase) {
-				delta += 2;
-			}
-		}
-		return delta;
-	}
-
-	public static byte[] encodeRelations(AbstractRelation<?>[] relations) {
-		int w = -1;
-		boolean customCase = false;
-		boolean oneWord = true;
-		if (relations.length >= Byte.MAX_VALUE) {
-			oneWord = false;
-			customCase = true;
-		}
-		for (int a = 0; a < relations.length; a++) {
-			if (w != -1 && w != relations[a].conceptId) {
-				oneWord = false;
-			}
-			if (w == -1) {
-				w = relations[a].conceptId;
-			}
-		}
-		if (relations.length == 0) {
-			oneWord = false;
-		}
-		int delta = 0;
-		if (oneWord) {
-			delta = relations.length*2 + 3 + 1;
-		} else {
-			delta = relations.length * 5 + 1;
-			if (customCase) {
-				delta += 2;
-			}
-		}
-		byte[] result = new byte[delta];
-		encodeRelations(relations, w, oneWord, result, 0, customCase);		
-		return result;
-	}
-
-	public static void encodeRelations(AbstractRelation<?>[] relations, int w,
-			boolean oneWord, byte[] target, int position, boolean customCase) {
-		
-		if (customCase) {
-			target[position++] = Byte.MIN_VALUE;
-			target[position++] = int0(relations.length);
-			target[position++] = int1(relations.length);
-			for (AbstractRelation<?> q : relations) {
-				int word = q.conceptId;
-				if (q.relation>Short.MAX_VALUE){
-					throw new IllegalStateException();
-				}
-				target[position++] = int0(word);
-				target[position++] = int1(word);
-				target[position++] = int2(word);
-				target[position++] = (byte) int0(q.relation);
-				target[position++] = (byte) int1(q.relation);
-			}
-		} else {
-			target[position++] = (byte) (oneWord ? -relations.length
-					: relations.length);
-			if (oneWord) {
-				target[position++] = int0(w);
-				target[position++] = int1(w);
-				target[position++] = int2(w);
-				for (AbstractRelation<?> q : relations) {
-					if (q.relation>Short.MAX_VALUE){
-						throw new IllegalStateException();
-					}
-					target[position++] = (byte) int0(q.relation);
-					target[position++] = (byte) int1(q.relation);
-				}
-			} else {
-				for (AbstractRelation<?> q : relations) {
-					int word = q.conceptId;
-					target[position++] = int0(word);
-					target[position++] = int1(word);
-					target[position++] = int2(word);
-					if (q.relation>Short.MAX_VALUE){
-						throw new IllegalStateException();
-					}
-					target[position++] = (byte) int0(q.relation);
-					target[position++] = (byte) int1(q.relation);
-				}
-			}
 		}
 	}
 

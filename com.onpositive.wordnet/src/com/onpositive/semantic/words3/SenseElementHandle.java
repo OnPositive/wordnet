@@ -137,7 +137,7 @@ public class SenseElementHandle extends TextElement{
 		if (noRelations) {
 			rels = WORD_RELATIONS;
 		} else
-			rels = ReadOnlyWordNet.decodeMeaningRelations(pos, buffer);
+			rels = CodingUtils.decodeMeaningRelations(pos, buffer);
 		for (AbstractRelation<MeaningElement> q:rels){
 			AbstractRelation<?> g=(AbstractRelation<?>) q;
 			g.setOwner(store.getWordNet());

@@ -4,8 +4,9 @@ import com.carrotsearch.hppc.CharByteOpenHashMap;
 
 public class StringCoder {
 
+	protected static final int CHAR_TABLE_SIZE = 126;
 	protected CharByteOpenHashMap charToByteMap = new CharByteOpenHashMap();
-	protected char[] byteToCharTable = new char[126];
+	protected char[] byteToCharTable = new char[CHAR_TABLE_SIZE];
 	
 	protected byte[] byteBuffer;
 	protected int usedBytes;
@@ -118,6 +119,10 @@ public class StringCoder {
 			}
 		}
 		return new String(dds2, 0, a1);
+	}
+	
+	public byte[] getBytes() {
+		return byteBuffer;
 	}
 	
 	public static int makeInt(byte b3, byte b2, byte b1,

@@ -26,8 +26,8 @@ public class PrefixRemover {
 //		test5();
 //		test6();
 		
-//		globalTest();
-		timeTest();
+		globalTest();
+//		timeTest();
 	}
 
 	private static void globalTest() {
@@ -36,7 +36,7 @@ public class PrefixRemover {
 			loaded = ReadOnlyWordNet.load("rwnet.dat");
 			String[] keys = loaded.getAllGrammarKeys();
 //			Map<String, Byte> dataMap = new HashMap<String, Byte>();
-			TrieGrammarStore trieGrammarStore = new TrieGrammarStore();
+			StringTrie<GrammarRelation[]> trieGrammarStore = new TrieGrammarStore();
 			TrieBuilder newBuilder = trieGrammarStore.newBuilder();
 			int n = keys.length;
 			for (int i = 0; i < n; i++) {
@@ -161,7 +161,7 @@ public class PrefixRemover {
 	
 	private static boolean broken(String[] keys, int start, int end, ReadOnlyWordNet loaded) {
 //		Map<String, Byte> dataMap = new HashMap<String, Byte>();
-		TrieGrammarStore trieGrammarStore = new TrieGrammarStore();
+		StringTrie<GrammarRelation[]> trieGrammarStore = new TrieGrammarStore();
 		TrieBuilder newBuilder = trieGrammarStore.newBuilder();
 		for (int i = start; i < end; i++) {
 			Byte b = (byte)(Math.random() * 100);
@@ -189,7 +189,7 @@ public class PrefixRemover {
 	
 	private static boolean broken(String[] keys, ArrayList<Integer> included, ReadOnlyWordNet loaded) {
 		try {
-			TrieGrammarStore trieGrammarStore = new TrieGrammarStore();
+			StringTrie<GrammarRelation[]> trieGrammarStore = new TrieGrammarStore();
 			TrieBuilder newBuilder = trieGrammarStore.newBuilder();
 			for (int i = 0; i < included.size(); i++) {
 				int index = included.get(i);
@@ -256,7 +256,7 @@ public class PrefixRemover {
 	}
 	
 	private static void test5() {
-		TrieGrammarStore trieGrammarStore = new TrieGrammarStore();
+		StringTrie<GrammarRelation[]> trieGrammarStore = new TrieGrammarStore();
 		TrieBuilder newBuilder = trieGrammarStore.newBuilder();
 		int i = 35;
 		
@@ -318,7 +318,7 @@ public class PrefixRemover {
 			}
 			
 			
-			TrieGrammarStore trieGrammarStore = new TrieGrammarStore();
+			StringTrie<GrammarRelation[]> trieGrammarStore = new TrieGrammarStore();
 			TrieBuilder newBuilder = trieGrammarStore.newBuilder();
 			Map<String, GrammarRelation[]> relationsMap = new HashMap<String, GrammarRelation[]>();
 			int n = testList.size();
