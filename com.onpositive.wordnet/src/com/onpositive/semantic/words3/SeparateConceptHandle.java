@@ -65,7 +65,7 @@ public class SeparateConceptHandle extends MeaningElement{
 
 	@Override
 	public AbstractRelation<MeaningElement>[] getAllRelations() {
-		AbstractRelation<MeaningElement>[] decodeSemanticRelations = ReadOnlyWordNet.decodeMeaningRelations(address+8, this.store.buffer());
+		AbstractRelation<MeaningElement>[] decodeSemanticRelations = CodingUtils.decodeMeaningRelations(address+8, this.store.buffer());
 		ReadOnlyWordNet wordNet = store.getWordNet();		
 		for (AbstractRelation<MeaningElement> e:decodeSemanticRelations){
 			e.setOwner(wordNet);

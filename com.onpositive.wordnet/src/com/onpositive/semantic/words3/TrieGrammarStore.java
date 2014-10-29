@@ -4,20 +4,22 @@ import com.onpositive.semantic.wordnet.AbstractRelation;
 import com.onpositive.semantic.wordnet.GrammarRelation;
 import com.onpositive.semantic.words3.hds.StringTrie;
 
-public class TrieGrammarStore extends StringTrie<GrammarRelation[]>{
+public class TrieGrammarStore extends StringTrie<GrammarRelation[]> {
 	
 	@Override
-	protected byte[] encodeValue(GrammarRelation[] associatedData2) {
-		return ReadOnlyWordNet.encodeRelations((AbstractRelation<?>[]) associatedData2);
+	protected int getDataSize(int i) {
+		return CodingUtils.estimateRelationsLength(i, byteBuffer);
 	}
 
 	@Override
 	protected GrammarRelation[] decodeValue(int i) {
-		return ReadOnlyWordNet.decodeGrammarRelations(i, byteBuffer);
+		return CodingUtils.decodeGrammarRelations(i, byteBuffer);
 	}
 
+	
 	@Override
-	protected int getDataSize(int i) {
-		return ReadOnlyWordNet.estimateRelationsLength(i, byteBuffer);
+	public byte[] encodeValue(GrammarRelation[] associatedData2) {
+		return CodingUtils.encodeRelations((AbstractRelation<?>[]) associatedData2);
 	}
+
 }

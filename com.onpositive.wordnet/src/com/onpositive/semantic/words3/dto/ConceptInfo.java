@@ -10,7 +10,7 @@ import java.util.Arrays;
 import com.carrotsearch.hppc.ByteArrayList;
 import com.onpositive.semantic.wordnet.AbstractRelation;
 import com.onpositive.semantic.wordnet.MeaningElement;
-import com.onpositive.semantic.words3.ReadOnlyWordNet;
+import com.onpositive.semantic.words3.CodingUtils;
 
 public final class ConceptInfo {
 
@@ -72,8 +72,8 @@ public final class ConceptInfo {
 		short gkind=(short) makeInt((byte)0, (byte)0, b[4+position], b[3+position]);
 		//short features=(short) makeInt((byte)0, (byte)0, b[6+position], b[5+position]);
 		int pid=makeInt((byte)0, b[7+position], b[6+position], b[5+position]);
-		AbstractRelation<MeaningElement>[] relations=ReadOnlyWordNet.decodeMeaningRelations(8+position, b);
-		int length = ReadOnlyWordNet.length(relations);
+		AbstractRelation<MeaningElement>[] relations=CodingUtils.decodeMeaningRelations(8+position, b);
+		int length = CodingUtils.length(relations);
 		//not actually clear how to fill it;
 		ConceptInfo wordSenseInfo = new ConceptInfo(pid,id, gkind, relations);
 		wordSenseInfo.sizeB=8+length;
@@ -83,8 +83,8 @@ public final class ConceptInfo {
 		if (gcode>Short.MAX_VALUE){
 			throw new IllegalStateException();
 		}
-		byte[] encodeRelations = ReadOnlyWordNet.encodeRelations(relations);
-		int estimateRelationsLength = ReadOnlyWordNet.estimateRelationsLength(0,encodeRelations);
+		byte[] encodeRelations = CodingUtils.encodeRelations(relations);
+		int estimateRelationsLength = CodingUtils.estimateRelationsLength(0,encodeRelations);
 		if (estimateRelationsLength!=encodeRelations.length){
 			System.out.println("Error");
 		}
@@ -104,7 +104,7 @@ public final class ConceptInfo {
 	}
 	
 	public static int getConceptLength(int addr,byte[] buf){
-		return ReadOnlyWordNet.estimateRelationsLength(addr+8,buf)+8;
+		return CodingUtils.estimateRelationsLength(addr+8,buf)+8;
 	}
 	
 	public byte[] encodeWordInfoSmall(int kind,AbstractRelation<?>[] relations){
@@ -119,7 +119,7 @@ public final class ConceptInfo {
 		if (relations.length==0){
 			return rs.toArray();
 		}
-		byte[] encodeRelations = ReadOnlyWordNet.encodeRelations(relations);
+		byte[] encodeRelations = CodingUtils.encodeRelations(relations);
 		rs.add(encodeRelations);
 		return rs.toArray();
 	}

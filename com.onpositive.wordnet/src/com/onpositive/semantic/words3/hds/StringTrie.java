@@ -1,10 +1,26 @@
 package com.onpositive.semantic.words3.hds;
 
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.nio.ByteBuffer;
+import java.nio.CharBuffer;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 
 import com.carrotsearch.hppc.ByteArrayList;
+import com.carrotsearch.hppc.CharByteOpenHashMap;
 
-public abstract class StringTrie<T> extends StringCoder {
+public abstract class StringTrie<T> extends StringStorage<T> {
+	
+	protected int count = 0;
+	private TrieBuilder builder;
+
+	public StringTrie() {
+	
+	}
 
 	public TrieBuilder newBuilder() {
 		return new TrieBuilder();
@@ -14,9 +30,10 @@ public abstract class StringTrie<T> extends StringCoder {
 		this.byteBuffer = builder.store();
 		this.byteToCharTable = builder.byteToCharTable;
 		this.charToByteMap = builder.charToByteMap;
+		this.count = builder.count;
 	}
 
-	public T find(String element) {
+	public T get(String element) {
 		return find(element, 0, 0);
 	}
 
@@ -83,7 +100,10 @@ public abstract class StringTrie<T> extends StringCoder {
 						curentChar = byteToCharTable[b];
 						if (charIndex>=length|| curentChar!=search.charAt(charIndex)){
 							//no we can skip to end of string and go next;
-							while (byteBuffer[i++]>=0);//skip string
+							while (i < byteBuffer.length && byteBuffer[i++]>=0);//skip string
+							if (i >= byteBuffer.length) {
+								return null;
+							}
 							if (currentItem==childCount-1){
 								return null;
 							}
@@ -151,7 +171,10 @@ public abstract class StringTrie<T> extends StringCoder {
 				}
 				else{
 					i++;
-					while (byteBuffer[i++]>=0);//skip string
+					while (i < byteBuffer.length && byteBuffer[i++]>=0);//skip string
+					if (i >= byteBuffer.length) {
+						return null;
+					}
 					//decode address
 					byte vl=byteBuffer[i];
 					if (vl==Byte.MIN_VALUE){
@@ -236,7 +259,11 @@ public abstract class StringTrie<T> extends StringCoder {
 							curentChar = byteToCharTable[b];
 							if (charIndex>=length|| curentChar!=search.charAt(charIndex)){
 								//no we can skip to end of string and go next;
-								while (byteBuffer[i++]>=0);//skip string
+								while (i < byteBuffer.length && byteBuffer[i++]>=0);//skip string
+								if (i >= byteBuffer.length) {
+									return null;
+								}
+
 								if (currentItem==childCount-1){
 									return null;
 								}
@@ -306,7 +333,10 @@ public abstract class StringTrie<T> extends StringCoder {
 					}
 					else{
 						i++;
-						while (byteBuffer[i++]>=0);//skip string
+						while (i<byteBuffer.length && byteBuffer[i++]>=0);//skip string
+						if (i >= byteBuffer.length) {
+							return null;
+						}
 						//decode address
 						byte vl=byteBuffer[i];
 						if (vl==Byte.MIN_VALUE){
@@ -335,8 +365,9 @@ public abstract class StringTrie<T> extends StringCoder {
 	}
 	
 	protected abstract int getDataSize(int i);
-
 	protected abstract T decodeValue(int i);
+
+	protected abstract byte[] encodeValue(T associatedData2);
 
 	public class TrieBuilder extends StringCoder {
 
@@ -360,9 +391,6 @@ public abstract class StringTrie<T> extends StringCoder {
 
 			protected void store(ByteArrayList list) {
 				int size = children.size();
-				if (size > 127) {
-					System.out.println("PREVED");
-				}
 				if (associatedData != null) {
 					size = -size;
 				}
@@ -435,6 +463,7 @@ public abstract class StringTrie<T> extends StringCoder {
 		}
 
 		protected TrieNode rootNode = new TrieNode();
+		private int count = 0;
 
 		public void append(String s, T value) {
 			TrieNode t = rootNode;
@@ -444,6 +473,7 @@ public abstract class StringTrie<T> extends StringCoder {
 				t = t.getOrCreateChild(c);
 			}
 			t.associatedData = value;
+			count++;
 		}
 
 		public byte[] store() {
@@ -452,9 +482,69 @@ public abstract class StringTrie<T> extends StringCoder {
 		}
 	}
 
-	protected abstract byte[] encodeValue(T associatedData2);
+	public void write(OutputStream stream) throws IOException {
+		DataOutputStream dos = (stream instanceof DataOutputStream) ? (DataOutputStream) stream : new DataOutputStream(stream);
+		dos.writeInt(count);
+		dos.writeInt(usedBytes);
+		ByteBuffer buffer = Charset.forName("UTF-8").encode(CharBuffer.wrap(charToByteMap.keys));
+		byte[] keys = new byte[buffer.limit()];
+		buffer.get(keys);
+		dos.writeInt(keys.length);
+		dos.write(keys);
+		dos.writeInt(charToByteMap.values.length);
+		dos.write(charToByteMap.values);
+		buffer = Charset.forName("UTF-8").encode(CharBuffer.wrap(byteToCharTable));
+		byte[] ba2 = new byte[buffer.limit()];
+		buffer.get(ba2);
+		dos.writeInt(ba2.length);
+		dos.write(ba2);
+		dos.writeInt(byteBuffer.length);
+		dos.write(byteBuffer);
+	}
 
-	public StringTrie() {
+	public void read(InputStream stream) throws IOException {
+		DataInputStream dis =  (stream instanceof DataInputStream) ? (DataInputStream)stream : new DataInputStream(stream);
+		count = dis.readInt();
+		usedBytes = dis.readInt();
+		int length = dis.readInt();
+		byte[] charToByteKeys = new byte[length];
+		dis.read(charToByteKeys);
+		CharBuffer buffer = Charset.forName("UTF-8").decode(ByteBuffer.wrap(charToByteKeys));
+		char[] keys = new char[buffer.limit()];
+		buffer.get(keys);
+		length = dis.readInt();
+		byte[] values = new byte[length];
+		dis.read(values);
+		charToByteMap = CharByteOpenHashMap.from(keys, values);
+		length = dis.readInt();
+		byte[] byteToChar = new byte[length];
+		dis.read(byteToChar);
+		buffer = Charset.forName("UTF-8").decode(ByteBuffer.wrap(byteToChar));
+		byteToCharTable = new char[buffer.limit()];
+		buffer.get(byteToCharTable);
+		length = dis.readInt();
+		byteBuffer = new byte[length];
+		dis.read(byteBuffer);
+	}
 
+	public int size() {
+		return count;
+	}
+
+	@Override
+	public int store(String string, T data) {
+		if (builder == null) {
+			builder = newBuilder();
+		}
+		builder.append(string, data);
+		return 0;
+	}
+	
+	public void commit() {
+		if (builder == null) {
+			return;
+		}
+		commit(builder);
+		builder = null;
 	}
 }

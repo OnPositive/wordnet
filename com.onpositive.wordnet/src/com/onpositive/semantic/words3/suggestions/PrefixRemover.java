@@ -1,13 +1,20 @@
 package com.onpositive.semantic.words3.suggestions;
 
+import java.io.ByteArrayOutputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
+import java.util.zip.ZipOutputStream;
 
 import com.onpositive.semantic.wordnet.GrammarRelation;
+import com.onpositive.semantic.words3.ReadOnlyMapWordNet;
+import com.onpositive.semantic.words3.ReadOnlyTrieWordNet;
 import com.onpositive.semantic.words3.ReadOnlyWordNet;
 import com.onpositive.semantic.words3.TrieGrammarStore;
 import com.onpositive.semantic.words3.hds.StringToByteTrie;
@@ -25,18 +32,21 @@ public class PrefixRemover {
 //		test4();
 //		test5();
 //		test6();
+//		test7();
 		
-//		globalTest();
-		timeTest();
+		globalTest();
+//		timeTest();
 	}
 
+	@SuppressWarnings("unchecked")
 	private static void globalTest() {
 		ReadOnlyWordNet loaded;
 		try {
-			loaded = ReadOnlyWordNet.load("rwnet.dat");
+			loaded = ReadOnlyMapWordNet.load("rwnet.dat");
+//			ReadOnlyTrieWordNet trieWordNet = ReadOnlyTrieWordNet.load(new ZipFile("russian.dict"));
 			String[] keys = loaded.getAllGrammarKeys();
 //			Map<String, Byte> dataMap = new HashMap<String, Byte>();
-			TrieGrammarStore trieGrammarStore = new TrieGrammarStore();
+			StringTrie<GrammarRelation[]> trieGrammarStore = new TrieGrammarStore();
 			TrieBuilder newBuilder = trieGrammarStore.newBuilder();
 			int n = keys.length;
 			for (int i = 0; i < n; i++) {
@@ -45,18 +55,30 @@ public class PrefixRemover {
 				newBuilder.append(keys[i], loaded.getPossibleGrammarForms(keys[i]));
 			}
 			trieGrammarStore.commit(newBuilder);
+			
+			ZipOutputStream zos = new ZipOutputStream(new FileOutputStream("dict.dict"));
+			ZipEntry entry = new ZipEntry("trie");
+			ByteArrayOutputStream baos = new ByteArrayOutputStream();
+			trieGrammarStore.write(baos);
+			byte[] input = baos.toByteArray();
+			entry.setSize(input.length);
+			zos.putNextEntry(entry);
+			zos.write(input);
+			zos.closeEntry();
+			zos.close();
+			
 			for (int i = 0; i < n; i++) {
-				GrammarRelation[] found = trieGrammarStore.find(keys[i]);
+				GrammarRelation[] found = trieGrammarStore.get(keys[i]);
 				if (!Arrays.equals(found, loaded.getPossibleGrammarForms(keys[i])) ) {
 					System.out.println("Error for str " + keys[i] + " idx = " + i);
 				}
-				found = trieGrammarStore.find(keys[i] + "aaa");
+				found = trieGrammarStore.get(keys[i] + "aaa");
 				if (found != null) {
 					System.out.println("Non-null for str " + keys[i] + "aaa" + " idx = " + i);
 				}
 				if (keys[i].length() > 2) {
 					String str = keys[i].substring(0,2) + "a" + keys[i].substring(2);
-					found = trieGrammarStore.find(str);
+					found = trieGrammarStore.get(str);
 					if (found != null) {
 						System.out.println("Non-null for str " + str + " idx = " + i);
 					}
@@ -79,7 +101,7 @@ public class PrefixRemover {
 		ReadOnlyWordNet loaded;
 		String[] keys;
 		try {
-			loaded = ReadOnlyWordNet.load("rwnet.dat");
+			loaded = ReadOnlyMapWordNet.load("rwnet.dat");
 			keys = loaded.getAllGrammarKeys();
 			int step = (highBound - lowBound) / 2;
 			while (step > 2) {
@@ -118,7 +140,7 @@ public class PrefixRemover {
 	private static void test3() {
 		ReadOnlyWordNet loaded;
 		try {
-			loaded = ReadOnlyWordNet.load("rwnet.dat");
+			loaded = ReadOnlyMapWordNet.load("rwnet.dat");
 			String[] keys = loaded.getAllGrammarKeys();
 			int start = 809063;
 			int end = 809078;
@@ -161,7 +183,7 @@ public class PrefixRemover {
 	
 	private static boolean broken(String[] keys, int start, int end, ReadOnlyWordNet loaded) {
 //		Map<String, Byte> dataMap = new HashMap<String, Byte>();
-		TrieGrammarStore trieGrammarStore = new TrieGrammarStore();
+		StringTrie<GrammarRelation[]> trieGrammarStore = new TrieGrammarStore();
 		TrieBuilder newBuilder = trieGrammarStore.newBuilder();
 		for (int i = start; i < end; i++) {
 			Byte b = (byte)(Math.random() * 100);
@@ -171,11 +193,11 @@ public class PrefixRemover {
 		trieGrammarStore.commit(newBuilder);
 		try {
 			for (int i = start; i < end; i++) {
-				GrammarRelation[] found = trieGrammarStore.find(keys[i]);
+				GrammarRelation[] found = trieGrammarStore.get(keys[i]);
 				if (!Arrays.equals(found, loaded.getPossibleGrammarForms(keys[i]))) {
 					return true;
 				}
-				found = trieGrammarStore.find(keys[i] + "aaa");
+				found = trieGrammarStore.get(keys[i] + "aaa");
 				if (found != null) {
 					return true;
 				}
@@ -189,7 +211,7 @@ public class PrefixRemover {
 	
 	private static boolean broken(String[] keys, ArrayList<Integer> included, ReadOnlyWordNet loaded) {
 		try {
-			TrieGrammarStore trieGrammarStore = new TrieGrammarStore();
+			StringTrie<GrammarRelation[]> trieGrammarStore = new TrieGrammarStore();
 			TrieBuilder newBuilder = trieGrammarStore.newBuilder();
 			for (int i = 0; i < included.size(); i++) {
 				int index = included.get(i);
@@ -198,11 +220,11 @@ public class PrefixRemover {
 			trieGrammarStore.commit(newBuilder);
 			for (int i = 0; i < included.size(); i++) {
 				int index = included.get(i);
-				GrammarRelation[] found = trieGrammarStore.find(keys[index]);
+				GrammarRelation[] found = trieGrammarStore.get(keys[index]);
 				if (!Arrays.equals(found, loaded.getPossibleGrammarForms(keys[index]))) {
 					return true;
 				}
-				found = trieGrammarStore.find(keys[index] + "aaa");
+				found = trieGrammarStore.get(keys[index] + "aaa");
 				if (found != null) {
 					return true;
 				}
@@ -250,13 +272,13 @@ public class PrefixRemover {
 		trieGrammarStore.commit(newBuilder);
         
 		for (String string : tst) {
-			Byte find = trieGrammarStore.find(string);
+			Byte find = trieGrammarStore.get(string);
 			System.out.println(string + " = " + find);
 		}
 	}
 	
 	private static void test5() {
-		TrieGrammarStore trieGrammarStore = new TrieGrammarStore();
+		StringTrie<GrammarRelation[]> trieGrammarStore = new TrieGrammarStore();
 		TrieBuilder newBuilder = trieGrammarStore.newBuilder();
 		int i = 35;
 		
@@ -266,7 +288,7 @@ public class PrefixRemover {
 
 		
 		try {
-			ReadOnlyWordNet loaded = ReadOnlyWordNet.load("rwnet.dat");
+			ReadOnlyWordNet loaded = ReadOnlyMapWordNet.load("rwnet.dat");
 			GrammarRelation[] forms = loaded.getPossibleGrammarForms(tst[0]);
 			forms = loaded.getPossibleGrammarForms(tst[0]);
 			for (String string : tst) {
@@ -277,9 +299,9 @@ public class PrefixRemover {
 			
 			for (String string : tst) {
 				forms = loaded.getPossibleGrammarForms(string);
-				GrammarRelation[] found = trieGrammarStore.find(string);
+				GrammarRelation[] found = trieGrammarStore.get(string);
 				System.out.println(string + " = " + found);
-				found = trieGrammarStore.find(string + "aaa");
+				found = trieGrammarStore.get(string + "aaa");
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -301,14 +323,23 @@ public class PrefixRemover {
 		
 		trieGrammarStore.commit(newBuilder);
         
-		Byte fond = trieGrammarStore.find("{{-}}aaa");
+		Byte fond = trieGrammarStore.get("{{-}}aaa");
 		System.out.println("PrefixRemover.test6() " + fond);
+	}
+	
+	private static void test7() {
+		try {
+			ReadOnlyTrieWordNet.load(new ZipFile("russian.dict"));
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 	
 	private static void timeTest() {
 		ReadOnlyWordNet loaded;
 		try {
-			loaded = ReadOnlyWordNet.load("rwnet.dat");
+			loaded = ReadOnlyMapWordNet.load("rwnet.dat");
 			String[] keys = loaded.getAllGrammarKeys();
 //			Map<String, Byte> dataMap = new HashMap<String, Byte>();
 			List<String> testList = new ArrayList<String>();
@@ -318,7 +349,7 @@ public class PrefixRemover {
 			}
 			
 			
-			TrieGrammarStore trieGrammarStore = new TrieGrammarStore();
+			StringTrie<GrammarRelation[]> trieGrammarStore = new TrieGrammarStore();
 			TrieBuilder newBuilder = trieGrammarStore.newBuilder();
 			Map<String, GrammarRelation[]> relationsMap = new HashMap<String, GrammarRelation[]>();
 			int n = testList.size();
@@ -333,7 +364,7 @@ public class PrefixRemover {
 			trieGrammarStore.commit(newBuilder);
 			long n1 = System.currentTimeMillis();
 			for (int i = 0; i < n; i++) {
-				GrammarRelation[] found = trieGrammarStore.find(testList.get(i));
+				GrammarRelation[] found = trieGrammarStore.get(testList.get(i));
 			}
 			System.out.println("Trie: " + (System.currentTimeMillis() - n1));
 			

@@ -15,7 +15,7 @@ public class PrefixTest extends TestCase{
 		StringTrie<Byte>.TrieBuilder newBuilder = trieGrammarStore.newBuilder();
 		newBuilder.append("aa", Byte.valueOf((byte) 34));
 		trieGrammarStore.commit(newBuilder);
-		Byte found = trieGrammarStore.find("aa");
+		Byte found = trieGrammarStore.get("aa");
 		assertEquals(34, found.byteValue());
 	}
 	
@@ -29,11 +29,11 @@ public class PrefixTest extends TestCase{
 		newBuilder.append("aa", Byte.valueOf((byte) 34));
 		newBuilder.append("ab", Byte.valueOf((byte) 31));
 		trieGrammarStore.commit(newBuilder);
-		Byte found = trieGrammarStore.find("aa");
+		Byte found = trieGrammarStore.get("aa");
 		assertEquals(34, found.byteValue());
-		found = trieGrammarStore.find("ab");
+		found = trieGrammarStore.get("ab");
 		assertEquals(31, found.byteValue());
-		found = trieGrammarStore.find("a");
+		found = trieGrammarStore.get("a");
 		assertNull(found);
 	}
 	
@@ -78,7 +78,7 @@ public class PrefixTest extends TestCase{
 		trieGrammarStore.commit(newBuilder);
         int k = 35;
 		for (String string : tst) {
-			Byte find = trieGrammarStore.find(string);
+			Byte find = trieGrammarStore.get(string);
 			assertEquals(find.byteValue(), (byte)k++);
 		}
 
@@ -92,7 +92,7 @@ public class PrefixTest extends TestCase{
 		}
 		trieGrammarStore.commit(newBuilder);
 		for (String key : data.keySet()) {
-			Byte found = trieGrammarStore.find(key);
+			Byte found = trieGrammarStore.get(key);
 			assertEquals(((Byte)data.get(key)), Byte.valueOf(found.byteValue()));
 		}
 	}

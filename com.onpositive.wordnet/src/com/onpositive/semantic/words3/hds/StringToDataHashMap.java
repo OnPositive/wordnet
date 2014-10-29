@@ -3,10 +3,12 @@ package com.onpositive.semantic.words3.hds;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 
 import com.carrotsearch.hppc.IntIntOpenHashMap;
 
-public abstract class StringToDataHashMap<T> extends StringCoder{
+public abstract class StringToDataHashMap<T> extends StringStorage<T> {
 	protected int[] offsets;
 	protected int usedCount = 0;
 	
@@ -21,6 +23,10 @@ public abstract class StringToDataHashMap<T> extends StringCoder{
 		return s;		
 	}
 	
+	/* (non-Javadoc)
+	 * @see com.onpositive.semantic.words3.hds.IStringToDataStorage#get(java.lang.String)
+	 */
+	@Override
 	public T get(String string) {
 		int actualAddress = getDataAddress(string);
 		if (actualAddress>=0){
@@ -43,7 +49,9 @@ public abstract class StringToDataHashMap<T> extends StringCoder{
 	protected abstract T decodeValue(byte[] buffer,int addr);
 	protected abstract byte[] encodeValue(T value);
 	
-	public void write(DataOutputStream ds) throws IOException {
+	@Override
+	public void write(OutputStream stream) throws IOException {
+		DataOutputStream ds = (stream instanceof DataOutputStream) ? (DataOutputStream) stream : new DataOutputStream(stream);
 		ds.writeInt(byteBuffer.length);
 		ds.write(byteBuffer);
 		ds.writeInt(usedCount);
@@ -56,7 +64,9 @@ public abstract class StringToDataHashMap<T> extends StringCoder{
 			ds.write(charToByteMap.get(c));
 		}
 	}
-	public void read(DataInputStream is) throws IOException {
+	@Override
+	public void read(InputStream stream) throws IOException {
+		DataInputStream is =  (stream instanceof DataInputStream) ? (DataInputStream)stream : new DataInputStream(stream);
 		int q = is.readInt();
 		byteBuffer = new byte[q];
 		is.readFully(byteBuffer);
@@ -125,6 +135,10 @@ public abstract class StringToDataHashMap<T> extends StringCoder{
 			ds.writeInt(offsets2[a]);
 		}
 	}
+	/* (non-Javadoc)
+	 * @see com.onpositive.semantic.words3.hds.IStringToDataStorage#store(java.lang.String, T)
+	 */
+	@Override
 	public int store(String string, T data) {
 		int hashCode = hashCode(string);
 		if (hashCode < 0) {
