@@ -21,7 +21,6 @@ import com.onpositive.semantic.words3.ReadOnlyWordNet;
 public class WordNetProvider {
 
 	private static final String HASMAP_FILE_NAME = "rwnet.dat";
-	private static final String ZIPPED_FILE_NAME = "russian.dict";
 
 	private static AbstractWordNet instance;
 	
@@ -110,21 +109,6 @@ public class WordNetProvider {
 		return instance;
 	}
 
-	private static AbstractWordNet readZipped(File fl) {
-		File file=new File(ZIPPED_FILE_NAME);
-		if (file.exists()){
-			try{
-				ZipFile zipFile = new ZipFile(file);
-				instance=ReadOnlyTrieWordNet.load(zipFile);
-				return instance;
-			}catch (Exception e) {
-				System.err.println("Read only wordnet is corrupted rebuilding...");
-			}
-		}
-
-		return null;
-	}
-
 	private static AbstractWordNet readHashMap(File fl) {
 		File readOnly=new File(HASMAP_FILE_NAME);
 		if (readOnly.exists()){
@@ -154,58 +138,4 @@ public class WordNetProvider {
 		}
 	}
 	
-	 /**
-     * Unzip it
-     * @param zipFile input zip file
-     * @param output zip file output folder
-     */
-    public void unZipIt(String zipFile, String outputFolder){
- 
-     byte[] buffer = new byte[1024];
- 
-     try{
- 
-    	//create output directory is not exists
-    	File folder = new File(outputFolder);
-    	if(!folder.exists()){
-    		folder.mkdir();
-    	}
- 
-    	//get the zip file content
-    	ZipInputStream zis = 
-    		new ZipInputStream(new FileInputStream(zipFile));
-    	//get the zipped file list entry
-    	ZipEntry ze = zis.getNextEntry();
- 
-    	while(ze!=null){
- 
-    	   String fileName = ze.getName();
-           File newFile = new File(outputFolder + File.separator + fileName);
- 
-           System.out.println("file unzip : "+ newFile.getAbsoluteFile());
- 
-            //create all non exists folders
-            //else you will hit FileNotFoundException for compressed folder
-            new File(newFile.getParent()).mkdirs();
- 
-            FileOutputStream fos = new FileOutputStream(newFile);             
- 
-            int len;
-            while ((len = zis.read(buffer)) > 0) {
-       		fos.write(buffer, 0, len);
-            }
- 
-            fos.close();   
-            ze = zis.getNextEntry();
-    	}
- 
-        zis.closeEntry();
-    	zis.close();
- 
-    	System.out.println("Done");
- 
-    }catch(IOException ex){
-       ex.printStackTrace(); 
-    }
-   }    
 }

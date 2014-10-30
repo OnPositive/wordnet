@@ -13,6 +13,7 @@ import java.util.zip.ZipFile;
 import java.util.zip.ZipOutputStream;
 
 import com.onpositive.semantic.wordnet.GrammarRelation;
+import com.onpositive.semantic.wordnet.TrieZippedProvider;
 import com.onpositive.semantic.words3.ReadOnlyMapWordNet;
 import com.onpositive.semantic.words3.ReadOnlyTrieWordNet;
 import com.onpositive.semantic.words3.ReadOnlyWordNet;
@@ -33,8 +34,9 @@ public class PrefixRemover {
 //		test5();
 //		test6();
 //		test7();
+		test8();
 		
-		globalTest();
+//		globalTest();
 //		timeTest();
 	}
 
@@ -334,6 +336,10 @@ public class PrefixRemover {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+	}
+	
+	private static void test8() {
+		TrieZippedProvider.getInstance();		
 	}
 	
 	private static void timeTest() {

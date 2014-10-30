@@ -2,6 +2,7 @@ package com.onpositive.semantic.words3;
 
 import java.io.DataInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.zip.ZipFile;
 
 import com.onpositive.semantic.wordnet.GrammarRelation;
@@ -22,6 +23,24 @@ public class ReadOnlyTrieWordNet extends ReadOnlyWordNet {
 		wordsData.read(inputStream);
 		inputStream.close();
 		inputStream = new DataInputStream(zipFile.getInputStream(zipFile.getEntry("store")));
+		int size = inputStream.readInt();
+		this.store=new byte[size];
+		inputStream.readFully(this.store);
+		sequences=StringToDataHashMap.readMap(inputStream);
+		readGrammems(inputStream);
+		inputStream.close();
+	}
+	
+	public ReadOnlyTrieWordNet(InputStream trieStream, InputStream wordStream, InputStream storeStream) throws IOException {
+		relations = createStorage(10);
+		wordsData = new WordStore(5, 5);
+		DataInputStream inputStream = trieStream instanceof DataInputStream ? (DataInputStream) trieStream : new DataInputStream(trieStream);
+		relations.read(inputStream);
+		inputStream.close();
+		inputStream = wordStream instanceof DataInputStream ? (DataInputStream) wordStream : new DataInputStream(wordStream);
+		wordsData.read(inputStream);
+		inputStream.close();
+		inputStream = storeStream instanceof DataInputStream ? (DataInputStream) storeStream : new DataInputStream(storeStream);
 		int size = inputStream.readInt();
 		this.store=new byte[size];
 		inputStream.readFully(this.store);
