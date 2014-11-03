@@ -7,6 +7,7 @@ import static com.onpositive.semantic.words3.hds.StringCoder.makeInt;
 
 import com.onpositive.semantic.wordnet.AbstractRelation;
 import com.onpositive.semantic.wordnet.GrammarRelation;
+import com.onpositive.semantic.wordnet.IGrammarVisitor;
 import com.onpositive.semantic.wordnet.MeaningElement;
 import com.onpositive.semantic.wordnet.MorphologicalRelation;
 import com.onpositive.semantic.wordnet.SemanticRelation;

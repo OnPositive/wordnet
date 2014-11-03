@@ -9,15 +9,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.zip.ZipEntry;
-import java.util.zip.ZipFile;
 import java.util.zip.ZipOutputStream;
 
 import com.onpositive.semantic.wordnet.GrammarRelation;
-import com.onpositive.semantic.wordnet.TrieZippedProvider;
 import com.onpositive.semantic.words3.ReadOnlyMapWordNet;
-import com.onpositive.semantic.words3.ReadOnlyTrieWordNet;
 import com.onpositive.semantic.words3.ReadOnlyWordNet;
 import com.onpositive.semantic.words3.TrieGrammarStore;
+import com.onpositive.semantic.words3.TrieZippedProvider;
 import com.onpositive.semantic.words3.hds.StringToByteTrie;
 import com.onpositive.semantic.words3.hds.StringTrie;
 import com.onpositive.semantic.words3.hds.StringTrie.TrieBuilder;
@@ -327,15 +325,6 @@ public class PrefixRemover {
         
 		Byte fond = trieGrammarStore.get("{{-}}aaa");
 		System.out.println("PrefixRemover.test6() " + fond);
-	}
-	
-	private static void test7() {
-		try {
-			ReadOnlyTrieWordNet.load(new ZipFile("russian.dict"));
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
 	}
 	
 	private static void test8() {
