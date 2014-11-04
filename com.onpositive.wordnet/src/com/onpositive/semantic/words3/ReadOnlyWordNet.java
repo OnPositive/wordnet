@@ -45,6 +45,8 @@ public abstract class ReadOnlyWordNet extends AbstractWordNet {
 	protected WordStore wordsData;
 	protected IntIntOpenHashMap sequences = new IntIntOpenHashMap();
 	protected byte[] store;
+	protected String version = "0";
+	protected String descripton = "Russian";
 
 	public final class WordStore extends StringToDataHashMap<SenseElementInfo> {
 		public static final int CUSTOM_CASE_OFFSET = -50;
@@ -418,6 +420,8 @@ public abstract class ReadOnlyWordNet extends AbstractWordNet {
 	}
 
 	public ReadOnlyWordNet(DataInputStream is) throws IOException {
+		version = is.readUTF();
+		descripton = is.readUTF();
 		relations = createStorage(10);
 		relations.read(is);
 		wordsData = new WordStore(5, 5);
@@ -455,6 +459,8 @@ public abstract class ReadOnlyWordNet extends AbstractWordNet {
 	}
 
 	public void store(DataOutputStream stream) throws IOException {
+		stream.writeUTF(version);
+		stream.writeUTF(descripton);
 		relations.write(stream);
 		wordsData.write(stream);
 		stream.writeInt(store.length);

@@ -17,6 +17,7 @@ public abstract class StringTrie<T> extends StringStorage<T> {
 	
 	protected int count = 0;
 	private TrieBuilder builder;
+	private boolean useESwitch = true;
 
 	public StringTrie() {
 	
@@ -73,8 +74,8 @@ public abstract class StringTrie<T> extends StringStorage<T> {
 				b=(byte) -b;
 				onChar=true;
 			}
-			char curentChar = byteToCharTable[b];
-			if (curentChar == nextChar) {
+			char currentChar = byteToCharTable[b];
+			if (charEquals(nextChar, currentChar)) {
 				if (onChar){
 					//read next address;
 					i++;
@@ -97,8 +98,8 @@ public abstract class StringTrie<T> extends StringStorage<T> {
 							b=(byte) -b;
 							onChar=true;
 						}
-						curentChar = byteToCharTable[b];
-						if (charIndex>=length|| curentChar!=search.charAt(charIndex)){
+						currentChar = byteToCharTable[b];
+						if (charIndex>=length|| !charEquals(currentChar,search.charAt(charIndex))){
 							//no we can skip to end of string and go next;
 							while (i < byteBuffer.length && byteBuffer[i++]>=0);//skip string
 							if (i >= byteBuffer.length) {
@@ -193,7 +194,7 @@ public abstract class StringTrie<T> extends StringStorage<T> {
 		}
 		
 	}
-	
+
 	private T find(String search, int position, int cAddress) {
 		int i = cAddress;
 		outerLoop:while (position <= search.length()) {
@@ -230,8 +231,8 @@ public abstract class StringTrie<T> extends StringStorage<T> {
 					b=(byte) -b;
 					onChar=true;
 				}
-				char curentChar = byteToCharTable[b];
-				if (curentChar == nextChar) {
+				char currentChar = byteToCharTable[b];
+				if (charEquals(nextChar, currentChar)) {
 					if (onChar){
 						//read next address;
 						i++;
@@ -256,8 +257,8 @@ public abstract class StringTrie<T> extends StringStorage<T> {
 								b=(byte) -b;
 								onChar=true;
 							}
-							curentChar = byteToCharTable[b];
-							if (charIndex>=length|| curentChar!=search.charAt(charIndex)){
+							currentChar = byteToCharTable[b];
+							if (charIndex>=length||  !charEquals(currentChar,search.charAt(charIndex))){
 								//no we can skip to end of string and go next;
 								while (i < byteBuffer.length && byteBuffer[i++]>=0);//skip string
 								if (i >= byteBuffer.length) {
@@ -364,6 +365,16 @@ public abstract class StringTrie<T> extends StringStorage<T> {
 		return i;
 	}
 	
+	protected boolean charEquals(char nextChar, char currentChar) {
+		if (useESwitch) {
+			if (currentChar == 'ё')
+				currentChar = 'е';
+			if (nextChar == 'ё')
+				nextChar = 'е';
+		}
+		return currentChar == nextChar;
+	}
+
 	protected abstract int getDataSize(int i);
 	protected abstract T decodeValue(int i);
 

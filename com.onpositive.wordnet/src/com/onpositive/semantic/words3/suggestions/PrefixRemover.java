@@ -13,6 +13,7 @@ import java.util.zip.ZipOutputStream;
 
 import com.onpositive.semantic.wordnet.GrammarRelation;
 import com.onpositive.semantic.words3.ReadOnlyMapWordNet;
+import com.onpositive.semantic.words3.ReadOnlyTrieWordNet;
 import com.onpositive.semantic.words3.ReadOnlyWordNet;
 import com.onpositive.semantic.words3.TrieGrammarStore;
 import com.onpositive.semantic.words3.TrieZippedProvider;
@@ -328,7 +329,10 @@ public class PrefixRemover {
 	}
 	
 	private static void test8() {
-		TrieZippedProvider.getInstance();		
+		ReadOnlyTrieWordNet instance = TrieZippedProvider.getInstance();		
+		GrammarRelation[] possibleGrammarForms = instance.getPossibleGrammarForms("вертолёт");
+		GrammarRelation[] forms1 = instance.getPossibleGrammarForms("вертолет");
+		System.out.println("PrefixRemover.test8()");
 	}
 	
 	private static void timeTest() {
