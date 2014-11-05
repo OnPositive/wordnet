@@ -8,13 +8,8 @@
 			</list>
 		</vc>
 		<ctab-folder >
-			<tree bindTo="$$.models($$.z)" property="Synonims" enablement="true" caption="Синонимы">
-			</tree>
-			<tree bindTo="$$.models($$.z)" property="Generalization" enablement="true" caption="Обобщения">
-			</tree>
 			<tree bindTo="$$.models($$.z)" property="Specialization" enablement="true" caption="Специализация">
 			</tree>
 		</ctab-folder>
 	</splitter>
-
 </form>

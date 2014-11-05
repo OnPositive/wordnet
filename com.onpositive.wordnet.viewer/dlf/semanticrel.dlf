@@ -1,0 +1,9 @@
+<form xmlns="http://jetface.org/JetFace1.0/" >
+
+
+<ctab-folder>
+<tree bindTo="$$.models($$.z)" property="Synonims" enablement="true">
+</tree>
+</ctab-folder>
+
+</form>

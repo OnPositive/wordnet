@@ -3,6 +3,7 @@ package com.onpositive.semantic.words2;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
+import java.util.Set;
 
 import com.onpositive.semantic.wordnet.AbstractWordNet;
 import com.onpositive.semantic.wordnet.Grammem;
@@ -180,7 +181,14 @@ public class Word extends TextElement implements Serializable {
 	}
 
 	public void commitTempSet() {
-		if (hasKind){	
+		if (this.basicForm.equals("мера"))
+		{
+			System.out.println("A");
+		}
+		if (tempSet==null){
+			return; 
+		}
+		if (hasKind&&!canReuse()){	
 			//no we should allocate new concept
 			WordMeaning mm=new WordMeaning(minimalNumber, owner, this);
 			minimalNumber--;
@@ -191,6 +199,21 @@ public class Word extends TextElement implements Serializable {
 		((WordMeaning)concepts[concepts.length-1]).kind=(short) ((SimpleWordNet)owner).getGrammemCode(tempSet);
 		tempSet=null;
 		//here  we should think about what we have
+	}
+
+	private boolean canReuse() {
+		
+		MeaningElement[] concepts = getConcepts();
+		int knd=((WordMeaning)concepts[concepts.length-1]).kind;
+		Set<Grammem>ms=owner.getGrammemSet(knd);
+		for (Grammem g:tempSet){
+			if (g instanceof PartOfSpeech){
+				if (ms.contains(g)){
+					return true;
+				}
+			}
+		}
+		return false;
 	}
 
 	public AbstractRelationTarget getCurrentRelationTarget() {

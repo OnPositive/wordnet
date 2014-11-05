@@ -83,7 +83,7 @@ public class BasicTest extends TestCase{
 	public void testMultiMeaning2(){
 		TextElement wordElement = WordNetProvider.getInstance().getWordElement("цель");
 		MeaningElement[] concepts = wordElement.getConcepts();
-		AbstractRelation<MeaningElement>[] semanticRelations = concepts[1].getAllRelations();
+		AbstractRelation<MeaningElement>[] semanticRelations = concepts[0].getAllRelations();
 		boolean found=true;
 		for (AbstractRelation<MeaningElement> q:semanticRelations){
 			TextElement parentTextElement = q.getWord().getParentTextElement();

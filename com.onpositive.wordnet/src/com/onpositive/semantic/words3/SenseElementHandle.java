@@ -49,7 +49,35 @@ public class SenseElementHandle extends TextElement{
 				return ReadOnlyWordNet.WordStore.makeShort(store.buffer()[pos+1],store.buffer()[pos]);						
 			}					
 		}
+		@Override
+		public int hashCode() {
+			final int prime = 31;
+			int result = 1;
+			result = prime * result + address;
+			result = prime * result + store.hashCode();
+			return result;
+		}
+		protected final int addr(){
+			return address;
+		}
 
+		@Override
+		public boolean equals(Object obj) {
+			if (this == obj)
+				return true;
+			if (obj == null)
+				return false;
+			if (getClass() != obj.getClass())
+				return false;
+			EmbeddedConcept other = (EmbeddedConcept) obj;
+			if (address != other.addr())
+				return false;
+			if (this.owner==other.owner){
+				return false;
+			}
+			return true;
+		}
+		
 		
 	}
 
