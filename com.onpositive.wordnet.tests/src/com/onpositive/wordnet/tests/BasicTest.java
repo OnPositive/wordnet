@@ -146,7 +146,12 @@ public class BasicTest extends TestCase{
 	}
 	
 	public void testIo(){
-		GrammarRelation[] possibleGrammarForms = WordNetProvider.getInstance().getPossibleGrammarForms("вертолет");
+		GrammarRelation[] possibleGrammarForms = WordNetProvider.getInstance().getPossibleGrammarForms("вертолеты");
+		TestCase.assertTrue(possibleGrammarForms.length>0);
+	}
+	
+	public void testI2o(){
+		GrammarRelation[] possibleGrammarForms = WordNetProvider.getInstance().getPossibleGrammarForms("самолеты");
 		TestCase.assertTrue(possibleGrammarForms.length>0);
 	}
 }

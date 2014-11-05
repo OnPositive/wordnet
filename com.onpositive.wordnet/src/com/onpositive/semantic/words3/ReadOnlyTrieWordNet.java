@@ -2,13 +2,10 @@ package com.onpositive.semantic.words3;
 
 import java.io.DataInputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.util.zip.ZipFile;
 
 import com.onpositive.semantic.wordnet.GrammarRelation;
 import com.onpositive.semantic.words2.SimpleWordNet;
 import com.onpositive.semantic.words3.hds.StringStorage;
-import com.onpositive.semantic.words3.hds.StringToDataHashMap;
 import com.onpositive.semantic.words3.hds.StringTrie;
 
 public class ReadOnlyTrieWordNet extends ReadOnlyWordNet {

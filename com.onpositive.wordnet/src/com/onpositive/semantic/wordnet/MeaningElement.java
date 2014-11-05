@@ -29,6 +29,7 @@ public abstract class MeaningElement extends RelationTarget {
 		int count=0;
 		for (AbstractRelation<?>q:allRelations){
 			if (q instanceof SemanticRelation){
+				q.toString();
 				count++;
 			}
 		}

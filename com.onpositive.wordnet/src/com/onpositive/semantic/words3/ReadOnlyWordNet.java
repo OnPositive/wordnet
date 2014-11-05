@@ -181,18 +181,24 @@ public abstract class ReadOnlyWordNet extends AbstractWordNet {
 		public void store(RelationTarget t) {
 			if (t instanceof Word) {
 				String basicForm = ((Word) t).getBasicForm();
-				 
 				if (basicForm.length() == 0) {
 					return;
-				}
-				if (basicForm.equals("вертолёт")){
-					System.out.println("A");
 				}
 				for (int a = 0; a < basicForm.length(); a++) {
 					char charAt = basicForm.charAt(a);
 					if (!Character.isLetter(charAt)
-							&& !Character.isWhitespace(charAt)) {
-						return;
+							&& !Character.isWhitespace(charAt)&&charAt!='-') {
+						MeaningElement[] concepts = ((Word) t).getConcepts();
+						boolean sr=false;
+						for (MeaningElement q:concepts){
+							SemanticRelation[] semanticRelations = q.getSemanticRelations();
+							if (semanticRelations!=null&&semanticRelations.length>0){
+								sr=true;
+							}
+						}
+						if (!sr){
+							return;
+						}
 					}
 				}
 				store(basicForm, toWordInfo((Word) t));
@@ -413,7 +419,6 @@ public abstract class ReadOnlyWordNet extends AbstractWordNet {
 		for (RelationTarget t : original) {
 			store.store(t);
 		}
-		
 		for (String q : original.getFormsSet()) {
 			relations.store(q, original.getPosibleWords(q));
 		}

@@ -19,7 +19,7 @@ public class WordNetProvider {
 
 	private static AbstractWordNet instance;
 
-	public static final String DEFAULT_INDEX_FOLDER = "D:/se2";
+	public static final String DEFAULT_INDEX_FOLDER = "D:/se1";
 
 	static String[] builderNames = new String[] {
 			"com.onpositive.semantic.words2.builder.WictionaryParser",
@@ -114,7 +114,7 @@ public class WordNetProvider {
 	}
 
 	private static AbstractWordNet readHashMap(File fl) {
-		File readOnly = new File(HASMAP_FILE_NAME);
+		File readOnly = new File(fl,HASMAP_FILE_NAME);
 		if (readOnly.exists()) {
 			try {
 				instance = ReadOnlyMapWordNet.load(readOnly);
