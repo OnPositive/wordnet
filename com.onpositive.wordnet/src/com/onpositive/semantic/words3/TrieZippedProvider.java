@@ -27,8 +27,8 @@ public class TrieZippedProvider {
 			if (trieFile.exists() ) {
 				instance = doRead(trieFile);
 			} else {
-				File archiveFile = getDataZipFile();
-				if (archiveFile.exists()) {
+				InputStream archiveFile = getDataZipFile();
+				if (archiveFile!=null) {
 					unZip(archiveFile, folder);
 					instance = doRead(trieFile);					
 				}
@@ -51,8 +51,8 @@ public class TrieZippedProvider {
 		return null;
 	}
 	
-	private static File getDataZipFile() {
-		return new File(ZIPPED_FILE_NAME);
+	private static InputStream getDataZipFile() {
+		return TrieZippedProvider.class.getResourceAsStream(ZIPPED_FILE_NAME);
 	}
 
 	private static File getTempFolder() {
@@ -68,12 +68,12 @@ public class TrieZippedProvider {
 	 * @param output
 	 *            zip file output folder
 	 */
-	public static void unZip(String zipFile, String outputFolder) {
-		unZip(new File(zipFile), new File(outputFolder));
+	public static void unZip(InputStream zipFile, String outputFolder) {
+		unZip(zipFile, new File(outputFolder));
 
 	}
 
-	public static void unZip(File zipFile, File outputFolder) {
+	public static void unZip(InputStream zipFile, File outputFolder) {
 
 		byte[] buffer = new byte[1024];
 
@@ -86,7 +86,7 @@ public class TrieZippedProvider {
 
 			// get the zip file content
 			ZipInputStream zis = new ZipInputStream(
-					new FileInputStream(zipFile));
+					zipFile);
 			// get the zipped file list entry
 			ZipEntry ze = zis.getNextEntry();
 
