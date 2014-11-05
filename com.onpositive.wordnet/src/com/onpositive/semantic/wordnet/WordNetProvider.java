@@ -1,20 +1,14 @@
 package com.onpositive.semantic.wordnet;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipFile;
-import java.util.zip.ZipInputStream;
 
 import com.onpositive.semantic.words2.SimpleWordNet;
 import com.onpositive.semantic.words2.WordNet;
 import com.onpositive.semantic.words2.WordNetContributor;
 import com.onpositive.semantic.words3.ReadOnlyMapWordNet;
-import com.onpositive.semantic.words3.ReadOnlyTrieWordNet;
 import com.onpositive.semantic.words3.ReadOnlyWordNet;
 
 

@@ -21,9 +21,6 @@ import com.onpositive.semantic.words2.Word;
 import com.onpositive.semantic.words2.WordFormTemplate;
 import com.onpositive.semantic.words2.WordNet;
 import com.onpositive.semantic.words2.WordNetContributor;
-import com.onpositive.wikipedia.dumps.builder.IPageVisitor;
-import com.onpositive.wikipedia.dumps.builder.PageModel;
-import com.onpositive.wikipedia.dumps.builder.XMLPageParser;
 
 public class WictionaryParser extends WordNetContributor {
 

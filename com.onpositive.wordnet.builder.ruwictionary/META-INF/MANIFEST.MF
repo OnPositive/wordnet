@@ -6,5 +6,4 @@ Bundle-Version: 1.0.0.qualifier
 Bundle-Vendor: ONPOSITIVE
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Require-Bundle: com.onpositive.wordnet;bundle-version="1.0.0",
- com.onpositive.wikipedia.workbench;bundle-version="1.0.0",
  com.onpositie.hpc.repackaged;bundle-version="1.0.0"
