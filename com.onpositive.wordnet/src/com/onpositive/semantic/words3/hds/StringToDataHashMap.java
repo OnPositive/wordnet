@@ -5,6 +5,7 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.lang.reflect.Field;
 
 import com.carrotsearch.hppc.IntIntOpenHashMap;
 
@@ -84,6 +85,13 @@ public abstract class StringToDataHashMap<T> extends StringStorage<T> {
 	public static void writeMap(DataOutputStream str, IntIntOpenHashMap omap)
 			throws IOException {
 		str.writeFloat(omap.loadFactor);
+		try{
+		Field field = IntIntOpenHashMap.class.getDeclaredField("perturbation");
+		field.setAccessible(true);
+		str.writeInt(field.getInt(omap));
+		}catch (Exception e) {
+			throw new IllegalStateException();
+		}
 		writeIntArray(omap.keys, str);
 		writeIntArray(omap.values, str);
 		str.writeInt(omap.assigned);
@@ -107,6 +115,13 @@ public abstract class StringToDataHashMap<T> extends StringStorage<T> {
 		float readFloat = di.readFloat();
 		IntIntOpenHashMap intIntOpenHashMap = new IntIntOpenHashMap(4,
 				readFloat);
+		try{
+			Field field = IntIntOpenHashMap.class.getDeclaredField("perturbation");
+			field.setAccessible(true);
+			field.setInt(intIntOpenHashMap,di.readInt());
+			}catch (Exception e) {
+				throw new IllegalStateException();
+			}		
 		intIntOpenHashMap.keys = readIntArray(di);
 		intIntOpenHashMap.values = readIntArray(di);
 		intIntOpenHashMap.assigned = di.readInt();

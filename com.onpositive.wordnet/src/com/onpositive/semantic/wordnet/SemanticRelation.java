@@ -18,7 +18,8 @@ public class SemanticRelation extends AbstractRelation<MeaningElement> implement
 	public static final int ANTONIM = 4;
 	public static final int SPECIALIZATION_BACK_LINK = 7;
 	public static final int MERONIM = 8;
-
+	public static final int ANTONIM_BACKLINK = 9;
+	public static final int MERONIM_BACKLINK = 10;
 	public SemanticRelation(AbstractWordNet owner, MeaningElement conceptId, int relation) {
 		super(owner,conceptId,relation);
 	}

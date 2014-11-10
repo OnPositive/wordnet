@@ -12,6 +12,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -22,12 +23,16 @@ import com.carrotsearch.hppc.IntIntOpenHashMap;
 import com.carrotsearch.hppc.IntObjectOpenHashMap;
 import com.carrotsearch.hppc.ObjectIntOpenHashMap;
 import com.onpositive.semantic.wordnet.AbstractRelation;
+import com.onpositive.semantic.wordnet.AbstractWordNet;
 import com.onpositive.semantic.wordnet.GrammarRelation;
 import com.onpositive.semantic.wordnet.Grammem;
 import com.onpositive.semantic.wordnet.MeaningElement;
 import com.onpositive.semantic.wordnet.RelationTarget;
 import com.onpositive.semantic.wordnet.SemanticRelation;
 import com.onpositive.semantic.wordnet.TextElement;
+import com.onpositive.semantic.words3.SenseElementHandle;
+import com.onpositive.semantic.words3.WordHandle;
+import com.onpositive.semantic.words3.WordSequenceHandle;
 
 public class SimpleWordNet extends WordNet implements Serializable {
 	/**
@@ -52,14 +57,16 @@ public class SimpleWordNet extends WordNet implements Serializable {
 	public int size() {
 		return words.size();
 	}
-	public void readGrammems(DataInputStream is)throws IOException{
+
+	public void readGrammems(DataInputStream is) throws IOException {
 		super.readGrammems(is);
 	}
-	
+
 	@Override
 	public void storeGrammems(DataOutputStream ds) throws IOException {
 		super.storeGrammems(ds);
 	}
+
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Override
 	public Iterator<TextElement> iterator() {
@@ -93,6 +100,121 @@ public class SimpleWordNet extends WordNet implements Serializable {
 			e.printStackTrace();
 		}
 		return null;
+	}
+
+	public SimpleWordNet() {
+
+	}
+
+	public SimpleWordNet(AbstractWordNet net) {
+		loadGrammems(net);
+		int max = 0;
+		for (int a = 0; a < net.wordCount(); a++) {
+			TextElement wordElement = net.getWordElement(a);
+			if (wordElement == null) {
+				continue;
+			}
+			max = Math.max(wordElement.id(), max);
+		}
+		for (int a = 0; a <= max; a++) {
+			words.add(null);
+		}
+		for (int a = 0; a < net.wordCount(); a++) {
+			TextElement wordElement = net.getWordElement(a);
+			if (wordElement instanceof SenseElementHandle) {
+				if (wordElement instanceof WordHandle) {
+					Word w = fromWordHandle((WordHandle) wordElement);
+					wordElement = w;
+				}
+				if (wordElement instanceof WordSequenceHandle) {
+					fromWordSequenceHandle(wordElement);
+				}
+			}
+			if (wordElement != null) {
+				if (net.hasContinuations(wordElement)) {
+					TextElement[] possibleContinuations = net
+							.getPossibleContinuations(wordElement);
+					ArrayList<Integer> mm = new ArrayList<Integer>();
+					for (TextElement q : possibleContinuations) {
+						mm.add(q.id());
+					}
+					sequenceMap.put(wordElement.id(), mm);
+				}
+			}
+		}
+		String[] allGrammarKeys = net.getAllGrammarKeys();
+		for (String s : allGrammarKeys) {
+			GrammarRelation[] possibleGrammarForms = net
+					.getPossibleGrammarForms(s);
+			for (GrammarRelation q : possibleGrammarForms) {
+				q.setOwner(this);
+			}
+			wordforms.put(
+					s,
+					new ArrayList<GrammarRelation>(Arrays
+							.asList(possibleGrammarForms)));
+		}
+
+	}
+
+	private void fromWordSequenceHandle(TextElement wordElement) {
+		WordSequenceHandle sk = (WordSequenceHandle) wordElement;
+		WordHandle[] words2 = sk.getWords();
+		Word[] ws = new Word[words2.length];
+		for (int i = 0; i < words2.length; i++) {
+			ws[i] = fromWordHandle(words2[i]);
+		}
+		SimpleSequence s = new SimpleSequence(ws, sk.id(), sk.getBasicForm(),
+				this);
+		ArrayList<WordMeaning> newMeanings = convertMeanings(sk.getConcepts(),
+				s);
+		s.meanings = newMeanings;
+		this.words.set(s.id(), wordElement);
+		this.wordMap.put(s.getBasicForm(), wordElement);
+		for (WordMeaning m : newMeanings) {
+			if (this.meanings.size() <= m.id()) {
+				expendMeanings(m.id);
+			}
+			this.meanings.set(m.id, m);
+		}
+	}
+
+	private void expendMeanings(int id) {
+		while (meanings.size() <= id) {
+			meanings.add(null);
+		}
+	}
+
+	private Word fromWordHandle(WordHandle wordElement) {
+		Word w = new Word(wordElement.getBasicForm(), wordElement.id(), this);
+		MeaningElement[] concepts = wordElement.getConcepts();
+		ArrayList<WordMeaning> newMeanings = convertMeanings(concepts, w);
+		w.meanings = newMeanings;
+		w.hasKind = true;
+		this.words.set(wordElement.id(), wordElement);
+		this.wordMap.put(wordElement.getBasicForm(), wordElement);
+		for (WordMeaning m : newMeanings) {
+			if (this.meanings.size() <= m.id()) {
+				expendMeanings(m.id);
+			}
+			this.meanings.set(m.id, m);
+		}
+		return w;
+	}
+
+	private ArrayList<WordMeaning> convertMeanings(MeaningElement[] concepts,
+			TextElement owner) {
+		ArrayList<WordMeaning> result = new ArrayList<WordMeaning>();
+		for (MeaningElement q : concepts) {
+			WordMeaning rr = new WordMeaning(q.id(), this, owner);
+			AbstractRelation<MeaningElement>[] allRelations = q
+					.getAllRelations();
+			for (AbstractRelation<MeaningElement> z : allRelations) {
+				rr.registerRelation(z.relation, z.conceptId);
+			}
+			result.add(rr);
+		}
+		return result;
 	}
 
 	@Override
@@ -131,18 +253,20 @@ public class SimpleWordNet extends WordNet implements Serializable {
 			arrayList = new ArrayList<GrammarRelation>();
 			wordforms.put(wf, arrayList);
 		}
-		for (GrammarRelation q:arrayList){
-			if (q.conceptId==form.conceptId&&q.relation==form.relation){
+		for (GrammarRelation q : arrayList) {
+			if (q.conceptId == form.conceptId && q.relation == form.relation) {
 				return;
 			}
 		}
-		for (GrammarRelation q:arrayList){
-			if (q.conceptId==form.conceptId&&form.relation==GrammarRelation.UNKNOWN_GRAMMAR_FORM){
+		for (GrammarRelation q : arrayList) {
+			if (q.conceptId == form.conceptId
+					&& form.relation == GrammarRelation.UNKNOWN_GRAMMAR_FORM) {
 				return;
 			}
 		}
-		for (GrammarRelation q:arrayList){
-			if (q.conceptId==form.conceptId&&q.relation==GrammarRelation.UNKNOWN_GRAMMAR_FORM){
+		for (GrammarRelation q : arrayList) {
+			if (q.conceptId == form.conceptId
+					&& q.relation == GrammarRelation.UNKNOWN_GRAMMAR_FORM) {
 				arrayList.remove(q);
 				arrayList.add(form);
 				return;
@@ -179,7 +303,7 @@ public class SimpleWordNet extends WordNet implements Serializable {
 
 	@Override
 	public void init() {
-		IntIntOpenHashMap idrecoder=new IntIntOpenHashMap();
+		IntIntOpenHashMap idrecoder = new IntIntOpenHashMap();
 		for (TextElement w : this.words) {
 			if (w instanceof Word) {
 				Word s = (Word) w;
@@ -190,7 +314,7 @@ public class SimpleWordNet extends WordNet implements Serializable {
 				for (MeaningElement q : concepts) {
 					WordMeaning wm = (WordMeaning) q;
 					if (wm.id < 0) {
-						int old=wm.id;
+						int old = wm.id;
 						wm.id = meanings.size();
 						idrecoder.put(old, meanings.size());
 						meanings.add(wm);
@@ -198,7 +322,7 @@ public class SimpleWordNet extends WordNet implements Serializable {
 				}
 			}
 		}
-		//recode relations
+		// recode relations
 		for (TextElement w : this.words) {
 			if (w instanceof Word) {
 				Word s = (Word) w;
@@ -240,7 +364,7 @@ public class SimpleWordNet extends WordNet implements Serializable {
 		return getOrCreateWord(lowerCase);
 	}
 
-	protected HashMap<Integer,ArrayList<Integer>> sequenceMap = new HashMap<Integer,ArrayList<Integer>>();
+	protected HashMap<Integer, ArrayList<Integer>> sequenceMap = new HashMap<Integer, ArrayList<Integer>>();
 
 	protected void prepareWordSeqs() {
 		l2: for (TextElement q : this) {
@@ -410,23 +534,24 @@ public class SimpleWordNet extends WordNet implements Serializable {
 
 	@Override
 	public void markRedirect(String from, String to) {
-		
+
 	}
 
 	@Override
 	public TextElement[] getPossibleContinuations(TextElement startOfSequence) {
 		ArrayList<Integer> intArrayList = sequenceMap.get(startOfSequence.id());
 		if (intArrayList != null) {
-			TextElement[]result=new TextElement[intArrayList.size()];
-			int a=0;
+			TextElement[] result = new TextElement[intArrayList.size()];
+			int a = 0;
 			for (Integer q : intArrayList) {
-				result[a++]=getWordElement(q);
+				result[a++] = getWordElement(q);
 			}
+			return result;
 		}
 		return new TextElement[0];
 	}
 
-	public HashMap<Integer,ArrayList<Integer>> getSequenceMap() {
+	public HashMap<Integer, ArrayList<Integer>> getSequenceMap() {
 		return sequenceMap;
 	}
 

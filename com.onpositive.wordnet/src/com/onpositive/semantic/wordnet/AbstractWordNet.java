@@ -74,6 +74,11 @@ public abstract class AbstractWordNet {
 	protected IntObjectOpenHashMap<LinkedHashSet<Grammem>>set=new IntObjectOpenHashMap<LinkedHashSet<Grammem>>();
 	protected ObjectIntOpenHashMap<LinkedHashSet<Grammem>>iset=new ObjectIntOpenHashMap<LinkedHashSet<Grammem>>();
 	
+	protected void loadGrammems(AbstractWordNet other){
+		this.set=other.set;
+		this.iset=other.iset;
+	}
+	
 	protected void storeGrammems(DataOutputStream ds) throws IOException{
 		int[] array = set.keys().toArray();
 		ds.writeInt(array.length);

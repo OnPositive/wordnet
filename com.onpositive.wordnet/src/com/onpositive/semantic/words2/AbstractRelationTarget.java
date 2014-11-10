@@ -105,6 +105,46 @@ public abstract class AbstractRelationTarget extends MeaningElement implements
 		ne[relations.length + 1] = id2;
 		this.relations = ne;
 	}
+	public void unregisterRelation(int relation, int conceptId) {
+		int pos=-1;
+		for (int a=0;a<relations.length;a+=2){
+			int kind=relations[a];
+			int id=relations[a+1];
+			if (kind==relation&&conceptId==id){
+				pos=a;
+				break;
+			}
+		}
+		if (pos!=-1){
+			int length = relations.length;
+			int[] ne = new int[length - 2];
+			int i=0;
+			for (int a=0;a<relations.length;a+=2){
+				int kind=relations[a];
+				int id=relations[a+1];
+				if (a==pos){
+					continue;
+				}
+				ne[i++]=kind;
+				ne[i++]=id;
+			}
+			this.relations=ne;
+		}
+	}
+	
+	public void registerRelation(int kind, int wordRelation) {
+		if (relations == null) {
+			relations = new int[0];
+		}
+
+		int length = relations.length;
+		int[] ne = new int[length + 2];
+		System.arraycopy(relations, 0, ne, 0, relations.length);
+		ne[relations.length] = kind;
+		int id2 = wordRelation;		
+		ne[relations.length + 1] = id2;
+		this.relations = ne;
+	}
 
 	public boolean isSynonim(AbstractRelationTarget other) {
 		int id = other.id();
@@ -167,4 +207,6 @@ public abstract class AbstractRelationTarget extends MeaningElement implements
 		}
 		return isRelated((AbstractRelationTarget) relationTarget);
 	}
+
+	
 }

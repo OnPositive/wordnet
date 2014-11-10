@@ -181,10 +181,6 @@ public class Word extends TextElement implements Serializable {
 	}
 
 	public void commitTempSet() {
-		if (this.basicForm.equals("мера"))
-		{
-			System.out.println("A");
-		}
 		if (tempSet==null){
 			return; 
 		}

@@ -9,8 +9,9 @@ import java.io.InputStreamReader;
 import java.io.StringReader;
 import java.io.UnsupportedEncodingException;
 import java.net.URL;
+import java.util.HashMap;
+import java.util.HashSet;
 
-import com.carrotsearch.hppc.CharOpenHashSet;
 import com.onpositive.semantic.wordnet.Grammem;
 import com.onpositive.semantic.wordnet.Grammem.PartOfSpeech;
 import com.onpositive.semantic.wordnet.MeaningElement;
@@ -21,16 +22,15 @@ import com.onpositive.semantic.words2.Word;
 import com.onpositive.semantic.words2.WordFormTemplate;
 import com.onpositive.semantic.words2.WordNet;
 import com.onpositive.semantic.words2.WordNetContributor;
-
 public class WictionaryParser extends WordNetContributor {
 
 	public static final class PageProcessor implements IPageVisitor {
-		private final CharOpenHashSet mm;
+		private final HashSet<Character> mm;
 		private final WordNet wi;
 
 		public PageProcessor(WordNet wi) {
 			this.wi = wi;
-			mm = new CharOpenHashSet();
+			mm = new HashSet<Character>();
 			for (char c : russianLetters.toCharArray()) {
 				mm.add(c);
 				mm.add(Character.toUpperCase(c));

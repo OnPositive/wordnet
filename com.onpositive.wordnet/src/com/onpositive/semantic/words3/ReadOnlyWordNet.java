@@ -20,6 +20,7 @@ import java.util.zip.ZipOutputStream;
 
 import com.carrotsearch.hppc.ByteArrayList;
 import com.carrotsearch.hppc.IntIntOpenHashMap;
+import com.carrotsearch.hppc.IntOpenHashSet;
 import com.onpositive.semantic.wordnet.AbstractRelation;
 import com.onpositive.semantic.wordnet.AbstractWordNet;
 import com.onpositive.semantic.wordnet.GrammarRelation;
@@ -30,6 +31,7 @@ import com.onpositive.semantic.wordnet.TextElement;
 import com.onpositive.semantic.words2.SimpleSequence;
 import com.onpositive.semantic.words2.SimpleWordNet;
 import com.onpositive.semantic.words2.Word;
+import com.onpositive.semantic.words2.WordSequence;
 import com.onpositive.semantic.words3.dto.ConceptInfo;
 import com.onpositive.semantic.words3.dto.SenseElementInfo;
 import com.onpositive.semantic.words3.dto.SequenceInfo;
@@ -41,7 +43,7 @@ import com.onpositive.semantic.words3.hds.StringToDataHashMap;
 public abstract class ReadOnlyWordNet extends AbstractWordNet {
 
 	protected StringStorage<GrammarRelation[]> relations;
-	
+
 	protected WordStore wordsData;
 	protected IntIntOpenHashMap sequences = new IntIntOpenHashMap();
 	protected byte[] store;
@@ -50,10 +52,10 @@ public abstract class ReadOnlyWordNet extends AbstractWordNet {
 
 	public final class WordStore extends StringToDataHashMap<SenseElementInfo> {
 		public static final int CUSTOM_CASE_OFFSET = -50;
-		
+
 		public static final int SMALL_KIND = 8;
 		public static final int NO_RELATIONS = 4;
-		
+
 		protected int[] wordIdToOffset;
 		protected int[] conceptIdToOffet;
 
@@ -72,7 +74,8 @@ public abstract class ReadOnlyWordNet extends AbstractWordNet {
 		@Override
 		public void write(OutputStream stream) throws IOException {
 			super.write(stream);
-			DataOutputStream ds = (stream instanceof DataOutputStream) ? (DataOutputStream) stream : new DataOutputStream(stream);
+			DataOutputStream ds = (stream instanceof DataOutputStream) ? (DataOutputStream) stream
+					: new DataOutputStream(stream);
 			writeIntArray(wordIdToOffset, ds);
 			writeIntArray(conceptIdToOffet, ds);
 		}
@@ -80,7 +83,8 @@ public abstract class ReadOnlyWordNet extends AbstractWordNet {
 		@Override
 		public void read(InputStream stream) throws IOException {
 			super.read(stream);
-			DataInputStream is =  (stream instanceof DataInputStream) ? (DataInputStream)stream : new DataInputStream(stream);
+			DataInputStream is = (stream instanceof DataInputStream) ? (DataInputStream) stream
+					: new DataInputStream(stream);
 			wordIdToOffset = readIntArray(is);
 			conceptIdToOffet = readIntArray(is);
 		}
@@ -125,7 +129,7 @@ public abstract class ReadOnlyWordNet extends AbstractWordNet {
 		public int store(String string, SenseElementInfo data) {
 			int store = super.store(string, data);
 			int addr = store + string.length();
-			
+
 			wordIdToOffset[data.elementId] = data instanceof WordInfo ? addr
 					: -addr;
 			int conceptStart = addr + 4;
@@ -134,43 +138,47 @@ public abstract class ReadOnlyWordNet extends AbstractWordNet {
 			} else {
 				for (ConceptInfo infs : data.senses) {
 					conceptIdToOffet[infs.senseId] = conceptStart;
-					SeparateConceptHandle separateConceptHandle = new SeparateConceptHandle(conceptStart, wordsData);
-					if (separateConceptHandle.id()!=infs.senseId){
+					SeparateConceptHandle separateConceptHandle = new SeparateConceptHandle(
+							conceptStart, wordsData);
+					if (separateConceptHandle.id() != infs.senseId) {
 						System.out.println("Error");
 					}
 					short features = separateConceptHandle.getGrammemCode();
-					if (features!=infs.gcode){
+					if (features != infs.gcode) {
 						System.out.println("Error");
 					}
-					int tid=separateConceptHandle.textElementId();
-					if (tid!=data.elementId){
+					int tid = separateConceptHandle.textElementId();
+					if (tid != data.elementId) {
 						System.out.println("Error");
 					}
-					AbstractRelation<MeaningElement>[] semanticRelations = separateConceptHandle.getAllRelations();
-					if (!Arrays.equals(semanticRelations, infs.relations)){
+					AbstractRelation<MeaningElement>[] semanticRelations = separateConceptHandle
+							.getAllRelations();
+					if (!Arrays.equals(semanticRelations, infs.relations)) {
 						System.out.println("Error");
 					}
 					byte[] byteArray = infs.toByteArray();
-					int conceptLength = ConceptInfo.getConceptLength(conceptStart-1, wordsData.byteBuffer);
-					if (conceptLength!=byteArray.length){
-						System.out.println(conceptLength+":"+byteArray.length);
+					int conceptLength = ConceptInfo.getConceptLength(
+							conceptStart - 1, wordsData.byteBuffer);
+					if (conceptLength != byteArray.length) {
+						System.out.println(conceptLength + ":"
+								+ byteArray.length);
 						System.out.println("Error");
 					}
 					conceptStart += byteArray.length;
 				}
 				SenseElementHandle wordElement = (SenseElementHandle) getWordElement(data.elementId);
 				MeaningElement[] concepts = wordElement.getConcepts();
-				for (MeaningElement q:concepts){
+				for (MeaningElement q : concepts) {
 					TextElement parentTextElement = q.getParentTextElement();
-					if (parentTextElement==null){
+					if (parentTextElement == null) {
 						q.getParentTextElement();
 					}
-					if (parentTextElement.id()!=data.elementId){
+					if (parentTextElement.id() != data.elementId) {
 						System.out.println("Error");
 					}
 				}
 			}
-			
+
 			return store;
 		}
 
@@ -178,25 +186,32 @@ public abstract class ReadOnlyWordNet extends AbstractWordNet {
 			return super.getDataAddress(string);
 		}
 
-		public void store(RelationTarget t) {
+		public void store(RelationTarget t, IntOpenHashSet set) {
 			if (t instanceof Word) {
 				String basicForm = ((Word) t).getBasicForm();
-				if (basicForm.length() == 0) {
+				if (basicForm.length() == 0&&!set.contains(t.id())) {
 					return;
 				}
 				for (int a = 0; a < basicForm.length(); a++) {
 					char charAt = basicForm.charAt(a);
 					if (!Character.isLetter(charAt)
-							&& !Character.isWhitespace(charAt)&&charAt!='-') {
+							&& !Character.isWhitespace(charAt) && charAt != '-') {
+
 						MeaningElement[] concepts = ((Word) t).getConcepts();
-						boolean sr=false;
-						for (MeaningElement q:concepts){
-							SemanticRelation[] semanticRelations = q.getSemanticRelations();
-							if (semanticRelations!=null&&semanticRelations.length>0){
-								sr=true;
+						boolean sr = false;
+						if (set.contains(t.id())) {
+							sr = true;
+						} else {
+							for (MeaningElement q : concepts) {
+								SemanticRelation[] semanticRelations = q
+										.getSemanticRelations();
+								if (semanticRelations != null
+										&& semanticRelations.length > 0) {
+									sr = true;
+								}
 							}
 						}
-						if (!sr){
+						if (!sr) {
 							return;
 						}
 					}
@@ -237,16 +252,18 @@ public abstract class ReadOnlyWordNet extends AbstractWordNet {
 							buffer[pos]);
 					pos += 2;
 				}
-				
-				
+
 				AbstractRelation<MeaningElement>[] rels = null;
 				if (noRelations) {
 					rels = new SemanticRelation[0];
 				} else
 					rels = CodingUtils.decodeMeaningRelations(pos, buffer);
-				ConceptInfo conceptInfo = new ConceptInfo(id, id, (short) kind, rels);
+				ConceptInfo conceptInfo = new ConceptInfo(id, id, (short) kind,
+						rels);
 				infos = new ConceptInfo[] { conceptInfo };
-				pos += CodingUtils.length(rels);
+				if (!noRelations) {
+					pos += CodingUtils.length(rels);
+				}
 			}
 			byte c = buffer[pos++];
 			String wordName = getStringBeforeData(buffer, addr);
@@ -288,7 +305,7 @@ public abstract class ReadOnlyWordNet extends AbstractWordNet {
 				ConceptInfo tt = value.senses[0];
 				byte vl = CUSTOM_CASE_OFFSET;
 				// no features
-				
+
 				// no relations
 				if (tt.relations.length == 0) {
 					vl -= NO_RELATIONS;
@@ -298,10 +315,9 @@ public abstract class ReadOnlyWordNet extends AbstractWordNet {
 				if (tt.gcode < 255) {
 					vl -= SMALL_KIND;
 				}
-				
+
 				ll.add(vl);
-				ll.add(tt.encodeWordInfoSmall(tt.gcode,
-						tt.relations));
+				ll.add(tt.encodeWordInfoSmall(tt.gcode, tt.relations));
 				byte[] array = ll.toArray();
 				smallPath++;
 				smallPathLength += array.length;
@@ -345,7 +361,7 @@ public abstract class ReadOnlyWordNet extends AbstractWordNet {
 			ConceptInfo[] result = new ConceptInfo[concepts.length];
 			for (int a = 0; a < concepts.length; a++) {
 				MeaningElement el = concepts[a];
-				result[a] = new ConceptInfo(par.id(), el.id(), 
+				result[a] = new ConceptInfo(par.id(), el.id(),
 						el.getGrammemCode(), el.getAllRelations());
 			}
 			return result;
@@ -380,7 +396,7 @@ public abstract class ReadOnlyWordNet extends AbstractWordNet {
 
 	public ReadOnlyWordNet(SimpleWordNet original) {
 		initRelations(original);
-		HashMap<Integer,ArrayList<Integer>> sequenceMap = original
+		HashMap<Integer, ArrayList<Integer>> sequenceMap = original
 				.getSequenceMap();
 		ByteArrayList mm = new ByteArrayList();
 
@@ -403,21 +419,31 @@ public abstract class ReadOnlyWordNet extends AbstractWordNet {
 				mm.add(StringCoder.int1(v));
 				mm.add(StringCoder.int2(v));
 			}
-			
+
 		}
 		this.store = mm.toArray();
 	}
 
 	protected void initRelations(SimpleWordNet original) {
 		Set<String> formsSet = original.getFormsSet();
-		this.iset=original.iset();
-		this.set=original.gset();
+		this.iset = original.iset();
+		this.set = original.gset();
 		relations = createStorage(formsSet.size() * 4 / 3 + 10);
 		WordStore store = new WordStore(original.size(),
 				original.conceptCount());
 		this.wordsData = store;
+		IntOpenHashSet sm = new IntOpenHashSet();
 		for (RelationTarget t : original) {
-			store.store(t);
+			if (t instanceof SimpleSequence) {
+				SimpleSequence sa = (SimpleSequence) t;
+				Word[] words = sa.getWords();
+				for (Word w : words) {
+					sm.add(w.id());
+				}
+			}
+		}
+		for (RelationTarget t : original) {
+			store.store(t, sm);
 		}
 		for (String q : original.getFormsSet()) {
 			relations.store(q, original.getPosibleWords(q));
@@ -432,12 +458,12 @@ public abstract class ReadOnlyWordNet extends AbstractWordNet {
 		wordsData = new WordStore(5, 5);
 		wordsData.read(is);
 		int readInt = is.readInt();
-		this.store=new byte[readInt];
+		this.store = new byte[readInt];
 		is.readFully(this.store);
-		sequences=StringToDataHashMap.readMap(is);
+		sequences = StringToDataHashMap.readMap(is);
 		readGrammems(is);
 	}
-	
+
 	protected ReadOnlyWordNet() {
 	}
 
@@ -459,7 +485,7 @@ public abstract class ReadOnlyWordNet extends AbstractWordNet {
 	}
 
 	public void trim() {
-//		relations.trim();
+		// relations.trim();
 		wordsData.trim();
 	}
 
@@ -472,12 +498,14 @@ public abstract class ReadOnlyWordNet extends AbstractWordNet {
 		stream.write(store);
 		StringToDataHashMap.writeMap(stream, sequences);
 		ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-		DataOutputStream dataOutputStream = new DataOutputStream(byteArrayOutputStream);
+		DataOutputStream dataOutputStream = new DataOutputStream(
+				byteArrayOutputStream);
 		storeGrammems(dataOutputStream);
 		storeGrammems(stream);
 		dataOutputStream.close();
 		byte[] byteArray = byteArrayOutputStream.toByteArray();
-		DataInputStream di=new DataInputStream(new ByteArrayInputStream(byteArray));
+		DataInputStream di = new DataInputStream(new ByteArrayInputStream(
+				byteArray));
 		SimpleWordNet simpleWordNet = new SimpleWordNet();
 		simpleWordNet.readGrammems(di);
 		ByteArrayOutputStream out = new ByteArrayOutputStream();
@@ -485,27 +513,30 @@ public abstract class ReadOnlyWordNet extends AbstractWordNet {
 		simpleWordNet.storeGrammems(ds);
 		ds.close();
 		byte[] byteArray2 = out.toByteArray();
-		if (!Arrays.equals(byteArray2, byteArray)){
+		/*if (!Arrays.equals(byteArray2, byteArray)) {
 			throw new IllegalStateException();
-		}
+		}*/
 	}
-	
+
 	public void storeZipped() throws IOException {
-//		relations.write(stream);
-//		wordsData.write(stream);
-		ZipOutputStream outputStream = new ZipOutputStream(new BufferedOutputStream(new FileOutputStream("grammar.dat")));
+		// relations.write(stream);
+		// wordsData.write(stream);
+		ZipOutputStream outputStream = new ZipOutputStream(
+				new BufferedOutputStream(new FileOutputStream("grammar.dat")));
 		outputStream.putNextEntry(new ZipEntry("store"));
 		DataOutputStream stream = new DataOutputStream(outputStream);
 		stream.writeInt(store.length);
 		stream.write(store);
 		StringToDataHashMap.writeMap(stream, sequences);
 		ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-		DataOutputStream dataOutputStream = new DataOutputStream(byteArrayOutputStream);
+		DataOutputStream dataOutputStream = new DataOutputStream(
+				byteArrayOutputStream);
 		storeGrammems(dataOutputStream);
 		storeGrammems(stream);
 		dataOutputStream.close();
 		byte[] byteArray = byteArrayOutputStream.toByteArray();
-		DataInputStream di=new DataInputStream(new ByteArrayInputStream(byteArray));
+		DataInputStream di = new DataInputStream(new ByteArrayInputStream(
+				byteArray));
 		SimpleWordNet simpleWordNet = new SimpleWordNet();
 		simpleWordNet.readGrammems(di);
 		ByteArrayOutputStream out = new ByteArrayOutputStream();
@@ -513,7 +544,7 @@ public abstract class ReadOnlyWordNet extends AbstractWordNet {
 		simpleWordNet.storeGrammems(ds);
 		ds.close();
 		byte[] byteArray2 = out.toByteArray();
-		if (!Arrays.equals(byteArray2, byteArray)){
+		if (!Arrays.equals(byteArray2, byteArray)) {
 			throw new IllegalStateException();
 		}
 		outputStream.closeEntry();
@@ -559,7 +590,7 @@ public abstract class ReadOnlyWordNet extends AbstractWordNet {
 	}
 
 	public TextElement getWordElement(String word) {
-		int dataAddress2 = wordsData.getDataAddress2(word);			
+		int dataAddress2 = wordsData.getDataAddress2(word);
 		if (dataAddress2 >= 0) {
 			byte[] buffer = wordsData.buffer();
 			int makeInt = StringCoder.makeInt(buffer[dataAddress2 + 2],
@@ -624,7 +655,7 @@ public abstract class ReadOnlyWordNet extends AbstractWordNet {
 		}
 		return false;
 	}
-	
+
 	public void writeWords(OutputStream stream) throws IOException {
 		wordsData.write(stream);
 		stream.close();

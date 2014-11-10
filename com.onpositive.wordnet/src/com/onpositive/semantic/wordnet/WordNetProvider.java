@@ -143,4 +143,8 @@ public class WordNetProvider {
 		}
 	}
 
+	public static void setInstance(AbstractWordNet simpleWordNet) {
+		instance=simpleWordNet;
+	}
+
 }

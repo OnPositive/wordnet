@@ -4,8 +4,6 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
-import junit.framework.TestCase;
-
 import com.onpositive.semantic.wordnet.AbstractRelation;
 import com.onpositive.semantic.wordnet.AbstractWordNet;
 import com.onpositive.semantic.wordnet.GrammarRelation;
@@ -15,13 +13,21 @@ import com.onpositive.semantic.wordnet.MorphologicalRelation;
 import com.onpositive.semantic.wordnet.SemanticRelation;
 import com.onpositive.semantic.wordnet.TextElement;
 import com.onpositive.semantic.wordnet.WordNetProvider;
+import com.onpositive.semantic.words2.SimpleWordNet;
 
-public class BasicTest extends TestCase{
+import junit.framework.TestCase;
 
-	static{
+public class WordNetEditTest extends TestCase{
+
+	
+	static {
 		WordNetProvider.setInstance(null);
-		//WordNetProvider.killDatabase();
+		AbstractWordNet instance = WordNetProvider.getInstance();
+		SimpleWordNet simpleWordNet = new SimpleWordNet(instance);
+		TestCase.assertEquals(instance.wordCount(), simpleWordNet.wordCount());
+		WordNetProvider.setInstance(simpleWordNet);
 	}
+	
 	public void testInit(){
 		AbstractWordNet instance = WordNetProvider.getInstance();
 		TestCase.assertNotNull(instance);
@@ -113,8 +119,8 @@ public class BasicTest extends TestCase{
 	
 	public void testWordApi(){
 		boolean found=false;
-		TextElement wordElement = WordNetProvider.getInstance().getWordElement("политический");
-		TextElement[] possibleContinuations = WordNetProvider.getInstance().getPossibleContinuations(wordElement);
+		AbstractWordNet instance = WordNetProvider.getInstance();
+		TextElement[] possibleContinuations = instance.getPossibleContinuations(WordNetProvider.getInstance().getWordElement("политический"));
 		for (TextElement z:possibleContinuations){
 			if (z.getBasicForm().equals("политический деятель")){
 				found=true;
@@ -145,16 +151,6 @@ public class BasicTest extends TestCase{
 		MorphologicalRelation[] morphologicalRelations = wordElement.getConcepts()[0].getMorphologicalRelations();
 		TestCase.assertTrue(morphologicalRelations.length==1);
 		TestCase.assertTrue(morphologicalRelations[0].getWord().getParentTextElement().getBasicForm().equals("выйти"));
-	}
-	
-	public void testIo(){
-		GrammarRelation[] possibleGrammarForms = WordNetProvider.getInstance().getPossibleGrammarForms("вертолеты");
-		TestCase.assertTrue(possibleGrammarForms.length>0);
-	}
-	
-	public void testI2o(){
-		GrammarRelation[] possibleGrammarForms = WordNetProvider.getInstance().getPossibleGrammarForms("самолеты");
-		TestCase.assertTrue(possibleGrammarForms.length>0);
 	}
 	
 	

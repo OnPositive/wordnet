@@ -2,9 +2,8 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Wordnet
 Bundle-SymbolicName: com.onpositive.wordnet
-Bundle-Version: 1.0.0.qualifier
+Bundle-Version: 1.0.1.qualifier
 Bundle-Vendor: ONPOSITIVE
-Require-Bundle: com.onpositie.hpc.repackaged;bundle-version="1.0.0"
 Export-Package: com.carrotsearch.hppc,
  com.carrotsearch.hppc.cursors,
  com.carrotsearch.hppc.hash,
@@ -13,7 +12,7 @@ Export-Package: com.carrotsearch.hppc,
  com.carrotsearch.hppc.procedures,
  com.carrotsearch.hppc.sorting,
  com.onpositive.semantic.wordnet,
- com.onpositive.semantic.words2;x-friends:="com.onpositive.wordnet.builder.ruwictionary,com.onpositive.rucorpus.parser",
+ com.onpositive.semantic.words2;x-friends:="com.onpositive.wordnet.builder.ruwictionary,com.onpositive.rucorpus.parser,com.onpositive.wordnet.tests",
  com.onpositive.semantic.words3.hds
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Eclipse-BuddyPolicy: dependent
