@@ -1,4 +1,4 @@
-package com.onpositive.semantic.words3.suggestions;
+package com.onpositive.wordnet.tests;
 
 import java.io.ByteArrayOutputStream;
 import java.io.FileOutputStream;
