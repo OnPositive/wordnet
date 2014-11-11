@@ -31,7 +31,6 @@ import com.onpositive.semantic.wordnet.TextElement;
 import com.onpositive.semantic.words2.SimpleSequence;
 import com.onpositive.semantic.words2.SimpleWordNet;
 import com.onpositive.semantic.words2.Word;
-import com.onpositive.semantic.words2.WordSequence;
 import com.onpositive.semantic.words3.dto.ConceptInfo;
 import com.onpositive.semantic.words3.dto.SenseElementInfo;
 import com.onpositive.semantic.words3.dto.SequenceInfo;
