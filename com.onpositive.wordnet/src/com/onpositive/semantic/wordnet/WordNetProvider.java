@@ -21,7 +21,7 @@ public class WordNetProvider {
 
 	private static AbstractWordNet instance;
 
-	public static final String DEFAULT_INDEX_FOLDER = "D:/se1";
+	public static String DEFAULT_INDEX_FOLDER = "D:/se1";
 
 	static String[] builderNames = new String[] {
 			"com.onpositive.semantic.words2.builder.WictionaryParser",
@@ -35,9 +35,7 @@ public class WordNetProvider {
 		SimpleWordNet copy=new SimpleWordNet(w);
 		return new SimpleWordNetEditInterface((SimpleWordNet) copy,getHashNetFile());
 	}
-	public static void store(){
-		
-	}
+	
 	
 	static File getHashNetFile(){
 		String property = System.getProperty("engineConfigDir");

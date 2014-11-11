@@ -510,11 +510,7 @@ public abstract class ReadOnlyWordNet extends AbstractWordNet {
 		ByteArrayOutputStream out = new ByteArrayOutputStream();
 		DataOutputStream ds = new DataOutputStream(out);
 		simpleWordNet.storeGrammems(ds);
-		ds.close();
-		byte[] byteArray2 = out.toByteArray();
-		/*if (!Arrays.equals(byteArray2, byteArray)) {
-			throw new IllegalStateException();
-		}*/
+		ds.close();		
 	}
 
 	public void storeZipped() throws IOException {
