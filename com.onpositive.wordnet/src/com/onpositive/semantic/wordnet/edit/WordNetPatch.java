@@ -22,6 +22,7 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 
 import com.onpositive.semantic.wordnet.Grammem;
+import com.onpositive.semantic.wordnet.MeaningElement;
 import com.onpositive.semantic.wordnet.MorphologicalRelation;
 import com.onpositive.semantic.wordnet.SemanticRelation;
 import com.onpositive.semantic.wordnet.TextElement;
@@ -57,7 +58,10 @@ public class WordNetPatch {
 		public WordOperation(Node item) {
 			NamedNodeMap attributes = item.getAttributes();
 			this.word=attributes.getNamedItem("w").getNodeValue();
-			this.removal=Boolean.parseBoolean(attributes.getNamedItem("removal").getNodeValue());
+			Node nm = attributes.getNamedItem("removal");
+			if (nm!=null){
+			this.removal=Boolean.parseBoolean(nm.getNodeValue());
+			}
 		}
 
 		@Override
@@ -100,7 +104,10 @@ public class WordNetPatch {
 			NamedNodeMap attributes = item.getAttributes();
 			this.from=attributes.getNamedItem("f").getNodeValue();
 			this.to=attributes.getNamedItem("t").getNodeValue();
-			this.removal=Boolean.parseBoolean(attributes.getNamedItem("removal").getNodeValue());
+			Node nm = attributes.getNamedItem("removal");
+			if (nm!=null){
+			this.removal=Boolean.parseBoolean(nm.getNodeValue());
+			}
 			Node namedItem = attributes.getNamedItem("r");
 			this.code=parseCode(namedItem.getNodeValue());
 		}
@@ -130,7 +137,7 @@ public class WordNetPatch {
 		
 		@Override
 		protected int parseCode(String nodeValue) {
-			Class<SemanticRelationOperation> class1 = SemanticRelationOperation.class;
+			Class<SemanticRelation> class1 = SemanticRelation.class;
 			return parse(nodeValue, class1);
 		}
 		
@@ -147,8 +154,8 @@ public class WordNetPatch {
 		@Override
 		protected void execute(IWordNetEditInterface net) {
 			if (removal) {
-				TextElement from = getOrCreate(net, this.from);
-				TextElement to = getOrCreate(net, this.to);
+				MeaningElement from = getOrCreate(net, this.from);
+				MeaningElement to = getOrCreate(net, this.to);
 				SemanticRelation tt = new SemanticRelation(net.getWordNet(),
 						to.id(), code);
 				SemanticRelation tt1 = new SemanticRelation(net.getWordNet(),
@@ -156,8 +163,8 @@ public class WordNetPatch {
 				net.removeSemanticRelation(from, tt);
 				net.removeSemanticRelation(to, tt1);
 			} else {
-				TextElement from = getOrCreate(net, this.from);
-				TextElement to = getOrCreate(net, this.to);
+				MeaningElement from = getOrCreate(net, this.from);
+				MeaningElement to = getOrCreate(net, this.to);
 				SemanticRelation tt = new SemanticRelation(net.getWordNet(),
 						to.id(), code);
 				SemanticRelation tt1 = new SemanticRelation(net.getWordNet(),
@@ -202,7 +209,7 @@ public class WordNetPatch {
 
 		@Override
 		protected String getRelationString(int code) {
-			Class<SemanticRelationOperation> class1 = SemanticRelationOperation.class;
+			Class<SemanticRelation> class1 = SemanticRelation.class;
 			return toStringFromCode(code, class1);
 		}
 
@@ -229,8 +236,8 @@ public class WordNetPatch {
 		protected void execute(IWordNetEditInterface net) {
 			
 			if (removal) {
-				TextElement from = getOrCreate(net, this.from);
-				TextElement to = getOrCreate(net, this.to);
+				MeaningElement from = getOrCreate(net, this.from);
+				MeaningElement to = getOrCreate(net, this.to);
 				MorphologicalRelation tt = new MorphologicalRelation(net.getWordNet(),
 						to.id(), code);
 				MorphologicalRelation tt1 = new MorphologicalRelation(net.getWordNet(),
@@ -238,8 +245,8 @@ public class WordNetPatch {
 				net.removeMorphologicalRelation(from, tt);
 				net.removeMorphologicalRelation(to, tt1);
 			} else {
-				TextElement from = getOrCreate(net, this.from);
-				TextElement to = getOrCreate(net, this.to);
+				MeaningElement from = getOrCreate(net, this.from);
+				MeaningElement to = getOrCreate(net, this.to);
 				MorphologicalRelation tt = new MorphologicalRelation(net.getWordNet(),
 						to.id(), code);
 				MorphologicalRelation tt1 = new MorphologicalRelation(net.getWordNet(),
@@ -287,14 +294,14 @@ public class WordNetPatch {
 
 		@Override
 		protected void execute(IWordNetEditInterface net) {
-			TextElement to = getOrCreate(net, this.to);
+			MeaningElement to = getOrCreate(net, this.to);
 			LinkedHashSet<Grammem> code=getCode(grammems,net);
 			if (removal){
 				
-				net.removeGrammarRelation(from,to,code);
+				net.removeGrammarRelation(from,to.getParentTextElement(),code);
 			}
 			else{
-				net.addGrammarRelation(from, to, code);
+				net.addGrammarRelation(from, to.getParentTextElement(), code);
 			}
 		}
 
@@ -328,13 +335,14 @@ public class WordNetPatch {
 		}
 	}
 
-	private static TextElement getOrCreate(IWordNetEditInterface net,
+	private static MeaningElement getOrCreate(IWordNetEditInterface net,
 			String from2) {
-		TextElement from = net.getWordNet().getWordElement(from2);
-		if (from == null) {
-			from = net.registerWord(from2);
+		TextElement wordElement = net.getWordNet().getWordElement(from2);
+		
+		if (wordElement == null) {
+			wordElement = net.registerWord(from2);
 		}
-		return from;
+		return wordElement.getConcepts()[0];
 	}
 	static int parse(String nodeValue, Class<?> class1) {
 		Field[] fields = class1.getFields();
@@ -371,37 +379,39 @@ public class WordNetPatch {
 		}
 		return null;
 	}
-	public WordNetPatch parse(Reader reader) throws Exception{
+	public static WordNetPatch parse(Reader reader) throws Exception{
 		Document parse = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(new InputSource(reader));
 		WordNetPatch patch=new WordNetPatch();
 		NodeList childNodes = parse.getDocumentElement().getChildNodes();
 		int length = childNodes.getLength();
 		for (int a=0;a<length;a++){
 			Node item = childNodes.item(a);
+			if (item instanceof Element){
 			AbstractOperation op=createCommand(item);
 			if (op==null){
 				throw new IllegalArgumentException("unknown tag:"+item.getNodeName());
 			}
 			else{
-				toExecute.add(op);
+				patch.toExecute.add(op);
+			}
 			}
 		}
 		return patch;	
 	}
 	
-	private AbstractOperation createCommand(Node item) {
+	private static AbstractOperation createCommand(Node item) {
 		if (item instanceof Element){
 			Element el=(Element) item;
-			if (el.getLocalName().equals(WC)){
+			if (el.getNodeName().equals(WC)){
 				return new WordOperation(item);
 			}
-			if (el.getLocalName().equals(SC)){
+			if (el.getNodeName().equals(SC)){
 				return new SemanticRelationOperation(item);
 			}
-			if (el.getLocalName().equals(MC)){
+			if (el.getNodeName().equals(MC)){
 				return new MorphologicalRelationOperation(item);
 			}
-			if (el.getLocalName().equals(GC)){
+			if (el.getNodeName().equals(GC)){
 				return new GrammarRelationOperation(item);
 			}
 		}
@@ -418,5 +428,8 @@ public class WordNetPatch {
 		Transformer newTransformer = TransformerFactory.newInstance().newTransformer();
 		newTransformer.setOutputProperty(OutputKeys.INDENT, "yes");
 		newTransformer.transform(new DOMSource(newDocument), new StreamResult(wr));
+	}
+	public int size() {
+		return toExecute.size();
 	}
 }

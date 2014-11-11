@@ -1,0 +1,10 @@
+<wnc>
+	<sc f="_ALL_DIMENSION_UNITS" t="_IMPERIAL_UNITS" r="specialization"/>
+	<sc f="_ALL_DIMENSION_UNITS" t="_METRIC_UNITS" r="specialization"/>
+	<sc f="_ALL_DIMENSION_UNITS" t="_LENGTH_UNITS" r="specialization"/>
+	<sc f="_ALL_DIMENSION_UNITS" t="_WEIGHT_UNITS" r="specialization"/>
+	<sc f="_ALL_DIMENSION_UNITS" t="_POWER_UNITS" r="specialization"/>
+	<sc f="_ALL_DIMENSION_UNITS" t="_SPEED_UNITS" r="specialization"/>
+	<sc f="_ALL_DIMENSION_UNITS" t="_ENERGY_UNITS" r="specialization"/>
+	<sc f="_ALL_DIMENSION_UNITS" t="_TIME_UNITS" r="specialization"/>	
+</wnc>

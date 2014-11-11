@@ -124,11 +124,7 @@ public class Word extends TextElement implements Serializable {
 		return meanings.toArray(new WordMeaning[meanings.size()]);
 	}
 
-	public MeaningElement createConcept() {
-		WordMeaning e = new WordMeaning(this.id,owner, this);
-		meanings.add(e);
-		return e;
-	}
+	
 
 	@Override
 	public boolean isMultiWord() {

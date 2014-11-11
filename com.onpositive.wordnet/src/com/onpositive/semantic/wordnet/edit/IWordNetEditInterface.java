@@ -8,6 +8,7 @@ import java.util.LinkedHashSet;
 
 import com.onpositive.semantic.wordnet.AbstractWordNet;
 import com.onpositive.semantic.wordnet.Grammem;
+import com.onpositive.semantic.wordnet.MeaningElement;
 import com.onpositive.semantic.wordnet.MorphologicalRelation;
 import com.onpositive.semantic.wordnet.SemanticRelation;
 import com.onpositive.semantic.wordnet.TextElement;
@@ -20,13 +21,13 @@ public interface IWordNetEditInterface {
 	
 	AbstractWordNet getWordNet();
 
-	void addSemanticRelation(TextElement from, SemanticRelation tt);
+	void addSemanticRelation(MeaningElement from, SemanticRelation tt);
 
-	void addMorphologicalRelation(TextElement to, MorphologicalRelation tt);
+	void addMorphologicalRelation(MeaningElement to, MorphologicalRelation tt);
 	
-	void removeSemanticRelation(TextElement from, SemanticRelation tt); 
+	void removeSemanticRelation(MeaningElement from, SemanticRelation tt); 
 	
-	void removeMorphologicalRelation(TextElement to, MorphologicalRelation tt);
+	void removeMorphologicalRelation(MeaningElement to, MorphologicalRelation tt);
 
 	void removeGrammarRelation(String from, TextElement to, LinkedHashSet<Grammem> code);
 	

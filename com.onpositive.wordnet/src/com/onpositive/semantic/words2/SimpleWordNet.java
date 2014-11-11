@@ -294,7 +294,11 @@ public class SimpleWordNet extends WordNet implements Serializable {
 			return (Word) wordMap.get(lowerCase);
 		}
 		Word s = new Word(lowerCase, words.size(), this);
-		WordMeaning mm = new WordMeaning(s.id, this, s);
+		int id=s.id;
+		if (meanings.size()>=words.size()){
+			id=meanings.size();
+		}
+		WordMeaning mm = new WordMeaning(id, this, s);
 		s.meanings.add(mm);
 		meanings.add(mm);
 		registerWord(s);
@@ -514,7 +518,7 @@ public class SimpleWordNet extends WordNet implements Serializable {
 
 	@Override
 	public MeaningElement getConceptInfo(int conceptId) {
-		return null;
+		return meanings.get(conceptId);
 	}
 
 	@Override

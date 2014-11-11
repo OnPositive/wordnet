@@ -1,5 +1,10 @@
 package com.onpositive.wordnet.tests;
 
+import java.io.BufferedInputStream;
+import java.io.DataInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStreamReader;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
@@ -13,6 +18,8 @@ import com.onpositive.semantic.wordnet.MorphologicalRelation;
 import com.onpositive.semantic.wordnet.SemanticRelation;
 import com.onpositive.semantic.wordnet.TextElement;
 import com.onpositive.semantic.wordnet.WordNetProvider;
+import com.onpositive.semantic.wordnet.edit.IWordNetEditInterface;
+import com.onpositive.semantic.wordnet.edit.WordNetPatch;
 import com.onpositive.semantic.words2.SimpleWordNet;
 
 import junit.framework.TestCase;
@@ -153,5 +160,31 @@ public class WordNetEditTest extends TestCase{
 		TestCase.assertTrue(morphologicalRelations[0].getWord().getParentTextElement().getBasicForm().equals("выйти"));
 	}
 	
-	
+	public void testCommandParse(){
+		try {
+			WordNetPatch parse = WordNetPatch.parse(new InputStreamReader(WordNetEditTest.class.getResourceAsStream("tst.xml")));
+			TestCase.assertEquals(8, parse.size());
+			IWordNetEditInterface editable = WordNetProvider.editable(WordNetProvider.getInstance());
+			parse.execute(editable);
+			TextElement wordElement = editable.getWordNet().getWordElement("_ALL_DIMENSION_UNITS".toLowerCase());
+			SemanticRelation[] semanticRelations = wordElement.getConcepts()[0].getSemanticRelations();
+			for (SemanticRelation q:semanticRelations){
+				if (q.relation!=SemanticRelation.SPECIALIZATION){
+					TestCase.assertTrue(false);		
+				}
+			}
+			File createTempFile = File.createTempFile("aaaa", "zzzz");
+			editable.store(createTempFile);
+			com.onpositive.semantic.words3.ReadOnlyMapWordNet mm=new com.onpositive.semantic.words3.ReadOnlyMapWordNet(new DataInputStream(new BufferedInputStream(new FileInputStream(createTempFile))));
+			createTempFile.deleteOnExit();
+			wordElement = mm.getWordElement("_ALL_DIMENSION_UNITS".toLowerCase());
+			SemanticRelation[]semanticRelations1 = wordElement.getConcepts()[0].getSemanticRelations();
+			if (!Arrays.equals(semanticRelations, semanticRelations1)){
+				TestCase.assertTrue(false);
+			}
+			
+		} catch (Exception e) {
+			TestCase.assertTrue(false);
+		}
+	}
 }

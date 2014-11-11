@@ -44,32 +44,28 @@ public class SimpleWordNetEditInterface implements IWordNetEditInterface {
 	}
 
 	@Override
-	public void addSemanticRelation(TextElement from, SemanticRelation tt) {
-		MeaningElement[] concepts = from.getConcepts();
-		AbstractRelationTarget t = (AbstractRelationTarget) concepts[concepts.length - 1];
+	public void addSemanticRelation(MeaningElement from, SemanticRelation tt) {
+		AbstractRelationTarget t = (AbstractRelationTarget) from;
 		t.registerRelation(tt.relation, tt.conceptId);
 	}
 
 	@Override
-	public void removeSemanticRelation(TextElement from, SemanticRelation tt) {
-		MeaningElement[] concepts = from.getConcepts();
-		AbstractRelationTarget t = (AbstractRelationTarget) concepts[concepts.length - 1];
+	public void removeSemanticRelation(MeaningElement from, SemanticRelation tt) {
+		AbstractRelationTarget t =(AbstractRelationTarget) from;
 		t.unregisterRelation(tt.relation, tt.conceptId);
 	}
 
 	@Override
-	public void addMorphologicalRelation(TextElement to,
+	public void addMorphologicalRelation(MeaningElement to,
 			MorphologicalRelation tt) {
-		MeaningElement[] concepts = to.getConcepts();
-		AbstractRelationTarget t = (AbstractRelationTarget) concepts[concepts.length - 1];
+		AbstractRelationTarget t = (AbstractRelationTarget)to;
 		t.registerRelation(tt.relation, tt.conceptId);
 	}
 
 	@Override
-	public void removeMorphologicalRelation(TextElement to,
+	public void removeMorphologicalRelation(MeaningElement to,
 			MorphologicalRelation tt) {
-		MeaningElement[] concepts = to.getConcepts();
-		AbstractRelationTarget t = (AbstractRelationTarget) concepts[concepts.length - 1];
+		AbstractRelationTarget t = (AbstractRelationTarget) to;
 		t.unregisterRelation(tt.relation, tt.conceptId);
 	}
 
