@@ -5,7 +5,9 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 
+import com.onpositive.semantic.wordnet.edit.IWordNetEditInterface;
 import com.onpositive.semantic.words2.SimpleWordNet;
+import com.onpositive.semantic.words2.SimpleWordNetEditInterface;
 import com.onpositive.semantic.words2.WordNet;
 import com.onpositive.semantic.words2.WordNetContributor;
 import com.onpositive.semantic.words3.ReadOnlyMapWordNet;
@@ -24,6 +26,31 @@ public class WordNetProvider {
 	static String[] builderNames = new String[] {
 			"com.onpositive.semantic.words2.builder.WictionaryParser",
 			"com.onpositive.semantic.words2.builder.RuCorpusParser" };
+	
+	
+	public static IWordNetEditInterface editable(AbstractWordNet w){
+		if (w instanceof SimpleWordNet){
+			return new SimpleWordNetEditInterface((SimpleWordNet) w, getHashNetFile());
+		}
+		SimpleWordNet copy=new SimpleWordNet(w);
+		return new SimpleWordNetEditInterface((SimpleWordNet) copy,getHashNetFile());
+	}
+	public static void store(){
+		
+	}
+	
+	static File getHashNetFile(){
+		String property = System.getProperty("engineConfigDir");
+		if (property == null) {
+			property = DEFAULT_INDEX_FOLDER;
+		}
+		File fl = new File(property);
+		if (!fl.exists()){
+			fl.mkdirs();
+		}
+		File readOnly = new File(fl,HASMAP_FILE_NAME);
+		return readOnly;
+	}
 
 	protected static WordNetContributor[] getContributors() {
 		try {
