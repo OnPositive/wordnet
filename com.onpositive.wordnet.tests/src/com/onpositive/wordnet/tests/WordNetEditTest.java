@@ -162,10 +162,17 @@ public class WordNetEditTest extends TestCase{
 	
 	public void testCommandParse(){
 		try {
-			WordNetPatch parse = WordNetPatch.parse(new InputStreamReader(WordNetEditTest.class.getResourceAsStream("tst.xml")));
-			TestCase.assertEquals(8, parse.size());
+			WordNetPatch parse = WordNetPatch.parse(new InputStreamReader(WordNetEditTest.class.getResourceAsStream("tst.xml"),"UTF-8"));
+			TestCase.assertEquals(12, parse.size());
 			IWordNetEditInterface editable = WordNetProvider.editable(WordNetProvider.getInstance());
+			TextElement wordElement3 = editable.getWordNet().getWordElement("метр");
+			TestCase.assertTrue(wordElement3!=null);
+			TextElement[] possibleContinuations = editable.getWordNet().getPossibleContinuations(wordElement3);
 			parse.execute(editable);
+			if (possibleContinuations!=null&&possibleContinuations.length>0)
+			{
+				System.out.println("Continuations already here");
+			}
 			TextElement wordElement = editable.getWordNet().getWordElement("_ALL_DIMENSION_UNITS".toLowerCase());
 			SemanticRelation[] semanticRelations = wordElement.getConcepts()[0].getSemanticRelations();
 			for (SemanticRelation q:semanticRelations){
@@ -182,7 +189,20 @@ public class WordNetEditTest extends TestCase{
 			if (!Arrays.equals(semanticRelations, semanticRelations1)){
 				TestCase.assertTrue(false);
 			}
-			
+			TextElement wordElement2 = mm.getWordElement("м/c");
+			SemanticRelation[] semanticRelations2 = wordElement2.getConcepts()[0].getSemanticRelations();
+			for (SemanticRelation q:semanticRelations2){
+				TestCase.assertTrue(q.getWord().getParentTextElement().getBasicForm().equals("_SPEED_UNITS".toLowerCase()));
+				TestCase.assertTrue(q.relation==SemanticRelation.SPECIALIZATION_BACK_LINK);
+			}
+			wordElement3 = mm.getWordElement("метр");
+			TestCase.assertTrue(wordElement3!=null);
+			possibleContinuations = mm.getPossibleContinuations(wordElement3);
+			HashSet<String>ss=new HashSet<String>();
+			for (TextElement q:possibleContinuations){
+				ss.add(q.getBasicForm());
+			}
+			TestCase.assertTrue(ss.contains("метры в секунду"));
 		} catch (Exception e) {
 			TestCase.assertTrue(false);
 		}

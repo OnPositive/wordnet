@@ -194,7 +194,7 @@ public abstract class ReadOnlyWordNet extends AbstractWordNet {
 				for (int a = 0; a < basicForm.length(); a++) {
 					char charAt = basicForm.charAt(a);
 					if (!Character.isLetter(charAt)
-							&& !Character.isWhitespace(charAt) && charAt != '-') {
+							&& !Character.isWhitespace(charAt) && charAt != '-' && charAt != '/') {
 
 						MeaningElement[] concepts = ((Word) t).getConcepts();
 						boolean sr = false;

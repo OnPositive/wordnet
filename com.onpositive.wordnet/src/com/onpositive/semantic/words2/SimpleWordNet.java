@@ -169,8 +169,8 @@ public class SimpleWordNet extends WordNet implements Serializable {
 		ArrayList<WordMeaning> newMeanings = convertMeanings(sk.getConcepts(),
 				s);
 		s.meanings = newMeanings;
-		this.words.set(s.id(), wordElement);
-		this.wordMap.put(s.getBasicForm(), wordElement);
+		this.words.set(s.id(), s);
+		this.wordMap.put(s.getBasicForm(), s);
 		for (WordMeaning m : newMeanings) {
 			if (this.meanings.size() <= m.id()) {
 				expendMeanings(m.id);
@@ -191,8 +191,8 @@ public class SimpleWordNet extends WordNet implements Serializable {
 		ArrayList<WordMeaning> newMeanings = convertMeanings(concepts, w);
 		w.meanings = newMeanings;
 		w.hasKind = true;
-		this.words.set(wordElement.id(), wordElement);
-		this.wordMap.put(wordElement.getBasicForm(), wordElement);
+		this.words.set(w.id(), w);
+		this.wordMap.put(w.getBasicForm(), w);
 		for (WordMeaning m : newMeanings) {
 			if (this.meanings.size() <= m.id()) {
 				expendMeanings(m.id);
@@ -207,6 +207,7 @@ public class SimpleWordNet extends WordNet implements Serializable {
 		ArrayList<WordMeaning> result = new ArrayList<WordMeaning>();
 		for (MeaningElement q : concepts) {
 			WordMeaning rr = new WordMeaning(q.id(), this, owner);
+			rr.kind=(short) q.getGrammemCode();
 			AbstractRelation<MeaningElement>[] allRelations = q
 					.getAllRelations();
 			for (AbstractRelation<MeaningElement> z : allRelations) {
@@ -371,38 +372,41 @@ public class SimpleWordNet extends WordNet implements Serializable {
 	protected HashMap<Integer, ArrayList<Integer>> sequenceMap = new HashMap<Integer, ArrayList<Integer>>();
 
 	protected void prepareWordSeqs() {
-		l2: for (TextElement q : this) {
+		for (TextElement q : this) {
 			if (!(q instanceof Word)) {
 				continue;
 			}
 			Word w = (Word) q;
+			toSequenceIfNeeded(w);
+		}
+	}
 
-			if (w.getBasicForm().indexOf(' ') != -1) {
-				String[] split = w.getBasicForm().split(" ");
-				ArrayList<Word> sequence = new ArrayList<Word>();
-				for (String s : split) {
-					Word singlePossibleWord = getSinglePossibleWord(s);
-					if (singlePossibleWord == null) {
-						continue l2;
-					}
-					sequence.add(singlePossibleWord);
+	void toSequenceIfNeeded(Word w) {
+		if (w.getBasicForm().indexOf(' ') != -1) {
+			String[] split = w.getBasicForm().split(" ");
+			ArrayList<Word> sequence = new ArrayList<Word>();
+			for (String s : split) {
+				Word singlePossibleWord = getSinglePossibleWord(s);
+				if (singlePossibleWord == null) {
+					return;
 				}
-				SimpleSequence s = new SimpleSequence(
-						sequence.toArray(new Word[sequence.size()]), w.id(),
-						w.getBasicForm(), this);
-				s.meanings = w.meanings;
-				registerSequence(s);
-				// register sequence
-				words.set(w.id(), s);
-				wordMap.put(w.getBasicForm(), s);
-				Word[] words2 = s.getWords();
-				ArrayList<Integer> intArrayList = sequenceMap.get(words2[0].id);
-				if (intArrayList == null) {
-					intArrayList = new ArrayList<Integer>();
-					sequenceMap.put(words2[0].id, intArrayList);
-				}
-				intArrayList.add(s.id);
+				sequence.add(singlePossibleWord);
 			}
+			SimpleSequence s = new SimpleSequence(
+					sequence.toArray(new Word[sequence.size()]), w.id(),
+					w.getBasicForm(), this);
+			s.meanings = w.meanings;
+			registerSequence(s);
+			// register sequence
+			words.set(w.id(), s);
+			wordMap.put(w.getBasicForm(), s);
+			Word[] words2 = s.getWords();
+			ArrayList<Integer> intArrayList = sequenceMap.get(words2[0].id);
+			if (intArrayList == null) {
+				intArrayList = new ArrayList<Integer>();
+				sequenceMap.put(words2[0].id, intArrayList);
+			}
+			intArrayList.add(s.id);
 		}
 	}
 

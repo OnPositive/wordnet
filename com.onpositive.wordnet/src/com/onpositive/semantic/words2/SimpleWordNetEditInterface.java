@@ -30,7 +30,11 @@ public class SimpleWordNetEditInterface implements IWordNetEditInterface {
 
 	@Override
 	public TextElement registerWord(String word) {
-		return original.getOrCreateWord(word.toLowerCase());
+		Word orCreateWord = original.getOrCreateWord(word.toLowerCase());
+		if (orCreateWord.getBasicForm().indexOf(' ')!=-1){
+			original.toSequenceIfNeeded(orCreateWord);
+		}
+		return orCreateWord;
 	}
 
 	@Override

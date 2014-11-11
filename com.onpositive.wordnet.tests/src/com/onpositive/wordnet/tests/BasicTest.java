@@ -22,6 +22,12 @@ public class BasicTest extends TestCase{
 		WordNetProvider.setInstance(null);
 		//WordNetProvider.killDatabase();
 	}
+	public void testContinuations(){
+		AbstractWordNet mm = WordNetProvider.getInstance();
+		TextElement wordElement = mm.getWordElement("метр");
+		TestCase.assertTrue(wordElement!=null);
+	}
+	
 	public void testInit(){
 		AbstractWordNet instance = WordNetProvider.getInstance();
 		TestCase.assertNotNull(instance);

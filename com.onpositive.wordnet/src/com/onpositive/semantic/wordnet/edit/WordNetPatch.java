@@ -29,23 +29,24 @@ import com.onpositive.semantic.wordnet.TextElement;
 
 public class WordNetPatch {
 
-	protected ArrayList<AbstractOperation>toExecute=new ArrayList<WordNetPatch.AbstractOperation>();
-	
-	public void execute(IWordNetEditInterface ei){
-		for (AbstractOperation op:toExecute){
+	protected ArrayList<AbstractOperation> toExecute = new ArrayList<WordNetPatch.AbstractOperation>();
+
+	public void execute(IWordNetEditInterface ei) {
+		for (AbstractOperation op : toExecute) {
 			op.execute(ei);
 		}
 	}
-	
+
 	protected static abstract class AbstractOperation {
 		protected abstract void execute(IWordNetEditInterface net);
 
-		public abstract Node append(Document appendChild) ;
+		public abstract Node append(Document appendChild);
 	}
+
 	static final String WC = "wc";
 
 	public static class WordOperation extends AbstractOperation {
-		
+
 		public final String word;
 		boolean removal;
 
@@ -57,10 +58,10 @@ public class WordNetPatch {
 
 		public WordOperation(Node item) {
 			NamedNodeMap attributes = item.getAttributes();
-			this.word=attributes.getNamedItem("w").getNodeValue();
+			this.word = attributes.getNamedItem("w").getNodeValue();
 			Node nm = attributes.getNamedItem("removal");
-			if (nm!=null){
-			this.removal=Boolean.parseBoolean(nm.getNodeValue());
+			if (nm != null) {
+				this.removal = Boolean.parseBoolean(nm.getNodeValue());
 			}
 		}
 
@@ -78,8 +79,8 @@ public class WordNetPatch {
 			String tagName = WC;
 			Element createElement = appendChild.createElement(tagName);
 			createElement.setAttribute("w", word);
-			if (removal){
-				createElement.setAttribute("removal",""+removal);
+			if (removal) {
+				createElement.setAttribute("removal", "" + removal);
 			}
 			return createElement;
 		}
@@ -99,30 +100,30 @@ public class WordNetPatch {
 			this.removal = removal;
 			this.code = code;
 		}
-		
+
 		public RelationOperation(Node item) {
 			NamedNodeMap attributes = item.getAttributes();
-			this.from=attributes.getNamedItem("f").getNodeValue();
-			this.to=attributes.getNamedItem("t").getNodeValue();
+			this.from = attributes.getNamedItem("f").getNodeValue();
+			this.to = attributes.getNamedItem("t").getNodeValue();
 			Node nm = attributes.getNamedItem("removal");
-			if (nm!=null){
-			this.removal=Boolean.parseBoolean(nm.getNodeValue());
+			if (nm != null) {
+				this.removal = Boolean.parseBoolean(nm.getNodeValue());
 			}
 			Node namedItem = attributes.getNamedItem("r");
-			this.code=parseCode(namedItem.getNodeValue());
+			this.code = parseCode(namedItem.getNodeValue());
 		}
 
-		protected abstract int parseCode(String nodeValue) ;
+		protected abstract int parseCode(String nodeValue);
 
 		public abstract String getTag();
-		
+
 		@Override
 		public Node append(Document appendChild) {
 			Element createElement = appendChild.createElement(getTag());
 			createElement.setAttribute("f", from);
 			createElement.setAttribute("t", to);
-			if (removal){
-				createElement.setAttribute("removal",""+removal);
+			if (removal) {
+				createElement.setAttribute("removal", "" + removal);
 			}
 			createElement.setAttribute("r", getRelationString(code));
 			return createElement;
@@ -130,17 +131,16 @@ public class WordNetPatch {
 
 		protected abstract String getRelationString(int code);
 	}
+
 	private static final String SC = "sc";
-	
+
 	public static class SemanticRelationOperation extends RelationOperation {
 
-		
 		@Override
 		protected int parseCode(String nodeValue) {
 			Class<SemanticRelation> class1 = SemanticRelation.class;
 			return parse(nodeValue, class1);
 		}
-		
 
 		public SemanticRelationOperation(String from, String to,
 				boolean removal, int code) {
@@ -195,7 +195,7 @@ public class WordNetPatch {
 			case SemanticRelation.SPECIALIZATION:
 				return SemanticRelation.SPECIALIZATION_BACK_LINK;
 			case SemanticRelation.SPECIALIZATION_BACK_LINK:
-				return SemanticRelation.SPECIALIZATION;				
+				return SemanticRelation.SPECIALIZATION;
 			default:
 				break;
 			}
@@ -213,15 +213,12 @@ public class WordNetPatch {
 			return toStringFromCode(code, class1);
 		}
 
-		
-
 	}
 
-	 static final String MC = "mc";
+	static final String MC = "mc";
+
 	public static class MorphologicalRelationOperation extends
 			RelationOperation {
-
-		
 
 		public MorphologicalRelationOperation(String from, String to,
 				boolean removal, int code) {
@@ -234,23 +231,25 @@ public class WordNetPatch {
 
 		@Override
 		protected void execute(IWordNetEditInterface net) {
-			
+
 			if (removal) {
 				MeaningElement from = getOrCreate(net, this.from);
 				MeaningElement to = getOrCreate(net, this.to);
-				MorphologicalRelation tt = new MorphologicalRelation(net.getWordNet(),
-						to.id(), code);
-				MorphologicalRelation tt1 = new MorphologicalRelation(net.getWordNet(),
-						from.id(), code+MorphologicalRelation.BACK_LINK_OFFSET);
+				MorphologicalRelation tt = new MorphologicalRelation(
+						net.getWordNet(), to.id(), code);
+				MorphologicalRelation tt1 = new MorphologicalRelation(
+						net.getWordNet(), from.id(), code
+								+ MorphologicalRelation.BACK_LINK_OFFSET);
 				net.removeMorphologicalRelation(from, tt);
 				net.removeMorphologicalRelation(to, tt1);
 			} else {
 				MeaningElement from = getOrCreate(net, this.from);
 				MeaningElement to = getOrCreate(net, this.to);
-				MorphologicalRelation tt = new MorphologicalRelation(net.getWordNet(),
-						to.id(), code);
-				MorphologicalRelation tt1 = new MorphologicalRelation(net.getWordNet(),
-						from.id(), code+MorphologicalRelation.BACK_LINK_OFFSET);
+				MorphologicalRelation tt = new MorphologicalRelation(
+						net.getWordNet(), to.id(), code);
+				MorphologicalRelation tt1 = new MorphologicalRelation(
+						net.getWordNet(), from.id(), code
+								+ MorphologicalRelation.BACK_LINK_OFFSET);
 				net.addMorphologicalRelation(from, tt);
 				net.addMorphologicalRelation(to, tt1);
 			}
@@ -276,46 +275,47 @@ public class WordNetPatch {
 	}
 
 	static final String GC = "gc";
+
 	public static class GrammarRelationOperation extends RelationOperation {
 
-		
 		public final String grammems;
 
 		public GrammarRelationOperation(String from, String to,
 				boolean removal, String grammems) {
 			super(from, to, removal, 0);
-			this.grammems=grammems;
+			this.grammems = grammems;
 		}
 
 		public GrammarRelationOperation(Node item) {
 			super(item);
-			this.grammems=item.getAttributes().getNamedItem("r").getNodeValue();
+			this.grammems = item.getAttributes().getNamedItem("r")
+					.getNodeValue();
 		}
 
 		@Override
 		protected void execute(IWordNetEditInterface net) {
 			MeaningElement to = getOrCreate(net, this.to);
-			LinkedHashSet<Grammem> code=getCode(grammems,net);
-			if (removal){
-				
-				net.removeGrammarRelation(from,to.getParentTextElement(),code);
-			}
-			else{
+			LinkedHashSet<Grammem> code = getCode(grammems, net);
+			if (removal) {
+
+				net.removeGrammarRelation(from, to.getParentTextElement(), code);
+			} else {
 				net.addGrammarRelation(from, to.getParentTextElement(), code);
 			}
 		}
 
-		private LinkedHashSet<Grammem> getCode(String grammems2, IWordNetEditInterface net) {
+		private LinkedHashSet<Grammem> getCode(String grammems2,
+				IWordNetEditInterface net) {
 			String[] split = grammems.split(",");
-			LinkedHashSet<Grammem>ms=new LinkedHashSet<Grammem>();
-			for (String s:split){
+			LinkedHashSet<Grammem> ms = new LinkedHashSet<Grammem>();
+			for (String s : split) {
 				Grammem grammem = Grammem.get(s.trim());
-				if (grammem==null){
+				if (grammem == null) {
 					throw new IllegalStateException("unknown grammem");
 				}
 				ms.add(grammem);
 			}
-			
+
 			return ms;
 		}
 
@@ -338,40 +338,42 @@ public class WordNetPatch {
 	private static MeaningElement getOrCreate(IWordNetEditInterface net,
 			String from2) {
 		TextElement wordElement = net.getWordNet().getWordElement(from2);
-		
+
 		if (wordElement == null) {
 			wordElement = net.registerWord(from2);
 		}
 		return wordElement.getConcepts()[0];
 	}
+
 	static int parse(String nodeValue, Class<?> class1) {
 		Field[] fields = class1.getFields();
-		for (Field f:fields){
-			if (Modifier.isStatic(f.getModifiers())){
-				if (f.getType()==int.class){
-					if (f.getName().toLowerCase().equals(nodeValue)){
-						try{
-						return f.getInt(null);
-						}catch (Exception e) {
+		for (Field f : fields) {
+			if (Modifier.isStatic(f.getModifiers())) {
+				if (f.getType() == int.class) {
+					if (f.getName().toLowerCase().equals(nodeValue)) {
+						try {
+							return f.getInt(null);
+						} catch (Exception e) {
 							throw new IllegalStateException(e);
 						}
 					}
-					
+
 				}
 			}
 		}
-		throw new IllegalArgumentException("Unknown relation:"+nodeValue);
+		throw new IllegalArgumentException("Unknown relation:" + nodeValue);
 	}
+
 	static String toStringFromCode(int code, Class<?> class1) {
 		Field[] fields = class1.getFields();
-		for (Field f:fields){
-			if (Modifier.isStatic(f.getModifiers())){
-				if (f.getType()==int.class){
-					try{
-					if (f.getInt(null)==code){
-						return f.getName().toLowerCase();
-					}
-					}catch (Exception e) {
+		for (Field f : fields) {
+			if (Modifier.isStatic(f.getModifiers())) {
+				if (f.getType() == int.class) {
+					try {
+						if (f.getInt(null) == code) {
+							return f.getName().toLowerCase();
+						}
+					} catch (Exception e) {
 						throw new IllegalStateException(e);
 					}
 				}
@@ -379,56 +381,80 @@ public class WordNetPatch {
 		}
 		return null;
 	}
-	public static WordNetPatch parse(Reader reader) throws Exception{
-		Document parse = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(new InputSource(reader));
-		WordNetPatch patch=new WordNetPatch();
-		NodeList childNodes = parse.getDocumentElement().getChildNodes();
+
+	public static WordNetPatch parse(Reader reader) throws Exception {
+		Document parse = DocumentBuilderFactory.newInstance()
+				.newDocumentBuilder().parse(new InputSource(reader));
+		WordNetPatch patch = new WordNetPatch();
+		Element documentElement = parse.getDocumentElement();
+		processNodes(patch, documentElement, null);
+		return patch;
+	}
+
+	static void processNodes(WordNetPatch patch, Element documentElement,
+			NamedNodeMap extraAttrs) {
+		NodeList childNodes = documentElement.getChildNodes();
 		int length = childNodes.getLength();
-		for (int a=0;a<length;a++){
+		for (int a = 0; a < length; a++) {
 			Node item = childNodes.item(a);
-			if (item instanceof Element){
-			AbstractOperation op=createCommand(item);
-			if (op==null){
-				throw new IllegalArgumentException("unknown tag:"+item.getNodeName());
-			}
-			else{
-				patch.toExecute.add(op);
-			}
+			if (item instanceof Element) {
+				if (item.getNodeName().equals("gr")) {
+					NamedNodeMap attributes = item.getAttributes();
+					processNodes(patch, (Element) item, attributes);
+					continue;
+				}
+				if (extraAttrs != null) {
+					for (int i = 0; i < extraAttrs.getLength(); i++) {
+						Node item2 = extraAttrs.item(i);
+						((Element) item).setAttribute(item2.getNodeName(), item2.getNodeValue());
+					}
+				}
+				AbstractOperation op = createCommand(item);
+				if (op == null) {
+					throw new IllegalArgumentException("unknown tag:"
+							+ item.getNodeName());
+				} else {
+					patch.toExecute.add(op);
+				}
 			}
 		}
-		return patch;	
 	}
-	
+
 	private static AbstractOperation createCommand(Node item) {
-		if (item instanceof Element){
-			Element el=(Element) item;
-			if (el.getNodeName().equals(WC)){
+		if (item instanceof Element) {
+			Element el = (Element) item;
+			if (el.getNodeName().equals(WC)) {
 				return new WordOperation(item);
 			}
-			if (el.getNodeName().equals(SC)){
+			if (el.getNodeName().equals(SC)) {
 				return new SemanticRelationOperation(item);
 			}
-			if (el.getNodeName().equals(MC)){
+			if (el.getNodeName().equals(MC)) {
 				return new MorphologicalRelationOperation(item);
 			}
-			if (el.getNodeName().equals(GC)){
+			if (el.getNodeName().equals(GC)) {
 				return new GrammarRelationOperation(item);
 			}
 		}
 		return null;
 	}
-	public void store(Writer wr) throws Exception{
-		Document newDocument = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
+
+	public void store(Writer wr) throws Exception {
+		Document newDocument = DocumentBuilderFactory.newInstance()
+				.newDocumentBuilder().newDocument();
 		Element createElement = newDocument.createElement("wnc");
 		Node appendChild = newDocument.appendChild(createElement);
-		for (AbstractOperation o:this.toExecute){
+		for (AbstractOperation o : this.toExecute) {
 			Node append = o.append(newDocument);
 			appendChild.appendChild(append);
 		}
-		Transformer newTransformer = TransformerFactory.newInstance().newTransformer();
+		Transformer newTransformer = TransformerFactory.newInstance()
+				.newTransformer();
 		newTransformer.setOutputProperty(OutputKeys.INDENT, "yes");
-		newTransformer.transform(new DOMSource(newDocument), new StreamResult(wr));
+		newTransformer.transform(new DOMSource(newDocument), new StreamResult(
+				wr));
 	}
+
 	public int size() {
 		return toExecute.size();
 	}
