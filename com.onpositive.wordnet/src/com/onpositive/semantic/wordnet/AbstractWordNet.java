@@ -48,7 +48,11 @@ public abstract class AbstractWordNet {
 				GuessedGrammarRelation[] gs=new GuessedGrammarRelation[possibleGrammarForms.length];
 				int j=0;
 				for (GrammarRelation q:possibleGrammarForms){
-					String basicForm = q.getWord().getBasicForm();
+					TextElement word = q.getWord();
+					if (word==null){
+						continue;
+					}
+					String basicForm = word.getBasicForm();
 					if (basicForm.length()<5){
 						if (Grammem.PartOfSpeech.VERB.mayBeThisPartOfSpech(possibleGrammarForms)){
 							return null; 

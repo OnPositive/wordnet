@@ -27,7 +27,7 @@ public final class StringVocabulary extends StringCoder2{
 		for (int a=0;a<capacity;a++){
 			int v=offsets.get(a);
 			if (v!=0){
-				s[k++]=decode(a);
+				s[k++]=decode(v);
 			}
 		}		
 		return s;		

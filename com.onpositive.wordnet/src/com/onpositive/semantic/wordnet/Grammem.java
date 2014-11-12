@@ -77,6 +77,15 @@ public class Grammem {
 		this.parent=parent;
 	}
 	
+	public boolean containedIn(GrammarRelation... rels){
+		for (GrammarRelation a:rels){
+			if (a.owner.getGrammemSet(a.relation).contains(this)){
+				return true;
+			}
+		}
+		return false;
+	}
+	
 	Grammem(int ordinal,String id, String alias, String description) {
 		super();
 		this.parent=null;
@@ -173,6 +182,12 @@ public class Grammem {
 		}
 		public final boolean mayBeThisPartOfSpech(GrammarRelation[] e){
 			for (GrammarRelation q:e){
+				if (q==null){
+					continue;
+				}
+				if (q.getWord()==null){
+					continue;
+				}
 				if (q.getWord().hasGrammem(this)){
 					return true;
 				}

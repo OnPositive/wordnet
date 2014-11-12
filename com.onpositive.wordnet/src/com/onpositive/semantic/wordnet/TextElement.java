@@ -34,7 +34,8 @@ public abstract class TextElement extends RelationTarget{
 	public boolean hasGrammem(Grammem g){
 		MeaningElement[] concepts = getConcepts();
 		for (MeaningElement e:concepts){
-			if (e.getGrammems().contains(g)){
+			Set<Grammem> grammems = e.getGrammems();
+			if (grammems.contains(g)){
 				return true;
 			}
 		}

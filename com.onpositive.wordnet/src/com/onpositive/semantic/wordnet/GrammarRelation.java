@@ -1,5 +1,10 @@
 package com.onpositive.semantic.wordnet;
 
+import java.util.HashSet;
+
+import com.onpositive.semantic.wordnet.Grammem.Case;
+import com.onpositive.semantic.wordnet.Grammem.PartOfSpeech;
+
 
 public class GrammarRelation extends AbstractRelation<TextElement> {
 	/**
@@ -25,5 +30,26 @@ public class GrammarRelation extends AbstractRelation<TextElement> {
 	public String toString() {
 		return getWord().toString()+" - ("+owner.getGrammemSet(relation)+")";
 	}
-	
+	public boolean hasGrammem(Grammem g){
+		HashSet<Grammem> grammemSet = owner.getGrammemSet(relation);
+		return grammemSet.contains(g);
+	}
+	public boolean hasAllGrammems(Grammem...options) {
+		HashSet<Grammem> grammemSet = owner.getGrammemSet(relation);
+		for (Grammem q:options){
+			if (!grammemSet.contains(q)){
+				return false;
+			}
+		}
+		return true;
+	}
+	public boolean hasArLeastOneOfGrammems(Grammem...options) {
+		HashSet<Grammem> grammemSet = owner.getGrammemSet(relation);
+		for (Grammem q:options){
+			if (grammemSet.contains(q)){
+				return true;
+			}
+		}
+		return false;
+	}
 }

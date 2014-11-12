@@ -72,7 +72,7 @@ public class SenseElementHandle extends TextElement{
 			EmbeddedConcept other = (EmbeddedConcept) obj;
 			if (address != other.addr())
 				return false;
-			if (this.owner==other.owner){
+			if (this.owner!=other.owner){
 				return false;
 			}
 			return true;
@@ -107,7 +107,7 @@ public class SenseElementHandle extends TextElement{
 		SenseElementHandle other = (SenseElementHandle) obj;
 		if (address != other.address)
 			return false;
-		if (this.store==other.store){
+		if (this.store!=other.store){
 			return false;
 		}
 		return true;
