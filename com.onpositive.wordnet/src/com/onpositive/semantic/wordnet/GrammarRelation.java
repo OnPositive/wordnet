@@ -43,6 +43,11 @@ public class GrammarRelation extends AbstractRelation<TextElement> {
 		}
 		return true;
 	}
+	public HashSet<Grammem>getGrammems(){
+		HashSet<Grammem> grammemSet = owner.getGrammemSet(relation);
+		return grammemSet;
+	}
+	
 	public boolean hasArLeastOneOfGrammems(Grammem...options) {
 		HashSet<Grammem> grammemSet = owner.getGrammemSet(relation);
 		for (Grammem q:options){

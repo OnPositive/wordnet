@@ -200,6 +200,8 @@ public class WordNetEditTest extends TestCase{
 			possibleContinuations = mm.getPossibleContinuations(wordElement3);
 			HashSet<String>ss=new HashSet<String>();
 			for (TextElement q:possibleContinuations){
+				TextElement[] parts = q.getParts();
+				System.out.println(Arrays.toString(parts));
 				ss.add(q.getBasicForm());
 			}
 			TestCase.assertTrue(ss.contains("метры в секунду"));

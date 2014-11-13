@@ -564,6 +564,9 @@ public abstract class ReadOnlyWordNet extends AbstractWordNet {
 	@Override
 	public MeaningElement getConceptInfo(int conceptId) {
 		int i = wordsData.conceptIdToOffet[conceptId];
+		if (i==Integer.MIN_VALUE){
+			return null;
+		}
 		if (i < 0) {
 			SenseElementHandle senseElementHandle = new SenseElementHandle(
 					-i - 1, wordsData);
