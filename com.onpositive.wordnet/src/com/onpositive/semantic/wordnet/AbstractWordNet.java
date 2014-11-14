@@ -7,6 +7,7 @@ import java.util.HashSet;
 import java.util.LinkedHashSet;
 
 import com.carrotsearch.hppc.IntObjectOpenHashMap;
+import com.carrotsearch.hppc.IntObjectOpenHashMapSerialzable;
 import com.carrotsearch.hppc.ObjectIntOpenHashMap;
 import com.onpositive.semantic.words3.suggestions.GuessedGrammarRelation;
 import com.onpositive.semantic.words3.suggestions.GuessedTextElement;
@@ -75,7 +76,7 @@ public abstract class AbstractWordNet {
 
 	public abstract boolean hasContinuations(TextElement te);
 	
-	protected IntObjectOpenHashMap<LinkedHashSet<Grammem>>set=new IntObjectOpenHashMap<LinkedHashSet<Grammem>>();
+	protected IntObjectOpenHashMapSerialzable<LinkedHashSet<Grammem>>set=new IntObjectOpenHashMapSerialzable<LinkedHashSet<Grammem>>();
 	protected ObjectIntOpenHashMap<LinkedHashSet<Grammem>>iset=new ObjectIntOpenHashMap<LinkedHashSet<Grammem>>();
 	
 	protected void loadGrammems(AbstractWordNet other){

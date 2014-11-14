@@ -20,7 +20,7 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 
 import com.carrotsearch.hppc.IntIntOpenHashMap;
-import com.carrotsearch.hppc.IntObjectOpenHashMap;
+import com.carrotsearch.hppc.IntObjectOpenHashMapSerialzable;
 import com.carrotsearch.hppc.ObjectIntOpenHashMap;
 import com.onpositive.semantic.wordnet.AbstractRelation;
 import com.onpositive.semantic.wordnet.AbstractWordNet;
@@ -576,7 +576,7 @@ public class SimpleWordNet extends WordNet implements Serializable {
 		return iset;
 	}
 
-	public IntObjectOpenHashMap<LinkedHashSet<Grammem>> gset() {
+	public IntObjectOpenHashMapSerialzable<LinkedHashSet<Grammem>> gset() {
 		return set;
 	}
 

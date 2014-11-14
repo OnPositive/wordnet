@@ -29,7 +29,7 @@ public final class IntIntArrayBasedMap  {
 		if (key == 0) {
 			key = Integer.MIN_VALUE;
 		}
-		int pos = (key % capacity) << 1;
+		int pos = (MurmurHash3.hash(key) % capacity) << 1;
 		if (pos<0){
 			pos=-pos;
 		}
@@ -53,7 +53,7 @@ public final class IntIntArrayBasedMap  {
 			key = Integer.MIN_VALUE;
 		}
 		int capacity = this.capacity;
-		int pos = (key % capacity) << 1;
+		int pos = (MurmurHash3.hash(key) % capacity) << 1;
 		if (pos<0){
 			pos=-pos;
 		}
@@ -82,7 +82,7 @@ public final class IntIntArrayBasedMap  {
 			key = Integer.MIN_VALUE;
 		}
 		int capacity = this.capacity;
-		int pos = (key % capacity) << 1;
+		int pos = (MurmurHash3.hash(key) % capacity) << 1;
 		if (pos<0){
 			pos=-pos;
 		}

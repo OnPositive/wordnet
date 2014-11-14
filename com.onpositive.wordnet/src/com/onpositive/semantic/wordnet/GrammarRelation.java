@@ -2,9 +2,6 @@ package com.onpositive.semantic.wordnet;
 
 import java.util.HashSet;
 
-import com.onpositive.semantic.wordnet.Grammem.Case;
-import com.onpositive.semantic.wordnet.Grammem.PartOfSpeech;
-
 
 public class GrammarRelation extends AbstractRelation<TextElement> {
 	/**
