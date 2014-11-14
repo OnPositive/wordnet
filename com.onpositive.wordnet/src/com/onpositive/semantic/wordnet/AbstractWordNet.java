@@ -128,6 +128,10 @@ public abstract class AbstractWordNet {
 		if (code==0){
 			return noGrammemSet;
 		}
-		return set.get(code);
+		LinkedHashSet<Grammem> linkedHashSet = set.get(code);
+		if (linkedHashSet==null){
+			return noGrammemSet;
+		}
+		return linkedHashSet;
 	}
 }
