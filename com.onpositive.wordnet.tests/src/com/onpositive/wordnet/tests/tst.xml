@@ -1,4 +1,5 @@
 <wnc>
+	<meta-layer id='relation_to_primary' caption="Relation to primary unit" type="double"/>
 	<gr f="_ALL_DIMENSION_UNITS" r="specialization">
 		<sc t="_IMPERIAL_UNITS" />
 		<sc t="_METRIC_UNITS" />
@@ -15,4 +16,5 @@
 		<sc t="кмч" />
 		<sc t="км/ч" />
 	</gr>
+	<meta w="кмч" v="0.27777777" l="relation_to_primary"/>
 </wnc>

@@ -26,6 +26,11 @@ import com.onpositive.semantic.wordnet.MeaningElement;
 import com.onpositive.semantic.wordnet.MorphologicalRelation;
 import com.onpositive.semantic.wordnet.SemanticRelation;
 import com.onpositive.semantic.wordnet.TextElement;
+import com.onpositive.semantic.words3.IntBooleanLayer;
+import com.onpositive.semantic.words3.IntByteLayer;
+import com.onpositive.semantic.words3.IntDoubleLayer;
+import com.onpositive.semantic.words3.IntIntLayer;
+import com.onpositive.semantic.words3.MetaLayer;
 
 public class WordNetPatch {
 
@@ -44,11 +49,181 @@ public class WordNetPatch {
 	}
 
 	static final String WC = "wc";
+	static final String LAYER = "meta-layer";
+	static final String META_COMMAND = "meta";
+	
+	public static class LayerOperation extends AbstractOperation {
+
+		public final String layerId;
+		public final String caption;
+		public final String layerType;
+		public final boolean remove;
+		public LayerOperation(String layerId, String caption, String layerType,
+				boolean remove) {
+			super();
+			this.layerId = layerId;
+			this.caption = caption;
+			this.layerType = layerType;
+			this.remove = remove;
+		}
+		public LayerOperation(Node item){
+			NamedNodeMap attributes = item.getAttributes();
+			this.layerId = attributes.getNamedItem("id").getNodeValue();
+			Node nm = attributes.getNamedItem("removal");
+			if (nm != null) {
+				this.remove = Boolean.parseBoolean(nm.getNodeValue());
+			}
+			else{
+				this.remove=false;
+			}
+			if (!this.remove){
+				this.caption = attributes.getNamedItem("caption").getNodeValue();
+				this.layerType = attributes.getNamedItem("type").getNodeValue();
+			}
+			else{
+				this.caption=null;
+				this.layerType=null;
+				
+			}
+		}
+		
+		@Override
+		public Node append(Document appendChild) {
+			String tagName = LAYER;
+			Element createElement = appendChild.createElement(tagName);
+			createElement.setAttribute("id", layerId);
+			if (!remove){
+			createElement.setAttribute("caption",caption);
+			createElement.setAttribute("type",layerType);
+			}
+			else{
+			createElement.setAttribute("remove", ""+remove);
+			}
+			return createElement;
+		}
+		
+		@Override
+		protected void execute(IWordNetEditInterface net) {
+			// TODO Auto-generated method stub
+			if(remove){
+				net.getWordNet().getMetaLayers().removeLayer(layerId);
+			}
+			else{
+				MetaLayer<?> layer = net.getWordNet().getMetaLayers().getLayer(layerId);
+				Class<?>type=convertType(layerType);
+				if (layer!=null){
+					if (layer.getType()==type){
+						return;
+					}
+					else{
+						throw new IllegalStateException("layer  with id "+layerId+" already exists with type "+type.getSimpleName());
+					}
+				}
+				if (type==Byte.class){
+					layer=new IntByteLayer(layerId, caption);
+				}
+				if (type==Integer.class){
+					layer=new IntIntLayer(layerId, caption);
+				}
+				if (type==Double.class){
+					layer=new IntDoubleLayer(layerId, caption);
+				}
+				if (type==Boolean.class){
+					layer=new IntBooleanLayer(layerId, caption);
+				}
+				net.getWordNet().getMetaLayers().registerLayer(layer);
+			}
+		}
+
+		private Class<?> convertType(String layerType2) {
+			try {
+				return Class.forName("java.lang."+Character.toUpperCase(layerType2.charAt(0))+layerType2.substring(1));
+			} catch (ClassNotFoundException e) {
+				throw new IllegalStateException(e);
+			}
+		}
+
+		
+		
+	}
+	
+	public static class MetaEditOperation extends AbstractOperation {
+
+		public final String word;
+		public boolean removal;
+		public final String value;
+		public String layer;
+
+		public MetaEditOperation(String word, boolean removal,String value,String layer) {
+			super();
+			this.word = word;
+			this.removal = removal;
+			this.value=value;
+			this.layer=layer;
+		}
+
+		public MetaEditOperation(Node item) {
+			NamedNodeMap attributes = item.getAttributes();
+			this.word = attributes.getNamedItem("w").getNodeValue();
+			this.layer=attributes.getNamedItem("l").getNodeValue();
+			Node nm = attributes.getNamedItem("removal");
+			if (nm != null) {
+				this.removal = Boolean.parseBoolean(nm.getNodeValue());
+			}
+			if (!this.removal){
+			this.value= attributes.getNamedItem("v").getNodeValue();
+			}
+			else{
+				this.value=null;
+			}
+		}
+
+		@Override
+		protected void execute(IWordNetEditInterface net) {
+			TextElement wordElement = net.getWordNet().getWordElement(word);
+			int id=wordElement.getConcepts()[0].id();
+			MetaLayer<Object> layer2 = net.getWordNet().getMetaLayers().getLayer(layer);
+			if (removal) {
+				layer2.removeValue(id);
+			} else {
+				Class<Object> type = layer2.getType();
+				Object val=null;
+				if (type.equals(Byte.class)){
+					val=Byte.parseByte(value);
+				}
+				if (type.equals(Double.class)){
+					val=Double.parseDouble(value);
+				}
+				if (type.equals(Integer.class)){
+					val=Integer.parseInt(value);
+				}
+				if (type.equals(Boolean.class)){
+					val=Boolean.parseBoolean(value);
+				}
+				layer2.putValue(id, val);
+			}
+		}
+
+		@Override
+		public Node append(Document appendChild) {
+			String tagName = META_COMMAND;
+			Element createElement = appendChild.createElement(tagName);
+			createElement.setAttribute("w", word);
+			createElement.setAttribute("l", layer);
+			if (value!=null&&!removal){
+			createElement.setAttribute("v", value);
+			}
+			if (removal) {
+				createElement.setAttribute("removal", "" + removal);
+			}
+			return createElement;
+		}
+	}
 
 	public static class WordOperation extends AbstractOperation {
 
 		public final String word;
-		boolean removal;
+		public boolean removal;
 
 		public WordOperation(String word, boolean removal) {
 			super();
@@ -425,6 +600,12 @@ public class WordNetPatch {
 			Element el = (Element) item;
 			if (el.getNodeName().equals(WC)) {
 				return new WordOperation(item);
+			}
+			if (el.getNodeName().equals(LAYER)) {
+				return new LayerOperation(item);
+			}
+			if (el.getNodeName().equals(META_COMMAND)) {
+				return new MetaEditOperation(item);
 			}
 			if (el.getNodeName().equals(SC)) {
 				return new SemanticRelationOperation(item);

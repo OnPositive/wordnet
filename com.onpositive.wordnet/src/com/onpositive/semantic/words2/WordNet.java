@@ -14,6 +14,13 @@ public abstract class WordNet extends AbstractWordNet implements
 	int incorrectNouns;
 	int incorrectAdj;
 	int incorrectVerbs;
+	public WordNet(){
+		
+	}
+
+	public WordNet(AbstractWordNet net) {
+		super(net);
+	}
 
 	public abstract TextElement getOrCreateRelationTarget(String s);
 	

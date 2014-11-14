@@ -21,6 +21,7 @@ import com.onpositive.semantic.wordnet.WordNetProvider;
 import com.onpositive.semantic.wordnet.edit.IWordNetEditInterface;
 import com.onpositive.semantic.wordnet.edit.WordNetPatch;
 import com.onpositive.semantic.words2.SimpleWordNet;
+import com.onpositive.semantic.words3.MetaLayer;
 
 import junit.framework.TestCase;
 
@@ -163,7 +164,7 @@ public class WordNetEditTest extends TestCase{
 	public void testCommandParse(){
 		try {
 			WordNetPatch parse = WordNetPatch.parse(new InputStreamReader(WordNetEditTest.class.getResourceAsStream("tst.xml"),"UTF-8"));
-			TestCase.assertEquals(12, parse.size());
+			TestCase.assertEquals(14, parse.size());
 			IWordNetEditInterface editable = WordNetProvider.editable(WordNetProvider.getInstance());
 			TextElement wordElement3 = editable.getWordNet().getWordElement("метр");
 			TestCase.assertTrue(wordElement3!=null);
@@ -205,6 +206,10 @@ public class WordNetEditTest extends TestCase{
 				ss.add(q.getBasicForm());
 			}
 			TestCase.assertTrue(ss.contains("метры в секунду"));
+			wordElement3 = mm.getWordElement("кмч");
+			MetaLayer<Object> layer = mm.getMetaLayers().getLayer("relation_to_primary");
+			Object value = layer.getValue(wordElement3.getConcepts()[0]);
+			TestCase.assertEquals(value, 0.27777777);
 		} catch (Exception e) {
 			TestCase.assertTrue(false);
 		}

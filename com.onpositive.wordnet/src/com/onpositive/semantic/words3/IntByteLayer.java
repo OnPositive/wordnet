@@ -6,21 +6,21 @@ import java.io.IOException;
 
 import com.carrotsearch.hppc.IntByteOpenHashMap;
 
-public class IntBooleanLayer extends MetaLayer<Boolean>{
+public class IntByteLayer extends MetaLayer<Byte>{
 
 	protected IntByteOpenHashMap map=new IntByteOpenHashMap();
 	
-	public IntBooleanLayer(String id, String caption) {
-		super(Boolean.class, id, caption);
+	public IntByteLayer(String id, String caption) {
+		super(Byte.class, id, caption);
 	}
 
 	@Override
-	public Boolean getValue(int meaningId) {
+	public Byte getValue(int meaningId) {
 		if(!map.containsKey(meaningId)){
 			return null;
 		}
 		byte d = map.get(meaningId);
-		return d!=0;
+		return d;
 	}
 
 	@Override
@@ -52,10 +52,10 @@ public class IntBooleanLayer extends MetaLayer<Boolean>{
 			map.put(stream.readInt(), stream.readByte());
 		}
 	}
-	
+
 	@Override
-	public void putValue(int meaningId, Boolean value) {
-		map.put(meaningId, (byte) (value?1:0));
+	public void putValue(int meaningId, Byte value) {
+		map.put(meaningId, value);
 	}
 
 	@Override

@@ -4,6 +4,8 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
+import com.onpositive.semantic.wordnet.MeaningElement;
+
 public abstract class MetaLayer<T> {
 
 	protected final Class<T>type;
@@ -23,7 +25,16 @@ public abstract class MetaLayer<T> {
 		return id;
 	}
 	
+	public final T getValue(MeaningElement el){
+		if (el==null){
+			return null;
+		}
+		return getValue(el.id());
+	}
+	
 	public abstract T getValue(int meaningId);
+	public abstract void putValue(int meaningId,T value);
+	public abstract void removeValue(int meaningId);
 	public abstract boolean hasValue(int id);
 	public abstract int[]getAllIds();
 	

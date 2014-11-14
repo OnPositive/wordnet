@@ -8,7 +8,7 @@ import com.carrotsearch.hppc.IntDoubleOpenHashMap;
 
 public class IntDoubleLayer extends MetaLayer<Double>{
 
-	protected IntDoubleOpenHashMap map;
+	protected IntDoubleOpenHashMap map=new IntDoubleOpenHashMap();
 	
 	public IntDoubleLayer(String id, String caption) {
 		super(Double.class, id, caption);
@@ -51,5 +51,14 @@ public class IntDoubleLayer extends MetaLayer<Double>{
 		for(int a=0;a<sz;a++){
 			map.put(stream.readInt(), stream.readDouble());
 		}
+	}
+	@Override
+	public void putValue(int meaningId, Double value) {
+		map.put(meaningId, value);
+	}
+
+	@Override
+	public void removeValue(int meaningId) {
+		map.remove(meaningId);
 	}
 }

@@ -6,13 +6,20 @@ import java.io.IOException;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 
-import com.carrotsearch.hppc.IntObjectOpenHashMap;
 import com.carrotsearch.hppc.IntObjectOpenHashMapSerialzable;
 import com.carrotsearch.hppc.ObjectIntOpenHashMap;
+import com.onpositive.semantic.words3.LayersPack;
 import com.onpositive.semantic.words3.suggestions.GuessedGrammarRelation;
 import com.onpositive.semantic.words3.suggestions.GuessedTextElement;
 
 public abstract class AbstractWordNet {
+
+	public AbstractWordNet(AbstractWordNet net) {
+		meta=net.meta;
+	}
+	public AbstractWordNet(){
+		meta=new LayersPack();
+	}
 
 	public abstract int wordCount();
 
@@ -26,6 +33,12 @@ public abstract class AbstractWordNet {
 	
 	public abstract String[] getAllGrammarKeys();
 	
+	protected final LayersPack meta;
+	
+	public final LayersPack getMetaLayers() {
+		return meta;
+	}
+
 	public GrammarRelation[] getPossibleGrammarFormsWithSuggestions(String wordForm){
 		GrammarRelation[] possibleGrammarForms = getPossibleGrammarForms(wordForm);
 		if (possibleGrammarForms!=null&&possibleGrammarForms.length>0){

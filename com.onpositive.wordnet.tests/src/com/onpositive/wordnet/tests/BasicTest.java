@@ -20,7 +20,7 @@ public class BasicTest extends TestCase{
 
 	static{
 		WordNetProvider.setInstance(null);
-		//WordNetProvider.killDatabase();
+		WordNetProvider.killDatabase();
 	}
 	public void testContinuations(){
 		AbstractWordNet mm = WordNetProvider.getInstance();

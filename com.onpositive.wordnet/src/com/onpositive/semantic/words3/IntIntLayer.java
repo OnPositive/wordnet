@@ -4,12 +4,11 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
-import com.carrotsearch.hppc.IntDoubleOpenHashMap;
 import com.carrotsearch.hppc.IntIntOpenHashMap;
 
 public class IntIntLayer extends MetaLayer<Integer>{
 
-	protected IntIntOpenHashMap map;
+	protected IntIntOpenHashMap map=new IntIntOpenHashMap();
 	
 	public IntIntLayer(String id, String caption) {
 		super(Integer.class, id, caption);
@@ -52,5 +51,15 @@ public class IntIntLayer extends MetaLayer<Integer>{
 		for(int a=0;a<sz;a++){
 			map.put(stream.readInt(), stream.readInt());
 		}
+	}
+
+	@Override
+	public void putValue(int meaningId, Integer value) {
+		map.put(meaningId, value);
+	}
+
+	@Override
+	public void removeValue(int meaningId) {
+		map.remove(meaningId);
 	}
 }

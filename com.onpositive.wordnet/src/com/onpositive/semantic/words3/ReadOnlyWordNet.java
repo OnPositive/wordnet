@@ -132,14 +132,14 @@ public abstract class ReadOnlyWordNet extends AbstractWordNet {
 			wordIdToOffset[data.elementId] = data instanceof WordInfo ? addr
 					: -addr;
 			int conceptStart = addr + 4;
-			if (data.senses.length == 1) {
+			if (data.senses.length == 1&&data.senses[0].senseId==data.elementId) {
 				conceptIdToOffet[data.senses[0].senseId] = -addr;
 			} else {
 				for (ConceptInfo infs : data.senses) {
 					conceptIdToOffet[infs.senseId] = conceptStart;
 					SeparateConceptHandle separateConceptHandle = new SeparateConceptHandle(
 							conceptStart, wordsData);
-					if (separateConceptHandle.id() != infs.senseId) {
+					if (separateConceptHandle.id() != infs.senseId&&data.senses.length!=1) {
 						System.out.println("Error");
 					}
 					short features = separateConceptHandle.getGrammemCode();
@@ -300,7 +300,7 @@ public abstract class ReadOnlyWordNet extends AbstractWordNet {
 			ll.add(int1(value.elementId));
 			ll.add(int2(value.elementId));
 			int length = value.senses.length;
-			if (length == 1) {
+			if (length == 1&&value.senses[0].senseId==value.elementId) {
 				ConceptInfo tt = value.senses[0];
 				byte vl = CUSTOM_CASE_OFFSET;
 				// no features
@@ -394,6 +394,7 @@ public abstract class ReadOnlyWordNet extends AbstractWordNet {
 	}
 
 	public ReadOnlyWordNet(SimpleWordNet original) {
+		super(original);
 		initRelations(original);
 		HashMap<Integer, ArrayList<Integer>> sequenceMap = original
 				.getSequenceMap();
@@ -461,6 +462,7 @@ public abstract class ReadOnlyWordNet extends AbstractWordNet {
 		is.readFully(this.store);
 		sequences = StringToDataHashMap.readMap(is);
 		readGrammems(is);
+		meta.load(is);
 	}
 
 	protected ReadOnlyWordNet() {
@@ -484,7 +486,7 @@ public abstract class ReadOnlyWordNet extends AbstractWordNet {
 	}
 
 	public void trim() {
-		// relations.trim();
+		relations.trim();
 		wordsData.trim();
 	}
 
@@ -496,54 +498,8 @@ public abstract class ReadOnlyWordNet extends AbstractWordNet {
 		stream.writeInt(store.length);
 		stream.write(store);
 		StringToDataHashMap.writeMap(stream, sequences);
-		ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-		DataOutputStream dataOutputStream = new DataOutputStream(
-				byteArrayOutputStream);
-		storeGrammems(dataOutputStream);
-		storeGrammems(stream);
-		dataOutputStream.close();
-		byte[] byteArray = byteArrayOutputStream.toByteArray();
-		DataInputStream di = new DataInputStream(new ByteArrayInputStream(
-				byteArray));
-		SimpleWordNet simpleWordNet = new SimpleWordNet();
-		simpleWordNet.readGrammems(di);
-		ByteArrayOutputStream out = new ByteArrayOutputStream();
-		DataOutputStream ds = new DataOutputStream(out);
-		simpleWordNet.storeGrammems(ds);
-		ds.close();		
-	}
-
-	public void storeZipped() throws IOException {
-		// relations.write(stream);
-		// wordsData.write(stream);
-		ZipOutputStream outputStream = new ZipOutputStream(
-				new BufferedOutputStream(new FileOutputStream("grammar.dat")));
-		outputStream.putNextEntry(new ZipEntry("store"));
-		DataOutputStream stream = new DataOutputStream(outputStream);
-		stream.writeInt(store.length);
-		stream.write(store);
-		StringToDataHashMap.writeMap(stream, sequences);
-		ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-		DataOutputStream dataOutputStream = new DataOutputStream(
-				byteArrayOutputStream);
-		storeGrammems(dataOutputStream);
-		storeGrammems(stream);
-		dataOutputStream.close();
-		byte[] byteArray = byteArrayOutputStream.toByteArray();
-		DataInputStream di = new DataInputStream(new ByteArrayInputStream(
-				byteArray));
-		SimpleWordNet simpleWordNet = new SimpleWordNet();
-		simpleWordNet.readGrammems(di);
-		ByteArrayOutputStream out = new ByteArrayOutputStream();
-		DataOutputStream ds = new DataOutputStream(out);
-		simpleWordNet.storeGrammems(ds);
-		ds.close();
-		byte[] byteArray2 = out.toByteArray();
-		if (!Arrays.equals(byteArray2, byteArray)) {
-			throw new IllegalStateException();
-		}
-		outputStream.closeEntry();
-		outputStream.close();
+		storeGrammems(stream);		
+		meta.store(stream);
 	}
 
 	@Override

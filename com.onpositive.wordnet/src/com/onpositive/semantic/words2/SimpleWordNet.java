@@ -107,6 +107,7 @@ public class SimpleWordNet extends WordNet implements Serializable {
 	}
 
 	public SimpleWordNet(AbstractWordNet net) {
+		super(net);
 		loadGrammems(net);
 		int max = 0;
 		for (int a = 0; a < net.wordCount(); a++) {
