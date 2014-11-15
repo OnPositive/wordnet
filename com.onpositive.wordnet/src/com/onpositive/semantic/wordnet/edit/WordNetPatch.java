@@ -51,9 +51,13 @@ public class WordNetPatch {
 	static final String WC = "wc";
 	static final String LAYER = "meta-layer";
 	static final String META_COMMAND = "meta";
+	static final String CAPTION = "caption";
+	static final String ID = "id";
+	static final String REMOVAL = "removal";
 	
 	public static class LayerOperation extends AbstractOperation {
 
+		private static final String TYPE = "type";
 		public final String layerId;
 		public final String caption;
 		public final String layerType;
@@ -68,8 +72,8 @@ public class WordNetPatch {
 		}
 		public LayerOperation(Node item){
 			NamedNodeMap attributes = item.getAttributes();
-			this.layerId = attributes.getNamedItem("id").getNodeValue();
-			Node nm = attributes.getNamedItem("removal");
+			this.layerId = attributes.getNamedItem(ID).getNodeValue();
+			Node nm = attributes.getNamedItem(REMOVAL);
 			if (nm != null) {
 				this.remove = Boolean.parseBoolean(nm.getNodeValue());
 			}
@@ -77,8 +81,8 @@ public class WordNetPatch {
 				this.remove=false;
 			}
 			if (!this.remove){
-				this.caption = attributes.getNamedItem("caption").getNodeValue();
-				this.layerType = attributes.getNamedItem("type").getNodeValue();
+				this.caption = attributes.getNamedItem(CAPTION).getNodeValue();
+				this.layerType = attributes.getNamedItem(TYPE).getNodeValue();
 			}
 			else{
 				this.caption=null;
@@ -91,20 +95,19 @@ public class WordNetPatch {
 		public Node append(Document appendChild) {
 			String tagName = LAYER;
 			Element createElement = appendChild.createElement(tagName);
-			createElement.setAttribute("id", layerId);
+			createElement.setAttribute(ID, layerId);
 			if (!remove){
-			createElement.setAttribute("caption",caption);
-			createElement.setAttribute("type",layerType);
+			createElement.setAttribute(CAPTION,caption);
+			createElement.setAttribute(TYPE,layerType);
 			}
 			else{
-			createElement.setAttribute("remove", ""+remove);
+			createElement.setAttribute(REMOVAL, ""+remove);
 			}
 			return createElement;
 		}
 		
 		@Override
 		protected void execute(IWordNetEditInterface net) {
-			// TODO Auto-generated method stub
 			if(remove){
 				net.getWordNet().getMetaLayers().removeLayer(layerId);
 			}
