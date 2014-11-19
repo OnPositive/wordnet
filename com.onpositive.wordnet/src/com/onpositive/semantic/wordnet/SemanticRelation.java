@@ -1,6 +1,7 @@
 package com.onpositive.semantic.wordnet;
 
 import java.io.Serializable;
+import java.util.HashMap;
 
 public class SemanticRelation extends AbstractRelation<MeaningElement> implements Serializable {
 	/**
@@ -20,6 +21,32 @@ public class SemanticRelation extends AbstractRelation<MeaningElement> implement
 	public static final int MERONIM = 8;
 	public static final int ANTONIM_BACKLINK = 9;
 	public static final int MERONIM_BACKLINK = 10;
+	
+	private static final HashMap<Integer,Integer> backlinkMap = new HashMap<Integer, Integer>();
+	
+	private static final HashMap<Integer,Integer> backlinkAnalogueMap = new HashMap<Integer, Integer>();
+	
+	static{
+		backlinkMap.put(SYNONIM, SYNONIM_BACK_LINK);
+		backlinkMap.put(SPECIALIZATION, SPECIALIZATION_BACK_LINK);
+		backlinkMap.put(GENERALIZATION, GENERALIZATION_BACK_LINK);
+		backlinkMap.put(ANTONIM, ANTONIM_BACKLINK);
+		backlinkMap.put(MERONIM, MERONIM_BACKLINK);
+		
+		backlinkAnalogueMap.put(SYNONIM, SYNONIM_BACK_LINK);
+		backlinkAnalogueMap.put(SPECIALIZATION, GENERALIZATION_BACK_LINK);
+		backlinkAnalogueMap.put(GENERALIZATION, SPECIALIZATION_BACK_LINK);
+		backlinkAnalogueMap.put(ANTONIM, ANTONIM_BACKLINK);
+	}
+	
+	public static Integer getBacklink(int relation){
+		return backlinkMap.get(relation);
+	}
+	
+	public static Integer getBacklinkAnalogue(int relation){
+		return backlinkAnalogueMap.get(relation);
+	}
+	
 	public SemanticRelation(AbstractWordNet owner, MeaningElement conceptId, int relation) {
 		super(owner,conceptId,relation);
 	}

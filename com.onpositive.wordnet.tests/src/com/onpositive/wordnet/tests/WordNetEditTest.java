@@ -39,14 +39,14 @@ public class WordNetEditTest extends TestCase{
 	public void testInit(){
 		AbstractWordNet instance = WordNetProvider.getInstance();
 		TestCase.assertNotNull(instance);
-		GrammarRelation[] possibleGrammarForms = instance.getPossibleGrammarForms("петроченко");
+		GrammarRelation[] possibleGrammarForms = instance.getPossibleGrammarForms("РїРµС‚СЂРѕС‡РµРЅРєРѕ");
 		Set<Grammem> grammems = possibleGrammarForms[0].getWord().getConcepts()[0].getGrammems();
 		TestCase.assertTrue(grammems.contains(Grammem.SemanGramem.SURN));		
 	}
 	
 	public void testRelations(){
 		AbstractWordNet instance = WordNetProvider.getInstance();
-		TextElement wordElement = instance.getWordElement("вертолёт");
+		TextElement wordElement = instance.getWordElement("РІРµСЂС‚РѕР»С‘С‚");
 		MeaningElement[] concepts = wordElement.getConcepts();
 		AbstractRelation<MeaningElement>[] semanticRelations = concepts[0].getAllRelations();
 		TestCase.assertTrue(semanticRelations.length>0);
@@ -54,7 +54,7 @@ public class WordNetEditTest extends TestCase{
 		for (AbstractRelation<MeaningElement>q:semanticRelations){
 			if (q instanceof SemanticRelation){
 				SemanticRelation sr=(SemanticRelation) q;
-				if (sr.getWord().getParentTextElement().getBasicForm().equals("летательный аппарат")){
+				if (sr.getWord().getParentTextElement().getBasicForm().equals("Р»РµС‚Р°С‚РµР»СЊРЅС‹Р№ Р°РїРїР°СЂР°С‚")){
 					if (sr.relation==SemanticRelation.GENERALIZATION){
 						found=true;
 						//TestCase.assertTrue(false);
@@ -66,10 +66,10 @@ public class WordNetEditTest extends TestCase{
 	}
 	
 	public void testSynonims(){
-		GrammarRelation[] possibleGrammarForms = WordNetProvider.getInstance().getPossibleGrammarForms("вертолёта");
+		GrammarRelation[] possibleGrammarForms = WordNetProvider.getInstance().getPossibleGrammarForms("РІРµСЂС‚РѕР»С‘С‚Р°");
 		for (GrammarRelation r:possibleGrammarForms){
 			String basicForm = r.getWord().getBasicForm();
-			TestCase.assertTrue(basicForm.equals("вертолёт"));
+			TestCase.assertTrue(basicForm.equals("РІРµСЂС‚РѕР»С‘С‚"));
 		}
 		System.out.println(Arrays.toString(possibleGrammarForms));
 		TestCase.assertTrue(possibleGrammarForms.length==1);
@@ -81,13 +81,13 @@ public class WordNetEditTest extends TestCase{
 	}
 
 	public void testMultiMeaning(){
-		TextElement wordElement = WordNetProvider.getInstance().getWordElement("целина");
+		TextElement wordElement = WordNetProvider.getInstance().getWordElement("С†РµР»РёРЅР°");
 		MeaningElement[] concepts = wordElement.getConcepts();
 		AbstractRelation<MeaningElement>[] semanticRelations = concepts[0].getAllRelations();
 		boolean found=false;
 		for (AbstractRelation<MeaningElement> q:semanticRelations){
 			TextElement parentTextElement = q.getWord().getParentTextElement();
-			if (parentTextElement.getBasicForm().equals("цель")){
+			if (parentTextElement.getBasicForm().equals("С†РµР»СЊ")){
 				found=true;
 				TestCase.assertEquals(q.relation, SemanticRelation.SYNONIM_BACK_LINK);
 			}			
@@ -96,13 +96,13 @@ public class WordNetEditTest extends TestCase{
 	}
 	
 	public void testMultiMeaning2(){
-		TextElement wordElement = WordNetProvider.getInstance().getWordElement("цель");
+		TextElement wordElement = WordNetProvider.getInstance().getWordElement("С†РµР»СЊ");
 		MeaningElement[] concepts = wordElement.getConcepts();
 		AbstractRelation<MeaningElement>[] semanticRelations = concepts[0].getAllRelations();
 		boolean found=true;
 		for (AbstractRelation<MeaningElement> q:semanticRelations){
 			TextElement parentTextElement = q.getWord().getParentTextElement();
-			if (parentTextElement.getBasicForm().equals("целина")){
+			if (parentTextElement.getBasicForm().equals("С†РµР»РёРЅР°")){
 				found=true;
 				TestCase.assertEquals(q.relation, SemanticRelation.SYNONIM);
 			}			
@@ -111,14 +111,14 @@ public class WordNetEditTest extends TestCase{
 	}
 	
 	public void testSequence(){
-		TextElement wordElement = WordNetProvider.getInstance().getWordElement("политический деятель");
+		TextElement wordElement = WordNetProvider.getInstance().getWordElement("РїРѕР»РёС‚РёС‡РµСЃРєРёР№ РґРµСЏС‚РµР»СЊ");
 		TestCase.assertTrue(wordElement.isMultiWord());
 		TextElement[] parts = wordElement.getParts();
 		TestCase.assertTrue(parts.length==2);
 	}
 	
 	public void testSequenceParsing(){
-		TextElement wordElement = WordNetProvider.getInstance().getWordElement("политический деятель");
+		TextElement wordElement = WordNetProvider.getInstance().getWordElement("РїРѕР»РёС‚РёС‡РµСЃРєРёР№ РґРµСЏС‚РµР»СЊ");
 		TestCase.assertTrue(wordElement.isMultiWord());
 		TextElement[] parts = wordElement.getParts();
 		TestCase.assertTrue(Grammem.PartOfSpeech.ADJF.isDefinitelyThisPartOfSpech(parts[0]));
@@ -128,9 +128,9 @@ public class WordNetEditTest extends TestCase{
 	public void testWordApi(){
 		boolean found=false;
 		AbstractWordNet instance = WordNetProvider.getInstance();
-		TextElement[] possibleContinuations = instance.getPossibleContinuations(WordNetProvider.getInstance().getWordElement("политический"));
+		TextElement[] possibleContinuations = instance.getPossibleContinuations(WordNetProvider.getInstance().getWordElement("РїРѕР»РёС‚РёС‡РµСЃРєРёР№"));
 		for (TextElement z:possibleContinuations){
-			if (z.getBasicForm().equals("политический деятель")){
+			if (z.getBasicForm().equals("РїРѕР»РёС‚РёС‡РµСЃРєРёР№ РґРµСЏС‚РµР»СЊ")){
 				found=true;
 			}
 		}
@@ -138,27 +138,27 @@ public class WordNetEditTest extends TestCase{
 	}
 	
 	public void testConjuration(){
-		TextElement wordElement = WordNetProvider.getInstance().getWordElement("после того как");
+		TextElement wordElement = WordNetProvider.getInstance().getWordElement("РїРѕСЃР»Рµ С‚РѕРіРѕ РєР°Рє");
 		TestCase.assertTrue(Grammem.PartOfSpeech.CONJ.isDefinitelyThisPartOfSpech(wordElement));
 	}
 	
 	public void testPreposition(){
-		TextElement wordElement = WordNetProvider.getInstance().getWordElement("в отличие от");
+		TextElement wordElement = WordNetProvider.getInstance().getWordElement("РІ РѕС‚Р»РёС‡РёРµ РѕС‚");
 		TestCase.assertTrue(Grammem.PartOfSpeech.PREP.isDefinitelyThisPartOfSpech(wordElement));
 	}
 	
 	public void testComparativ(){
-		TextElement wordElement = WordNetProvider.getInstance().getWordElement("длиннее");
+		TextElement wordElement = WordNetProvider.getInstance().getWordElement("РґР»РёРЅРЅРµРµ");
 		TestCase.assertTrue(Grammem.PartOfSpeech.COMP.isDefinitelyThisPartOfSpech(wordElement));		
 	}
 	
-	public void testМorphology(){
-		GrammarRelation[] possibleGrammarForms = WordNetProvider.getInstance().getPossibleGrammarForms("вышла");
+	public void testMorphology(){
+		GrammarRelation[] possibleGrammarForms = WordNetProvider.getInstance().getPossibleGrammarForms("РІС‹С€Р»Р°");
 		TextElement wordElement = possibleGrammarForms[0].getWord();
 		TestCase.assertTrue(wordElement.hasOnlyGrammemOfKind(Grammem.PartOfSpeech.VERB));	
 		MorphologicalRelation[] morphologicalRelations = wordElement.getConcepts()[0].getMorphologicalRelations();
 		TestCase.assertTrue(morphologicalRelations.length==1);
-		TestCase.assertTrue(morphologicalRelations[0].getWord().getParentTextElement().getBasicForm().equals("выйти"));
+		TestCase.assertTrue(morphologicalRelations[0].getWord().getParentTextElement().getBasicForm().equals("РІС‹Р№С‚Рё"));
 	}
 	
 	public void testCommandParse(){
@@ -166,7 +166,7 @@ public class WordNetEditTest extends TestCase{
 			WordNetPatch parse = WordNetPatch.parse(new InputStreamReader(WordNetEditTest.class.getResourceAsStream("tst.xml"),"UTF-8"));
 			TestCase.assertEquals(15, parse.size());
 			IWordNetEditInterface editable = WordNetProvider.editable(WordNetProvider.getInstance());
-			TextElement wordElement3 = editable.getWordNet().getWordElement("километр");
+			TextElement wordElement3 = editable.getWordNet().getWordElement("РјРµС‚СЂ");
 			TestCase.assertTrue(wordElement3!=null);
 			TextElement[] possibleContinuations = editable.getWordNet().getPossibleContinuations(wordElement3);
 			parse.execute(editable);
@@ -190,13 +190,13 @@ public class WordNetEditTest extends TestCase{
 			if (!Arrays.equals(semanticRelations, semanticRelations1)){
 				TestCase.assertTrue(false);
 			}
-			TextElement wordElement2 = mm.getWordElement("м/c");
+			TextElement wordElement2 = mm.getWordElement("Рј/c");
 			SemanticRelation[] semanticRelations2 = wordElement2.getConcepts()[0].getSemanticRelations();
 			for (SemanticRelation q:semanticRelations2){
 				TestCase.assertTrue(q.getWord().getParentTextElement().getBasicForm().equals("_SPEED_UNITS".toLowerCase()));
 				TestCase.assertTrue(q.relation==SemanticRelation.SPECIALIZATION_BACK_LINK);
 			}
-			wordElement3 = mm.getWordElement("метр");
+			wordElement3 = mm.getWordElement("РјРµС‚СЂ");
 			TestCase.assertTrue(wordElement3!=null);
 			possibleContinuations = mm.getPossibleContinuations(wordElement3);
 			HashSet<String>ss=new HashSet<String>();
@@ -205,12 +205,12 @@ public class WordNetEditTest extends TestCase{
 				System.out.println(Arrays.toString(parts));
 				ss.add(q.getBasicForm());
 			}
-			TestCase.assertTrue(ss.contains("метры в секунду"));
-			wordElement3 = mm.getWordElement("кмч");
+			TestCase.assertTrue(ss.contains("РјРµС‚СЂС‹ РІ СЃРµРєСѓРЅРґСѓ"));
+			wordElement3 = mm.getWordElement("РєРјС‡");
 			MetaLayer<Object> layer = mm.getMetaLayers().getLayer("relation_to_primary");
 			Object value = layer.getValue(wordElement3.getConcepts()[0]);
 			TestCase.assertEquals(value, 0.27777777);
-			wordElement3 = mm.getWordElement("километр");
+			wordElement3 = mm.getWordElement("пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
 			possibleContinuations = mm.getPossibleContinuations(wordElement3);
 			TestCase.assertTrue(possibleContinuations.length>0);
 		} catch (Exception e) {
