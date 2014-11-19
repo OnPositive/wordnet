@@ -20,7 +20,7 @@ import java.util.zip.ZipOutputStream;
 
 import com.carrotsearch.hppc.ByteArrayList;
 import com.carrotsearch.hppc.IntIntOpenHashMap;
-import com.carrotsearch.hppc.IntOpenHashSet;
+import com.carrotsearch.hppc.IntOpenHashSetSerializable;
 import com.onpositive.semantic.wordnet.AbstractRelation;
 import com.onpositive.semantic.wordnet.AbstractWordNet;
 import com.onpositive.semantic.wordnet.GrammarRelation;
@@ -185,7 +185,7 @@ public abstract class ReadOnlyWordNet extends AbstractWordNet {
 			return super.getDataAddress(string);
 		}
 
-		public void store(RelationTarget t, IntOpenHashSet set) {
+		public void store(RelationTarget t, IntOpenHashSetSerializable set) {
 			if (t instanceof Word) {
 				String basicForm = ((Word) t).getBasicForm();
 				if (basicForm.length() == 0&&!set.contains(t.id())) {
@@ -432,7 +432,7 @@ public abstract class ReadOnlyWordNet extends AbstractWordNet {
 		WordStore store = new WordStore(original.size(),
 				original.conceptCount());
 		this.wordsData = store;
-		IntOpenHashSet sm = new IntOpenHashSet();
+		IntOpenHashSetSerializable sm = new IntOpenHashSetSerializable();
 		for (RelationTarget t : original) {
 			if (t instanceof SimpleSequence) {
 				SimpleSequence sa = (SimpleSequence) t;

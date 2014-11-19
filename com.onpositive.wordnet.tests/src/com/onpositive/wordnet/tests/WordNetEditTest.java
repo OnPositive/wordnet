@@ -164,9 +164,9 @@ public class WordNetEditTest extends TestCase{
 	public void testCommandParse(){
 		try {
 			WordNetPatch parse = WordNetPatch.parse(new InputStreamReader(WordNetEditTest.class.getResourceAsStream("tst.xml"),"UTF-8"));
-			TestCase.assertEquals(14, parse.size());
+			TestCase.assertEquals(15, parse.size());
 			IWordNetEditInterface editable = WordNetProvider.editable(WordNetProvider.getInstance());
-			TextElement wordElement3 = editable.getWordNet().getWordElement("метр");
+			TextElement wordElement3 = editable.getWordNet().getWordElement("километр");
 			TestCase.assertTrue(wordElement3!=null);
 			TextElement[] possibleContinuations = editable.getWordNet().getPossibleContinuations(wordElement3);
 			parse.execute(editable);
@@ -210,6 +210,9 @@ public class WordNetEditTest extends TestCase{
 			MetaLayer<Object> layer = mm.getMetaLayers().getLayer("relation_to_primary");
 			Object value = layer.getValue(wordElement3.getConcepts()[0]);
 			TestCase.assertEquals(value, 0.27777777);
+			wordElement3 = mm.getWordElement("километр");
+			possibleContinuations = mm.getPossibleContinuations(wordElement3);
+			TestCase.assertTrue(possibleContinuations.length>0);
 		} catch (Exception e) {
 			TestCase.assertTrue(false);
 		}

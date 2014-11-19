@@ -423,6 +423,11 @@ public class SimpleWordNet extends WordNet implements Serializable {
 			if (tt.size() == 1) {
 				return (Word) tt.iterator().next();
 			}
+			for (TextElement q:tt){
+				if (q.getBasicForm().equals(s)){
+					return (Word) q;
+				}
+			}
 		}
 		return null;
 	}
