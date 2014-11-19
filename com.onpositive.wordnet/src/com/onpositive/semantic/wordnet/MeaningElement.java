@@ -1,5 +1,9 @@
 package com.onpositive.semantic.wordnet;
 
+import java.awt.geom.GeneralPath;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import com.onpositive.semantic.wordnet.Grammem.PartOfSpeech;
@@ -90,5 +94,76 @@ public abstract class MeaningElement extends RelationTarget {
 		return 0;
 	}
 
+	public boolean isInTransitiveRelationWith(MeaningElement other, int relation){
+		
+		int otherId = other.id();
+		boolean result = isInTransitiveRelationWith(otherId, relation);
+		return result;
+	}
+
+	public boolean isInTransitiveRelationWith(int otherId, int relation) {
+		
+		if(this.id() == otherId){
+			return false;
+		}
+		
+		Integer bl = SemanticRelation.getBacklinkAnalogue(relation);
+		
+		HashSet<Integer> passed = new HashSet<Integer>();
+		passed.add(this.id());
+		ArrayList<MeaningElement> toInspect = new ArrayList<MeaningElement>();
+		toInspect.add(this);
+		for(int i = 0 ; i < toInspect.size() ; i++){
+			MeaningElement me = toInspect.get(i);
+			
+			SemanticRelation[] semanticRelations = me.getSemanticRelations();
+			for(SemanticRelation sr : semanticRelations){
+				
+				if( sr.relation == relation || (bl!=null&&bl==sr.relation) ){
+					MeaningElement word = sr.getWord();
+					if(word.id()==otherId){
+						return true;
+					}
+					else if(!passed.contains(word.id())){
+						toInspect.add(word);
+						passed.add(word.id());
+					}					
+				}
+			}
+		}		
+		return false;
+	}
 	
+	public List<Integer> detectGeneralizations(Set<Integer> set){
+		
+		ArrayList<Integer> result = null;
+		
+		HashSet<Integer> passed = new HashSet<Integer>();
+		passed.add(this.id());
+		ArrayList<MeaningElement> toInspect = new ArrayList<MeaningElement>();
+		toInspect.add(this);
+		for(int i = 0 ; i < toInspect.size() ; i++){
+			MeaningElement me = toInspect.get(i);
+			
+			SemanticRelation[] semanticRelations = me.getSemanticRelations();
+			for(SemanticRelation sr : semanticRelations){
+				
+				if( sr.relation == SemanticRelation.GENERALIZATION || sr.relation == SemanticRelation.SPECIALIZATION_BACK_LINK ){
+					MeaningElement word = sr.getWord();
+					if(set.contains(word.id())){
+						if(result==null){
+							result = new ArrayList<Integer>();
+						}
+						result.add(word.id());
+					}
+					else if(!passed.contains(word.id())){
+						toInspect.add(word);
+						passed.add(word.id());
+					}					
+				}
+			}
+		}
+		
+		return result;
+	}
 }
