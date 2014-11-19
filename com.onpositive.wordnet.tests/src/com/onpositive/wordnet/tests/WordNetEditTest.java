@@ -164,7 +164,7 @@ public class WordNetEditTest extends TestCase{
 	public void testCommandParse(){
 		try {
 			WordNetPatch parse = WordNetPatch.parse(new InputStreamReader(WordNetEditTest.class.getResourceAsStream("tst.xml"),"UTF-8"));
-			TestCase.assertEquals(15, parse.size());
+			TestCase.assertEquals(20, parse.size());
 			IWordNetEditInterface editable = WordNetProvider.editable(WordNetProvider.getInstance());
 			TextElement wordElement3 = editable.getWordNet().getWordElement("метр");
 			TestCase.assertTrue(wordElement3!=null);
