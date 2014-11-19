@@ -164,7 +164,7 @@ public class WordNetEditTest extends TestCase{
 	public void testCommandParse(){
 		try {
 			WordNetPatch parse = WordNetPatch.parse(new InputStreamReader(WordNetEditTest.class.getResourceAsStream("tst.xml"),"UTF-8"));
-			TestCase.assertEquals(20, parse.size());
+			TestCase.assertEquals(21, parse.size());
 			IWordNetEditInterface editable = WordNetProvider.editable(WordNetProvider.getInstance());
 			TextElement wordElement3 = editable.getWordNet().getWordElement("метр");
 			TestCase.assertTrue(wordElement3!=null);
@@ -193,7 +193,7 @@ public class WordNetEditTest extends TestCase{
 			TextElement wordElement2 = mm.getWordElement("м/c");
 			SemanticRelation[] semanticRelations2 = wordElement2.getConcepts()[0].getSemanticRelations();
 			for (SemanticRelation q:semanticRelations2){
-				TestCase.assertTrue(q.getWord().getParentTextElement().getBasicForm().equals("_SPEED_UNITS".toLowerCase()));
+				TestCase.assertTrue(q.getWord().getParentTextElement().getBasicForm().equals("_UNITS_SPEED".toLowerCase()));
 				TestCase.assertTrue(q.relation==SemanticRelation.SPECIALIZATION_BACK_LINK);
 			}
 			wordElement3 = mm.getWordElement("метр");
@@ -205,12 +205,12 @@ public class WordNetEditTest extends TestCase{
 				System.out.println(Arrays.toString(parts));
 				ss.add(q.getBasicForm());
 			}
-			TestCase.assertTrue(ss.contains("метры в секунду"));
+			TestCase.assertTrue(ss.contains("метр в секунду"));
 			wordElement3 = mm.getWordElement("кмч");
 			MetaLayer<Object> layer = mm.getMetaLayers().getLayer("relation_to_primary");
 			Object value = layer.getValue(wordElement3.getConcepts()[0]);
 			TestCase.assertEquals(value, 0.27777777);
-			wordElement3 = mm.getWordElement("��������");
+			wordElement3 = mm.getWordElement("километр");
 			possibleContinuations = mm.getPossibleContinuations(wordElement3);
 			TestCase.assertTrue(possibleContinuations.length>0);
 		} catch (Exception e) {

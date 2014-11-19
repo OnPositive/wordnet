@@ -17,6 +17,7 @@
 	</gr>
 	<gr f="_UNITS_SPEED" r="specialization" >
 		<sc t="м / c" />
+		<sc t="м/c" />
 		<sc t="метр в секунду" />
 		<sc t="кмч" />
 		<sc t="км/ч" />
