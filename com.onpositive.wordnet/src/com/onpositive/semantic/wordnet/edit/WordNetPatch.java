@@ -367,13 +367,13 @@ public class WordNetPatch {
 			case SemanticRelation.MERONIM_BACKLINK:
 				return SemanticRelation.MERONIM;
 			case SemanticRelation.GENERALIZATION:
-				return SemanticRelation.GENERALIZATION_BACK_LINK;
-			case SemanticRelation.GENERALIZATION_BACK_LINK:
-				return SemanticRelation.GENERALIZATION;
-			case SemanticRelation.SPECIALIZATION:
 				return SemanticRelation.SPECIALIZATION_BACK_LINK;
-			case SemanticRelation.SPECIALIZATION_BACK_LINK:
+			case SemanticRelation.GENERALIZATION_BACK_LINK:
 				return SemanticRelation.SPECIALIZATION;
+			case SemanticRelation.SPECIALIZATION:
+				return SemanticRelation.GENERALIZATION_BACK_LINK;
+			case SemanticRelation.SPECIALIZATION_BACK_LINK:
+				return SemanticRelation.GENERALIZATION;
 			default:
 				break;
 			}

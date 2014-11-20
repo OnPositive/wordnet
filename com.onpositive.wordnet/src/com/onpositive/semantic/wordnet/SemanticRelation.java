@@ -34,8 +34,8 @@ public class SemanticRelation extends AbstractRelation<MeaningElement> implement
 		backlinkMap.put(MERONIM, MERONIM_BACKLINK);
 		
 		backlinkAnalogueMap.put(SYNONIM, SYNONIM_BACK_LINK);
-		backlinkAnalogueMap.put(SPECIALIZATION, GENERALIZATION_BACK_LINK);
-		backlinkAnalogueMap.put(GENERALIZATION, SPECIALIZATION_BACK_LINK);
+		backlinkAnalogueMap.put(SPECIALIZATION, SPECIALIZATION_BACK_LINK);
+		backlinkAnalogueMap.put(GENERALIZATION, GENERALIZATION_BACK_LINK);
 		backlinkAnalogueMap.put(ANTONIM, ANTONIM_BACKLINK);
 	}
 	

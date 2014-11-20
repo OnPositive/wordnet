@@ -148,7 +148,7 @@ public abstract class MeaningElement extends RelationTarget {
 			SemanticRelation[] semanticRelations = me.getSemanticRelations();
 			for(SemanticRelation sr : semanticRelations){
 				
-				if( sr.relation == SemanticRelation.GENERALIZATION || sr.relation == SemanticRelation.SPECIALIZATION_BACK_LINK ){
+				if( sr.relation == SemanticRelation.GENERALIZATION || sr.relation == SemanticRelation.GENERALIZATION_BACK_LINK ){
 					MeaningElement word = sr.getWord();
 					if(set.contains(word.id())){
 						if(result==null){
