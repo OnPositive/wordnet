@@ -10,6 +10,8 @@
 		<ctab-folder >
 			<tree bindTo="$$.models($$.z)" property="Specialization" enablement="true" caption="Специализация">
 			</tree>
+			<tree bindTo="$$.models($$.z)" property="Generalization" enablement="true" caption="Обобщение">
+			</tree>
 		</ctab-folder>
 	</splitter>
 </form>
