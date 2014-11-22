@@ -26,15 +26,12 @@ public abstract class WordNet extends AbstractWordNet implements
 	
 	protected abstract void registerWord(Word word);
 	
-	protected abstract void registerWordForm(String wf,GrammarRelation form);
+	public abstract void registerWordForm(String wf,GrammarRelation form);
 	
 	public abstract Word getOrCreateWord(String lowerCase);
 	
 	public abstract void init();
 
-	public abstract WordFormTemplate findTemplate(String string);
-
-	public abstract void registerTemplate(WordFormTemplate tpl);
 
 	public abstract void markRedirect(String from, String to);
 	

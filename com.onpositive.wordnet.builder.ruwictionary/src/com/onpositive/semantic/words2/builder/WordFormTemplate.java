@@ -1,4 +1,4 @@
-package com.onpositive.semantic.words2;
+package com.onpositive.semantic.words2.builder;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -11,6 +11,9 @@ import java.util.LinkedHashSet;
 
 import com.onpositive.semantic.wordnet.GrammarRelation;
 import com.onpositive.semantic.wordnet.Grammem;
+import com.onpositive.semantic.words2.SimpleWordNet;
+import com.onpositive.semantic.words2.Word;
+import com.onpositive.semantic.words2.WordNet;
 
 public class WordFormTemplate implements Serializable {
 
@@ -158,9 +161,9 @@ public class WordFormTemplate implements Serializable {
 
 	
 
-	public void build(Word w) {
-		boolean pt=w.pt;
-		boolean st=w.st;
+	public void build(Word w,TempWordInfo inf) {
+		boolean pt=inf.pt;
+		boolean st=inf.st;
 		
 		Field[] declaredFields = formRule.getClass().getDeclaredFields();
 		boolean allCorrect = true;
@@ -185,10 +188,10 @@ public class WordFormTemplate implements Serializable {
 				if (object != null && object.equals("—")) {
 					continue;
 				}
-				if (w.foundation == null && w.foundation1 == null
+				if (inf.foundation == null && inf.foundation1 == null
 						&& object != null) {
 					try {
-						w.foundation = w.basicForm.substring(0, w.basicForm.length()
+						inf.foundation = w.getBasicForm().substring(0, w.getBasicForm().length()
 								- (object.length() - 2));
 					} catch (Exception e) {
 
@@ -198,14 +201,14 @@ public class WordFormTemplate implements Serializable {
 					allCorrect=false;
 					continue;
 				}
-				if (w.foundation != null) {
-					pl = pl.replace((CharSequence) "#0", w.foundation);
+				if (inf.foundation != null) {
+					pl = pl.replace((CharSequence) "#0", inf.foundation);
 				}
-				if (w.foundation1 != null) {
-					pl = pl.replace((CharSequence) "#1", w.foundation1);
+				if (inf.foundation1 != null) {
+					pl = pl.replace((CharSequence) "#1", inf.foundation1);
 				}
-				if (w.foundation2 != null) {
-					pl = pl.replace((CharSequence) "#2", w.foundation2);
+				if (inf.foundation2 != null) {
+					pl = pl.replace((CharSequence) "#2", inf.foundation2);
 				}
 //				if (w.foundation3 != null) {
 //					pl = pl.replace((CharSequence) "#3", w.foundation3);
@@ -240,28 +243,8 @@ public class WordFormTemplate implements Serializable {
 
 			}
 		}
-		if(allCorrect){
-			if (formRule instanceof NounFormRule){
-				wordNet.fullyCorrectNouns++;
-			}
-			if (formRule instanceof VerbFormRule){
-				wordNet.fullyCorrectVerbs++;
-			}
-			if (formRule instanceof AdjectiveFormRule){
-				wordNet.fullyCorrectAdj++;
-			}
-		}
-		else{
-			if (formRule instanceof NounFormRule){
-				wordNet.incorrectNouns++;
-			}
-			if (formRule instanceof VerbFormRule){
-				wordNet.incorrectVerbs++;
-			}
-			if (formRule instanceof AdjectiveFormRule){
-				wordNet.incorrectAdj++;
-			}
-		}
+		
+		
 	}
 
 	private GrammarRelation getRelation(SimpleWordNet wn, Word w, Field f, IFormRule formRule2) {
@@ -289,15 +272,15 @@ public class WordFormTemplate implements Serializable {
 	@SuppressWarnings("rawtypes")
 	transient HashMap<Class, HashMap<Field, Integer>>map=new HashMap<Class, HashMap<Field,Integer>>();
 
-	public void register(Word word) {
+	public void register(Word word,TempExtras e,TempWordInfo inf) {
 		if (templateLink!=null){
-			processOverride();
+			processOverride(e);
 		}
-		build((Word) word);
+		build((Word) word, inf);
 	}
 
-	private void processOverride() {
-		WordFormTemplate findTemplate = wordNet.findTemplate("Шаблон:"+templateLink);
+	private void processOverride(TempExtras ex) {
+		WordFormTemplate findTemplate = ex.findTemplate("Шаблон:"+templateLink);
 		if (findTemplate!=null){
 			IFormRule formRule2 = findTemplate.formRule;
 			map.get(formRule2.getClass());

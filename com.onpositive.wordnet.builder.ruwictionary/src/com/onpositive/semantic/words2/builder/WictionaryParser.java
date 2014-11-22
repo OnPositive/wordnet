@@ -19,7 +19,6 @@ import com.onpositive.semantic.wordnet.SemanticRelation;
 import com.onpositive.semantic.words2.AbstractRelationTarget;
 import com.onpositive.semantic.words2.SimpleWordNet;
 import com.onpositive.semantic.words2.Word;
-import com.onpositive.semantic.words2.WordFormTemplate;
 import com.onpositive.semantic.words2.WordNet;
 import com.onpositive.semantic.words2.WordNetContributor;
 public class WictionaryParser extends WordNetContributor {
@@ -27,9 +26,11 @@ public class WictionaryParser extends WordNetContributor {
 	public static final class PageProcessor implements IPageVisitor {
 		private final HashSet<Character> mm;
 		private final WordNet wi;
+		private TempExtras extras;
 
-		public PageProcessor(WordNet wi) {
+		public PageProcessor(WordNet wi, TempExtras etras) {
 			this.wi = wi;
+			this.extras=etras;
 			mm = new HashSet<Character>();
 			for (char c : russianLetters.toCharArray()) {
 				mm.add(c);
@@ -83,7 +84,7 @@ public class WictionaryParser extends WordNetContributor {
 					}									
 					processWordKind(orCreate, readLine);
 					processFeatures(orCreate, readLine);
-					parseFoundations(orCreate, readLine);
+					parseFoundations(extras.getInfo(orCreate), readLine);
 					int nkind = parseSemanticRelationHeader(readLine);
 					if (nkind!=-1){
 						areWeParsingKnownRelation = true;
@@ -361,29 +362,30 @@ public class WictionaryParser extends WordNetContributor {
 		}
 
 		private void processWordKind(Word orCreate, String readLine) {
+			TempWordInfo gi=extras.getInfo(orCreate);
 			if (readLine.startsWith("{{")) {
 				String rl = readLine.substring(2)
 						.trim();
 				if (rl.startsWith("сущ")
 						|| rl.startsWith("сущ")) {
-					setupTemplate(wi, orCreate, rl);
+					setupTemplate(wi, gi, rl);
 					orCreate.setPartOfSpeech(Grammem.PartOfSpeech.NOUN);
 				}
 				if (rl.startsWith("conj")) {
-					setupTemplate(wi, orCreate, rl);
+					setupTemplate(wi, gi, rl);
 					orCreate.setPartOfSpeech(Grammem.PartOfSpeech.CONJ);
 				}
 				if (rl.startsWith("числ")) {
-					setupTemplate(wi, orCreate, rl);
+					setupTemplate(wi, gi, rl);
 					orCreate.setPartOfSpeech(Grammem.PartOfSpeech.NUMR);
 				}
 				
 				if (rl.startsWith("прил")) {
-					setupTemplate(wi, orCreate, rl);
+					setupTemplate(wi, gi, rl);
 					orCreate.setPartOfSpeech(Grammem.PartOfSpeech.ADJF);
 				}
 				if (rl.startsWith("гл")) {
-					setupTemplate(wi, orCreate, rl);
+					setupTemplate(wi, gi, rl);
 					orCreate.setPartOfSpeech(Grammem.PartOfSpeech.VERB);
 				}
 			}
@@ -401,7 +403,7 @@ public class WictionaryParser extends WordNetContributor {
 			}
 		}
 
-		private void parseFoundations(Word orCreate, String readLine) {
+		private void parseFoundations(TempWordInfo orCreate, String readLine) {
 			String s = readLine;
 			if (s.startsWith("|pt=")&&s.contains("1")){
 				orCreate.setPluralTantum(true);
@@ -414,7 +416,7 @@ public class WictionaryParser extends WordNetContributor {
 			}
 		}
 
-		private String parseFoundation(Word orCreate, String s) {
+		private String parseFoundation(TempWordInfo orCreate, String s) {
 			s = s.substring(s
 					.indexOf("|основа"));
 			
@@ -476,7 +478,7 @@ public class WictionaryParser extends WordNetContributor {
 		}
 
 		public void setupTemplate(final WordNet wi,
-				Word orCreate, String rl) {
+				TempWordInfo orCreate, String rl) {
 			String substring = cleanTemplate(rl);
 			WordFormTemplate findTemplate = innerFindTemplate(
 					wi, substring);
@@ -491,7 +493,7 @@ public class WictionaryParser extends WordNetContributor {
 			if (indexOf != -1) {
 				substring = substring.substring(0, indexOf);
 			}
-			return wi.findTemplate("Шаблон:" + substring);
+			return extras.findTemplate("Шаблон:" + substring);
 		}
 
 		private String cleanTemplate(String readLine) {
@@ -512,8 +514,9 @@ public class WictionaryParser extends WordNetContributor {
 	static final String russianLetters = "абвгдеёжзийклмнопрстуфхцчшщъыьэюя";
 
 	static void fill(XMLPageParser pp, final WordNet wi, String name) {
-		registerTemplates(pp, wi, name);
-		processPages(pp, wi, name);
+		TempExtras etras=new TempExtras();
+		registerTemplates(pp, wi, name, etras);
+		processPages(pp, wi, name,etras);
 		try{
 		registerWords("conj.txt",Grammem.PartOfSpeech.CONJ,wi);
 		registerWords("prep.txt",Grammem.PartOfSpeech.PREP,wi);
@@ -540,12 +543,12 @@ public class WictionaryParser extends WordNetContributor {
 	}
 
 	public static void processPages(XMLPageParser pp, final WordNet wi,
-			String name) {
+			String name, TempExtras etras) {
 		try {
 			try {
 				pp.visitContent(new BufferedReader(new InputStreamReader(
 						new FileInputStream(name), "UTF-8")),
-						new PageProcessor(wi));
+						new PageProcessor(wi,etras));
 
 			} catch (UnsupportedEncodingException e) {
 				e.printStackTrace();
@@ -556,7 +559,7 @@ public class WictionaryParser extends WordNetContributor {
 	}
 
 	public static void registerTemplates(XMLPageParser pp, final WordNet wi,
-			String name) {
+			String name,final TempExtras extras) {
 		try {
 			System.out.println("Templates collecting");
 			pp.visitContent(new BufferedReader(new InputStreamReader(
@@ -570,7 +573,7 @@ public class WictionaryParser extends WordNetContributor {
 								WordFormTemplate wordFormTemplate = new WordFormTemplate(
 										model.getTitle(), model.getText(), wi,
 										Grammem.PartOfSpeech.NOUN.intId);
-								wi.registerTemplate(wordFormTemplate);
+								extras.registerTemplate(wordFormTemplate);
 							} catch (IOException e) {
 							}
 						}
@@ -579,7 +582,7 @@ public class WictionaryParser extends WordNetContributor {
 								WordFormTemplate wordFormTemplate = new WordFormTemplate(
 										model.getTitle(), model.getText(), wi,
 										Grammem.PartOfSpeech.ADJF.intId);
-								wi.registerTemplate(wordFormTemplate);
+								extras.registerTemplate(wordFormTemplate);
 							} catch (IOException e) {
 							}
 						}
@@ -588,7 +591,7 @@ public class WictionaryParser extends WordNetContributor {
 								WordFormTemplate wordFormTemplate = new WordFormTemplate(
 										model.getTitle(), model.getText(), wi,
 										Grammem.PartOfSpeech.VERB.intId);
-								wi.registerTemplate(wordFormTemplate);
+								extras.registerTemplate(wordFormTemplate);
 							} catch (Exception e) {
 							}
 						}

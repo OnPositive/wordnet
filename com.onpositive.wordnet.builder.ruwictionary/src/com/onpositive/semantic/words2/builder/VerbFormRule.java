@@ -1,4 +1,4 @@
-package com.onpositive.semantic.words2;
+package com.onpositive.semantic.words2.builder;
 
 import java.io.Serializable;
 

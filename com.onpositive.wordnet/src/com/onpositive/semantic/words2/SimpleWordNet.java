@@ -47,8 +47,7 @@ public class SimpleWordNet extends WordNet implements Serializable {
 
 	protected ArrayList<MeaningElement> meanings = new ArrayList<MeaningElement>();
 
-	protected HashMap<String, WordFormTemplate> wordTemplateMap = new HashMap<String, WordFormTemplate>();
-
+	
 	protected HashMap<String, ArrayList<GrammarRelation>> wordforms = new HashMap<String, ArrayList<GrammarRelation>>();
 
 	public Set<String> getFormsSet() {
@@ -279,14 +278,7 @@ public class SimpleWordNet extends WordNet implements Serializable {
 		arrayList.add(form);
 	}
 
-	@Override
-	public WordFormTemplate findTemplate(String string) {
-		return wordTemplateMap.get(string);
-	}
-
-	public void registerTemplate(WordFormTemplate template) {
-		wordTemplateMap.put(template.title, template);
-	}
+	
 
 	public RelationTarget getWordMeaning(int id) {
 		return meanings.get(id);
@@ -315,9 +307,7 @@ public class SimpleWordNet extends WordNet implements Serializable {
 		for (TextElement w : this.words) {
 			if (w instanceof Word) {
 				Word s = (Word) w;
-				if (s.template != null) {
-					s.template.register((Word) w);
-				}
+				
 				MeaningElement[] concepts = s.getConcepts();
 				for (MeaningElement q : concepts) {
 					WordMeaning wm = (WordMeaning) q;
@@ -490,42 +480,7 @@ public class SimpleWordNet extends WordNet implements Serializable {
 		return sequences;
 	}
 
-	public Word getSingleWord(GrammarRelation[] posibleWords) {
-		if (posibleWords == null || posibleWords.length == 0) {
-			return null;
-		}
-		if (posibleWords.length == 1) {
-			return (Word) posibleWords[0].getWord();
-		}
-		int id = -1;
-		for (GrammarRelation r : posibleWords) {
-			TextElement word = r.getWord();
-			if (word instanceof Word) {
-				Word wr = (Word) word;
 
-				if (wr.mayBeUsedAsNoun()) {
-					if (r.relation == NounFormRule.NOM_SG) {
-						return wr;
-					}
-					if (r.relation == NounFormRule.NOM_PL) {
-						return wr;
-					}
-					if (r.relation == 0) {
-						return wr;
-					}
-				}
-			}
-			if (id == -1) {
-				id = r.conceptId;
-			} else if (id != r.conceptId) {
-				return null;
-			}
-		}
-		if (id == -1) {
-			return null;
-		}
-		return (Word) words.get(id);
-	}
 
 	@Override
 	public int wordCount() {
