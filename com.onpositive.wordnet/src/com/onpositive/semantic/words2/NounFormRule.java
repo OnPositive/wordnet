@@ -27,6 +27,9 @@ public class NounFormRule implements Serializable,IFormRule{
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
+	
+	String st;
+	String pt;
 	/**
 	 * Именительный единственное 
 	 */

@@ -403,6 +403,12 @@ public class WictionaryParser extends WordNetContributor {
 
 		private void parseFoundations(Word orCreate, String readLine) {
 			String s = readLine;
+			if (s.startsWith("|pt=")&&s.contains("1")){
+				orCreate.setPluralTantum(true);
+			}
+			if (s.startsWith("|st=")&&s.contains("1")){
+				orCreate.setSingularTantum(true);
+			}
 			while (s.indexOf("|основа") > -1) {
 				s=parseFoundation(orCreate, s);
 			}
@@ -411,6 +417,7 @@ public class WictionaryParser extends WordNetContributor {
 		private String parseFoundation(Word orCreate, String s) {
 			s = s.substring(s
 					.indexOf("|основа"));
+			
 			if (s.startsWith("|основа")) {
 				if (s.indexOf('=') > 0) {
 					char c = s

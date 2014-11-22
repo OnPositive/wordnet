@@ -251,6 +251,11 @@ public class SimpleWordNet extends WordNet implements Serializable {
 	@Override
 	public void registerWordForm(String wf, GrammarRelation form) {
 		wf = wf.toLowerCase();
+		if (wf.equals("час")){
+			if (form.getWord().getBasicForm().equals("часы")){
+				System.out.println("a");
+			}
+		}
 		ArrayList<GrammarRelation> arrayList = wordforms.get(wf);
 		if (arrayList == null) {
 			arrayList = new ArrayList<GrammarRelation>();

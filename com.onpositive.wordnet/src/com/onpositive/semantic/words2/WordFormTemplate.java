@@ -159,13 +159,23 @@ public class WordFormTemplate implements Serializable {
 	
 
 	public void build(Word w) {
-		if (w.basicForm.equals("слон")){
-			System.out.println("A");
-		}
+		boolean pt=w.pt;
+		boolean st=w.st;
+		
 		Field[] declaredFields = formRule.getClass().getDeclaredFields();
 		boolean allCorrect = true;
 		for (Field f : declaredFields) {
 			try {
+				if (pt&&formRule instanceof NounFormRule){
+					if (f.getName().endsWith("_sg")){
+						continue;
+					}
+				}
+				if (st&&formRule instanceof NounFormRule){
+					if (f.getName().endsWith("_pl")){
+						continue;
+					}
+				}
 				f.setAccessible(true);
 				if (f.getType() != String.class) {
 					continue;
@@ -215,7 +225,10 @@ public class WordFormTemplate implements Serializable {
 							rr=replace.split("<br>");
 						}
 						for (String s: rr){
-						wordNet.registerWordForm(s, getRelation((SimpleWordNet) wordNet, w,f,formRule));
+						GrammarRelation relation = getRelation((SimpleWordNet) wordNet, w,f,formRule);
+						if (relation!=null){
+						wordNet.registerWordForm(s, relation);
+						}
 						}
 						continue;
 					}
@@ -255,9 +268,13 @@ public class WordFormTemplate implements Serializable {
 		Class<?> declaringClass = f.getDeclaringClass();
 		HashMap<Field, Integer> hashMap = mm.get(declaringClass);
 		Integer integer = hashMap.get(f);
+		if (f.getName().equals("pt")||f.getName().equals("st")){
+			return null;
+		}
 		LinkedHashSet<Grammem>grSet=new LinkedHashSet<Grammem>();
 		if (formRule instanceof NounFormRule){
-			grSet=NounRelations.getRelations(integer);
+			LinkedHashSet<Grammem> relations = NounRelations.getRelations(integer);
+			grSet=relations;
 		}
 		if (formRule instanceof VerbFormRule){
 			grSet=VerbRelations.getRelations(integer);

@@ -31,6 +31,8 @@ public class Word extends TextElement implements Serializable {
 	protected String foundation;
 	protected String foundation1;
 	protected String foundation2;
+	protected boolean pt;
+	protected boolean st;
 	
 	protected ArrayList<WordMeaning>meanings=new ArrayList<WordMeaning>();
 	
@@ -211,5 +213,12 @@ public class Word extends TextElement implements Serializable {
 	public AbstractRelationTarget getCurrentRelationTarget() {
 		MeaningElement[] concepts = getConcepts();
 		return ((WordMeaning)concepts[concepts.length-1]);
+	}
+
+	public void setPluralTantum(boolean pt) {
+		this.pt=pt;
+	}
+	public void setSingularTantum(boolean st) {
+		this.st=st;
 	}
 }

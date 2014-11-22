@@ -33,6 +33,13 @@ public class BasicTest extends TestCase{
 		TextElement[] possibleContinuations = mm.getPossibleContinuations(wordElement);
 		TestCase.assertTrue(possibleContinuations.length>0);
 	}
+	public void testHour(){
+		AbstractWordNet mm = WordNetProvider.getInstance();
+		GrammarRelation[] possibleGrammarForms = mm.getPossibleGrammarForms("час");
+		for (GrammarRelation g:possibleGrammarForms){
+			TestCase.assertTrue(g.getWord().getBasicForm().equals("час"));
+		}
+	}
 	
 	public void testInit(){
 		AbstractWordNet instance = WordNetProvider.getInstance();
