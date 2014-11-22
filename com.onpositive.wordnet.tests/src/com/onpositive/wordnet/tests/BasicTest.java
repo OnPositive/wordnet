@@ -20,7 +20,7 @@ public class BasicTest extends TestCase{
 
 	static{
 		WordNetProvider.setInstance(null);
-		WordNetProvider.killDatabase();
+		//WordNetProvider.killDatabase();
 	}
 	public void testContinuations(){
 		AbstractWordNet mm = WordNetProvider.getInstance();
@@ -152,6 +152,19 @@ public class BasicTest extends TestCase{
 	public void testConjuration(){
 		TextElement wordElement = WordNetProvider.getInstance().getWordElement("после того как");
 		TestCase.assertTrue(Grammem.PartOfSpeech.CONJ.isDefinitelyThisPartOfSpech(wordElement));
+	}
+	public void testPrep1(){
+		TextElement wordElement = WordNetProvider.getInstance().getWordElement("в");
+		TestCase.assertTrue(Grammem.PartOfSpeech.PREP.mayBeThisPartOfSpech(wordElement));
+		GrammarRelation[] wordElement1 = WordNetProvider.getInstance().getPossibleGrammarForms("в");
+		TestCase.assertTrue(Grammem.PartOfSpeech.PREP.mayBeThisPartOfSpech(wordElement1));
+	}
+	
+	public void testPrep2(){
+		TextElement wordElement = WordNetProvider.getInstance().getWordElement("с");
+		TestCase.assertTrue(Grammem.PartOfSpeech.PREP.mayBeThisPartOfSpech(wordElement));
+		GrammarRelation[] wordElement1 = WordNetProvider.getInstance().getPossibleGrammarForms("с");
+		TestCase.assertTrue(Grammem.PartOfSpeech.PREP.mayBeThisPartOfSpech(wordElement1));
 	}
 	
 	public void testPreposition(){

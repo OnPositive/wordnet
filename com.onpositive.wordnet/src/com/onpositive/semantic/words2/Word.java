@@ -2,6 +2,7 @@ package com.onpositive.semantic.words2;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
@@ -155,7 +156,41 @@ public class Word extends TextElement implements Serializable {
 		}
 		MeaningElement[] concepts = getConcepts();
 		WordMeaning e=(WordMeaning) concepts[concepts.length-1];
+		HashSet<Grammem> grammemSet = owner.getGrammemSet(relationCode);
+		HashSet<Grammem> grammemSet1 = owner.getGrammemSet(e.kind);
+		if (sameKindOfSpeech(grammemSet,grammemSet1)){
 		e.kind=(short) relationCode;
+		}
+		else{
+				//no we should allocate new concept
+				WordMeaning mm=new WordMeaning(minimalNumber, owner, this);
+				minimalNumber--;
+				meanings.add(mm);
+				concepts=getConcepts();
+			hasKind=true;
+			((WordMeaning)concepts[concepts.length-1]).kind=(short)relationCode;
+			tempSet=null;
+		}
+		}
+		
+	
+
+	private boolean sameKindOfSpeech(HashSet<Grammem> grammemSet,
+			HashSet<Grammem> grammemSet1) {
+		PartOfSpeech p=null;
+		for (Grammem q:grammemSet){
+			if (q instanceof PartOfSpeech){
+				p=(PartOfSpeech) q;
+			}
+		}
+		for (Grammem q:grammemSet1){
+			if (q instanceof PartOfSpeech){
+				if (p!=null&&p!=q){
+					return false;
+				}
+			}
+		}
+		return true;
 	}
 
 	public void setFeature(SemanGramem toponim) {

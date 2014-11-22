@@ -531,7 +531,8 @@ public class WictionaryParser extends WordNetContributor {
 			if (readLine==null){
 				break;
 			}
-			readLine=readLine.trim();			
+			readLine=readLine.trim();	
+				
 			Word orCreateWord = wi.getOrCreateWord(readLine.toLowerCase());
 			orCreateWord.setPartOfSpeech(conj);
 			orCreateWord.commitTempSet();
