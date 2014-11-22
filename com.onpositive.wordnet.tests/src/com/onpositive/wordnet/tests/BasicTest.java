@@ -20,7 +20,7 @@ public class BasicTest extends TestCase{
 
 	static{
 		WordNetProvider.setInstance(null);
-		//WordNetProvider.killDatabase();
+		WordNetProvider.killDatabase();
 	}
 	public void testContinuations(){
 		AbstractWordNet mm = WordNetProvider.getInstance();
@@ -85,6 +85,11 @@ public class BasicTest extends TestCase{
 			}			
 		}
 		TestCase.assertTrue(found);
+	}
+	
+	public void testMinus(){
+		GrammarRelation[] possibleGrammarForms = WordNetProvider.getInstance().getPossibleGrammarForms("-");
+		TestCase.assertTrue(possibleGrammarForms==null||possibleGrammarForms.length==0);
 	}
 	
 	public void testMultiMeaning2(){

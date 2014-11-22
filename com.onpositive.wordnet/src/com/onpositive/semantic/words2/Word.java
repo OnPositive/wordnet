@@ -87,7 +87,7 @@ public class Word extends TextElement implements Serializable {
 	}
 
 	public void registerFoundation(int number, String foundation) {
-		if (foundation!=null&&foundation.length()>0){
+		if (foundation!=null&&foundation.length()>0&&!foundation.equals("-")){
 			if (number==0){
 				if (this.foundation==null){
 				this.foundation=foundation;
