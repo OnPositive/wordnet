@@ -17,6 +17,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Set;
 
 import com.carrotsearch.hppc.IntIntOpenHashMap;
@@ -382,25 +383,39 @@ public class SimpleWordNet extends WordNet implements Serializable {
 		}
 	}
 
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	void toSequenceIfNeeded(Word w) {
-		if (w.getBasicForm().indexOf(' ') != -1) {
-			String[] split = w.getBasicForm().split(" ");
+		String basicForm = w.getBasicForm();
+		if (basicForm.indexOf(' ') != -1||basicForm.indexOf('-')!=-1) {
+			String[] split = basicForm.split(" ");
+			if (split.length==1){
+				split=basicForm.split("-");
+				
+			}
 			ArrayList<Word> sequence = new ArrayList<Word>();
 			for (String s : split) {
-				Word singlePossibleWord = getSinglePossibleWord(s);
+				TextElement singlePossibleWord2 = getSinglePossibleWord(s);
+				if (singlePossibleWord2 instanceof SimpleSequence){
+					SimpleSequence seq=(SimpleSequence) singlePossibleWord2;
+					sequence.addAll((List)Arrays.asList(seq.getParts()));
+				}
+				else{
+				Word singlePossibleWord = (Word) singlePossibleWord2;
 				if (singlePossibleWord == null) {
 					return;
 				}
+				
 				sequence.add(singlePossibleWord);
+				}
 			}
 			SimpleSequence s = new SimpleSequence(
 					sequence.toArray(new Word[sequence.size()]), w.id(),
-					w.getBasicForm(), this);
+					basicForm, this);
 			s.meanings = w.meanings;
 			registerSequence(s);
 			// register sequence
 			words.set(w.id(), s);
-			wordMap.put(w.getBasicForm(), s);
+			wordMap.put(basicForm, s);
 			Word[] words2 = s.getWords();
 			ArrayList<Integer> intArrayList = sequenceMap.get(words2[0].id);
 			if (intArrayList == null) {
@@ -411,7 +426,7 @@ public class SimpleWordNet extends WordNet implements Serializable {
 		}
 	}
 
-	private Word getSinglePossibleWord(String s) {
+	private TextElement getSinglePossibleWord(String s) {
 		GrammarRelation[] possibleGrammarForms = getPossibleGrammarForms(s);
 		if (possibleGrammarForms != null) {
 			HashSet<TextElement> tt = new HashSet<TextElement>();
@@ -421,11 +436,11 @@ public class SimpleWordNet extends WordNet implements Serializable {
 
 			}
 			if (tt.size() == 1) {
-				return (Word) tt.iterator().next();
+				return tt.iterator().next();
 			}
 			for (TextElement q:tt){
 				if (q.getBasicForm().equals(s)){
-					return (Word) q;
+					return q;
 				}
 			}
 		}

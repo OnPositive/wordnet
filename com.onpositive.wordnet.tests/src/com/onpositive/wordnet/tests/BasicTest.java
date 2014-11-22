@@ -27,6 +27,12 @@ public class BasicTest extends TestCase{
 		TextElement wordElement = mm.getWordElement("метр");
 		TestCase.assertTrue(wordElement!=null);
 	}
+	public void testContinuationNormal(){
+		AbstractWordNet mm = WordNetProvider.getInstance();
+		TextElement wordElement = mm.getWordElement("ковер");
+		TextElement[] possibleContinuations = mm.getPossibleContinuations(wordElement);
+		TestCase.assertTrue(possibleContinuations.length>0);
+	}
 	
 	public void testInit(){
 		AbstractWordNet instance = WordNetProvider.getInstance();
@@ -106,6 +112,8 @@ public class BasicTest extends TestCase{
 		}
 		TestCase.assertTrue(found);
 	}
+	
+
 	
 	public void testSequence(){
 		TextElement wordElement = WordNetProvider.getInstance().getWordElement("политический деятель");
