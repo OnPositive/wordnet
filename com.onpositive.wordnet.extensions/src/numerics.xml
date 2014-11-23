@@ -1,5 +1,12 @@
 <wnc>
 	<meta-layer id='numbers' caption="Numerics to numbers" type="double" />
+	<meta-layer id='numbers.scale' caption="Numerics with scale" type="boolean" />
+	<gr l="numbers.scale">
+		<meta w='тысяча' v='true' />
+		<meta w='миллион' v='true' />
+		<meta w='миллиард' v='true' />
+		<meta w='триллион' v='true' />
+	</gr>
 	<gr l="numbers">
 		<meta w='семь' v='7' />
 		<meta w='восемь' v='8' />
@@ -154,5 +161,8 @@
 		<meta w='сто восемь' v='108' />
 		<meta w='сто девять' v='109' />
 		<meta w='сто десять' v='110' />
+		<meta w='миллион' v='1000000' />
+		<meta w='миллиард' v='1000000000' />
+		<meta w='триллион' v='1000000000000' />
 	</gr>
 </wnc>

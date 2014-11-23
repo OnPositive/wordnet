@@ -447,7 +447,7 @@ public class SimpleWordNet extends WordNet implements Serializable {
 
 		public void add(SimpleSequence sequence) {
 			ws.add(sequence);
-			System.out.println(sequence);
+			//System.out.println(sequence);
 		}
 
 		public SimpleSequence match(int a, ArrayList<Word> w) {
