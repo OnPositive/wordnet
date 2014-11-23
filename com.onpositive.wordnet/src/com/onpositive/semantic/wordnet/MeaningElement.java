@@ -4,9 +4,6 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 
-import com.carrotsearch.hppc.IntArrayList;
-import com.carrotsearch.hppc.IntObjectOpenHashMapSerialzable.KeysContainer;
-import com.carrotsearch.hppc.IntOpenHashSet;
 import com.onpositive.semantic.wordnet.Grammem.PartOfSpeech;
 
 /**

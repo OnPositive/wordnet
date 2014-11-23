@@ -2,6 +2,7 @@ package com.onpositive.semantic.words3;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.util.Collection;
 import java.util.HashMap;
 
 public class LayersPack {
@@ -75,5 +76,9 @@ public class LayersPack {
 	
 	public void registerLayer(MetaLayer<?>layer){
 		laeyrs.put(layer.id, layer);
+	}
+
+	public Collection<MetaLayer<?>> getAll() {
+		return laeyrs.values();
 	}
 }

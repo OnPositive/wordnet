@@ -184,6 +184,9 @@ public class WordNetPatch {
 		@Override
 		protected void execute(IWordNetEditInterface net) {
 			TextElement wordElement = net.getWordNet().getWordElement(word);
+			if (wordElement==null){
+				wordElement=net.registerWord(word);
+			}
 			int id=wordElement.getConcepts()[0].id();
 			MetaLayer<Object> layer2 = net.getWordNet().getMetaLayers().getLayer(layer);
 			if (removal) {

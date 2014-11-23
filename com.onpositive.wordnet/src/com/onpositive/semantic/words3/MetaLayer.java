@@ -5,6 +5,7 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 
 import com.onpositive.semantic.wordnet.MeaningElement;
+import com.onpositive.semantic.wordnet.TextElement;
 
 public abstract class MetaLayer<T> {
 
@@ -40,4 +41,19 @@ public abstract class MetaLayer<T> {
 	
 	protected abstract void store(DataOutputStream stream) throws IOException;
 	protected abstract void load(DataInputStream stream) throws IOException;
+
+	public T getValue(TextElement textElement) {
+		MeaningElement[] concepts = textElement.getConcepts();
+		for (MeaningElement q:concepts){
+			T value = getValue(q.id());
+			if (value!=null){
+				return value;
+			}
+		}
+		return null;
+	}
+
+	public String getCaption() {
+		return caption;
+	}
 }

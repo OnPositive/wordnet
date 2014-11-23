@@ -20,8 +20,26 @@ public class BasicTest extends TestCase{
 
 	static{
 		WordNetProvider.setInstance(null);
-		WordNetProvider.killDatabase();
+		//WordNetProvider.killDatabase();
 	}
+	public static void main(String[] args) {
+		AbstractWordNet instance = WordNetProvider.getInstance();
+		int wordCount = instance.wordCount();
+		System.out.println("======");
+		for(int i=0;i<wordCount;i++){
+			TextElement wordElement = instance.getWordElement(i);
+			if (wordElement!=null){
+				MeaningElement[] concepts = wordElement.getConcepts();
+				for(MeaningElement q:concepts){
+					Set<Grammem> grammems = q.getGrammems();
+					if(grammems!=null&&grammems.contains(Grammem.PartOfSpeech.NUMR)){
+						System.out.println("<meta w='"+wordElement.getBasicForm()+"' v='' l='numeric' />");
+					}
+				}
+			}
+		}
+	}
+	
 	public void testContinuations(){
 		AbstractWordNet mm = WordNetProvider.getInstance();
 		TextElement wordElement = mm.getWordElement("метр");

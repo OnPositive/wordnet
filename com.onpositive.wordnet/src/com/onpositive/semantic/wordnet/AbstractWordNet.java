@@ -12,7 +12,7 @@ import com.onpositive.semantic.words3.LayersPack;
 import com.onpositive.semantic.words3.suggestions.GuessedGrammarRelation;
 import com.onpositive.semantic.words3.suggestions.GuessedTextElement;
 
-public abstract class AbstractWordNet {
+public abstract class AbstractWordNet extends WordLookupEngine{
 
 	public AbstractWordNet(AbstractWordNet net) {
 		meta=net.meta;
