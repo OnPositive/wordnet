@@ -15,13 +15,25 @@
 		<sc t="_UNITS_TIME"/>
 		<sc t="_UNITS_POWER_TO_MASS_RATIO"/>
 	</gr>
+	<gr f="_UNITS_AREA" r="specialization" >
+		<sc t="километр^2" />		
+		<sc t="метр^2" />
+	</gr>
+	<gr f="_UNITS_SIZE" r="specialization" >
+		<sc t="километр" />		
+		<sc t="метр" />
+	</gr>
+	<gr f="км" r="Abbr" >
+		<gc t="километр" />		
+	</gr>
+	
 	<gr f="_UNITS_SPEED" r="specialization" >
 		<sc t="м / c" />
-		<sc t="м/c" />
 		<sc t="метр в секунду" />
-		<sc t="кмч" />
-		<sc t="км/ч" />
 		<sc t="километр в час" />
+		<sc t="кмч" />
+		<sc t="км / ч" />
 	</gr>
-	<meta w="кмч" v="0.27777777" l="relation_to_primary"/>
+	<meta w="кмч" v="1" l="relation_to_primary"/>
+	<meta w="километр" v="1000" l="relation_to_primary"/>
 </wnc>
