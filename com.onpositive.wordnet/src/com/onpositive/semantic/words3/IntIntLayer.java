@@ -4,11 +4,11 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
-import com.carrotsearch.hppc.IntIntOpenHashMap;
+import com.carrotsearch.hppc.IntIntOpenHashMapSerialable;
 
 public class IntIntLayer extends MetaLayer<Integer>{
 
-	protected IntIntOpenHashMap map=new IntIntOpenHashMap();
+	protected IntIntOpenHashMapSerialable map=new IntIntOpenHashMapSerialable();
 	
 	public IntIntLayer(String id, String caption) {
 		super(Integer.class, id, caption);
@@ -47,7 +47,7 @@ public class IntIntLayer extends MetaLayer<Integer>{
 	@Override
 	protected void load(DataInputStream stream) throws IOException {
 		int sz=stream.readInt();
-		map=new IntIntOpenHashMap(sz*3/2);
+		map=new IntIntOpenHashMapSerialable(sz*3/2);
 		for(int a=0;a<sz;a++){
 			map.put(stream.readInt(), stream.readInt());
 		}

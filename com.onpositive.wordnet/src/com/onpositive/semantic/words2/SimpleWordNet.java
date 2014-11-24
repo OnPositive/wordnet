@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.Set;
 
 import com.carrotsearch.hppc.IntIntOpenHashMap;
+import com.carrotsearch.hppc.IntIntOpenHashMapSerialable;
 import com.carrotsearch.hppc.IntObjectOpenHashMapSerialzable;
 import com.carrotsearch.hppc.ObjectIntOpenHashMap;
 import com.onpositive.semantic.wordnet.AbstractRelation;
@@ -303,7 +304,7 @@ public class SimpleWordNet extends WordNet implements Serializable {
 
 	@Override
 	public void init() {
-		IntIntOpenHashMap idrecoder = new IntIntOpenHashMap();
+		IntIntOpenHashMapSerialable idrecoder = new IntIntOpenHashMapSerialable();
 		for (TextElement w : this.words) {
 			if (w instanceof Word) {
 				Word s = (Word) w;
@@ -434,6 +435,10 @@ public class SimpleWordNet extends WordNet implements Serializable {
 					return q;
 				}
 			}
+		}
+		if (possibleGrammarForms.length==0){
+			Word orCreateWord = getOrCreateWord(s);
+			return orCreateWord;
 		}
 		return null;
 	}

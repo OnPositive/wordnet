@@ -19,7 +19,7 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
 import com.carrotsearch.hppc.ByteArrayList;
-import com.carrotsearch.hppc.IntIntOpenHashMap;
+import com.carrotsearch.hppc.IntIntOpenHashMapSerialable;
 import com.carrotsearch.hppc.IntOpenHashSetSerializable;
 import com.onpositive.semantic.wordnet.AbstractRelation;
 import com.onpositive.semantic.wordnet.AbstractWordNet;
@@ -44,7 +44,7 @@ public abstract class ReadOnlyWordNet extends AbstractWordNet {
 	protected StringStorage<GrammarRelation[]> relations;
 
 	protected WordStore wordsData;
-	protected IntIntOpenHashMap sequences = new IntIntOpenHashMap();
+	protected IntIntOpenHashMapSerialable sequences = new IntIntOpenHashMapSerialable();
 	protected byte[] store;
 	protected String version = "0";
 	protected String descripton = "Russian";

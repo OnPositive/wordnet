@@ -7,7 +7,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.reflect.Field;
 
-import com.carrotsearch.hppc.IntIntOpenHashMap;
+import com.carrotsearch.hppc.IntIntOpenHashMapSerialable;
 
 public abstract class StringToDataHashMap<T> extends StringStorage<T> {
 	protected int[] offsets;
@@ -82,11 +82,11 @@ public abstract class StringToDataHashMap<T> extends StringStorage<T> {
 			byteToCharTable[v]=c;
 		}
 	}
-	public static void writeMap(DataOutputStream str, IntIntOpenHashMap omap)
+	public static void writeMap(DataOutputStream str, IntIntOpenHashMapSerialable omap)
 			throws IOException {
 		str.writeFloat(omap.loadFactor);
 		try{
-		Field field = IntIntOpenHashMap.class.getDeclaredField("perturbation");
+		Field field = IntIntOpenHashMapSerialable.class.getDeclaredField("perturbation");
 		field.setAccessible(true);
 		str.writeInt(field.getInt(omap));
 		}catch (Exception e) {
@@ -110,13 +110,13 @@ public abstract class StringToDataHashMap<T> extends StringStorage<T> {
 		return rs;
 	}
 
-	public static IntIntOpenHashMap readMap(DataInputStream di)
+	public static IntIntOpenHashMapSerialable readMap(DataInputStream di)
 			throws IOException {
 		float readFloat = di.readFloat();
-		IntIntOpenHashMap intIntOpenHashMap = new IntIntOpenHashMap(4,
+		IntIntOpenHashMapSerialable intIntOpenHashMap = new IntIntOpenHashMapSerialable(4,
 				readFloat);
 		try{
-			Field field = IntIntOpenHashMap.class.getDeclaredField("perturbation");
+			Field field = IntIntOpenHashMapSerialable.class.getDeclaredField("perturbation");
 			field.setAccessible(true);
 			field.setInt(intIntOpenHashMap,di.readInt());
 			}catch (Exception e) {

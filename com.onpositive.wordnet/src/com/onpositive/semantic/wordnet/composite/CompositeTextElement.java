@@ -59,7 +59,7 @@ public class CompositeTextElement extends TextElement {
 
 	@Override
 	public TextElement[] getParts() {
-		TextElement[] parts = original.getParts();
+		TextElement[] parts = original!=null?original.getParts():extra.getParts();
 		TextElement[] newElements = new TextElement[parts.length];
 		for (int a = 0; a < parts.length; a++) {
 			newElements[a] = convert(parts[a]);

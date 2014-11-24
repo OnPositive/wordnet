@@ -2,7 +2,7 @@ package com.onpositive.semantic.words2;
 
 import java.io.Serializable;
 
-import com.carrotsearch.hppc.IntIntOpenHashMap;
+import com.carrotsearch.hppc.IntIntOpenHashMapSerialable;
 import com.onpositive.semantic.wordnet.AbstractRelation;
 import com.onpositive.semantic.wordnet.AbstractWordNet;
 import com.onpositive.semantic.wordnet.MeaningElement;
@@ -81,7 +81,7 @@ public abstract class AbstractRelationTarget extends MeaningElement implements
 		}
 		return result;
 	}
-	public void recodeRelations(IntIntOpenHashMap idrecoder) {
+	public void recodeRelations(IntIntOpenHashMapSerialable idrecoder) {
 		if (relations!=null){
 		for (int a = 0; a < relations.length; a += 2) {
 			int relationId = relations[a+1];
