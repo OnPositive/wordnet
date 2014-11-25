@@ -66,4 +66,14 @@ public class IntMeaningLayer extends MetaLayer<MeaningElement>{
 	public void removeValue(int meaningId) {
 		map.remove(meaningId);
 	}
+	
+	public void recode(IntIntOpenHashMapSerialable idrecoder) {
+		super.recode(idrecoder);
+		for (int q:getAllIds()){
+			int i = map.get(q);
+			if (idrecoder.containsKey(i)){
+				idrecoder.put(q, idrecoder.get(i));
+			}
+		}
+	}
 }

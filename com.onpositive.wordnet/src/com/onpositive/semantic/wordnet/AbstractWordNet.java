@@ -18,7 +18,7 @@ public abstract class AbstractWordNet extends WordLookupEngine{
 		meta=net.meta;
 	}
 	public AbstractWordNet(){
-		meta=new LayersPack();
+		meta=new LayersPack(this);
 	}
 
 	public abstract int wordCount();

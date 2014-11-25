@@ -4,6 +4,7 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
+import com.carrotsearch.hppc.IntIntOpenHashMapSerialable;
 import com.onpositive.semantic.wordnet.MeaningElement;
 import com.onpositive.semantic.wordnet.TextElement;
 
@@ -55,5 +56,17 @@ public abstract class MetaLayer<T> {
 
 	public String getCaption() {
 		return caption;
+	}
+
+	public void recode(IntIntOpenHashMapSerialable idrecoder) {
+		for (int q:getAllIds()){
+			if (idrecoder.containsKey(q)){
+				int newId = idrecoder.get(q);
+				T value = getValue(q);
+				removeValue(q);
+				//it is safe because new id is guaranted to be not used
+				putValue(newId, value);
+			}
+		}
 	}
 }

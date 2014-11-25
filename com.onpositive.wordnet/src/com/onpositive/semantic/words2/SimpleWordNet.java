@@ -13,6 +13,7 @@ import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -32,6 +33,8 @@ import com.onpositive.semantic.wordnet.MeaningElement;
 import com.onpositive.semantic.wordnet.RelationTarget;
 import com.onpositive.semantic.wordnet.SemanticRelation;
 import com.onpositive.semantic.wordnet.TextElement;
+import com.onpositive.semantic.words3.IntMeaningLayer;
+import com.onpositive.semantic.words3.MetaLayer;
 import com.onpositive.semantic.words3.SenseElementHandle;
 import com.onpositive.semantic.words3.WordHandle;
 import com.onpositive.semantic.words3.WordSequenceHandle;
@@ -331,6 +334,10 @@ public class SimpleWordNet extends WordNet implements Serializable {
 					wm.recodeRelations(idrecoder);
 				}
 			}
+		}
+		Collection<MetaLayer<?>> all = meta.getAll();
+		for (MetaLayer<?>q:all){
+			q.recode(idrecoder);
 		}
 		for (MeaningElement w : this.meanings) {
 			AbstractRelation<?>[] relations = w.getAllRelations();
