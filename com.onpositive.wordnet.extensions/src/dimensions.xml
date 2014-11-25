@@ -15,17 +15,50 @@
 		<sc t="_UNITS_TIME"/>
 		<sc t="_UNITS_POWER_TO_MASS_RATIO"/>
 	</gr>
-	<gr f="_UNITS_AREA" r="specialization" >
-		<sc t="километр^2" />		
-		<sc t="метр^2" />
-	</gr>
+	
 	<gr f="_UNITS_SIZE" r="specialization" >
-		<sc t="километр" />		
 		<sc t="метр" />
+		<sc t="фут" />
+		<sc t="дюйм" />
+		<sc t="сухопутная миля" />
+		<sc t="морская миля" />
 	</gr>
+	
 	<gr f="км" r="Abbr" >
-		<gc t="километр" />		
+		<gc t="километр" />
 	</gr>
+	<gr f="см" r="Abbr" >
+		<gc t="сантиметр" />
+	</gr>
+	<gr f="мм" r="Abbr" >
+		<gc t="миллиметр" />
+	</gr>
+	<gr f="мкм" r="Abbr" >
+		<gc t="микрометр" />
+	</gr>
+	<gr f="нм" r="Abbr" >
+		<gc t="нанометр" />
+	</gr>
+<!-- 	
+	<gr f="миля" r="synonim" >
+		<gc t="морская миля" />
+	</gr>
+	<gr f="миля" r="synonim" >
+		<gc t="сухопутная миля" />
+	</gr>	
+ -->	
+	<meta w="фут" v="0.3048" l="relation_to_primary"/>
+	<meta w="дюйм" v="0.0254" l="relation_to_primary"/>
+	<meta w="сухопутная миля" v="1609.344" l="relation_to_primary"/>
+	<meta w="морская миля" v="1853.248" l="relation_to_primary"/>	
+	
+	<gr f="_UNITS_AREA" r="specialization" >
+		<sc t="метр^2" />
+		<sc t="фут^2" />
+		<sc t="гектар" />
+	</gr>
+	
+	<meta w="гектар" v="10000" l="relation_to_primary"/>
 	
 	<gr f="_UNITS_SPEED" r="specialization" >
 		<sc t="м / c" />
@@ -34,6 +67,18 @@
 		<sc t="кмч" />
 		<sc t="км / ч" />
 	</gr>
+	
+	<gr f="кмч" r="Abbr" >
+		<gc t="километр в час" />		
+	</gr>
+	<gr f="м / с" r="Abbr" >
+		<gc t="метр в секунду" />
+	</gr>
+	<gr f="км / ч" r="Abbr" >
+		<gc t="километр в час" />
+	</gr>
+	
 	<meta w="кмч" v="1" l="relation_to_primary"/>
-	<meta w="километр" v="1000" l="relation_to_primary"/>
+	
+	
 </wnc>
