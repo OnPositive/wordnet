@@ -31,6 +31,7 @@ import com.onpositive.semantic.words3.IntByteLayer;
 import com.onpositive.semantic.words3.IntDoubleLayer;
 import com.onpositive.semantic.words3.IntIntLayer;
 import com.onpositive.semantic.words3.IntMeaningLayer;
+import com.onpositive.semantic.words3.IntStringLayer;
 import com.onpositive.semantic.words3.MetaLayer;
 
 public class WordNetPatch {
@@ -123,26 +124,31 @@ public class WordNetPatch {
 						throw new IllegalStateException("layer  with id "+layerId+" already exists with type "+type.getSimpleName());
 					}
 				}
-				if (type==Byte.class){
-					layer=new IntByteLayer(layerId, caption);
-				}
-				if (type==Integer.class){
-					layer=new IntIntLayer(layerId, caption);
-				}
-				if (type==Double.class){
-					layer=new IntDoubleLayer(layerId, caption);
-				}
-				if (type==Boolean.class){
-					layer=new IntBooleanLayer(layerId, caption);
-				}
-				if (type==String.class){
-					layer=new IntBooleanLayer(layerId, caption);
-				}
-				if (type==MeaningElement.class){
-					layer=new IntMeaningLayer(layerId, caption,net.getWordNet());
-				}
+				layer = createLayer(net, layer, type);
 				net.getWordNet().getMetaLayers().registerLayer(layer);
 			}
+		}
+		MetaLayer<?> createLayer(IWordNetEditInterface net, MetaLayer<?> layer,
+				Class<?> type) {
+			if (type==Byte.class){
+				layer=new IntByteLayer(layerId, caption);
+			}
+			if (type==Integer.class){
+				layer=new IntIntLayer(layerId, caption);
+			}
+			if (type==Double.class){
+				layer=new IntDoubleLayer(layerId, caption);
+			}
+			if (type==Boolean.class){
+				layer=new IntBooleanLayer(layerId, caption);
+			}
+			if (type==String.class){
+				layer=new IntStringLayer(layerId, caption);
+			}
+			if (type==MeaningElement.class){
+				layer=new IntMeaningLayer(layerId, caption,net.getWordNet());
+			}
+			return layer;
 		}
 
 		private Class<?> convertType(String layerType2) {
