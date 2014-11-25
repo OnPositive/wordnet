@@ -5,9 +5,16 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.HashMap;
 
+import com.onpositive.semantic.wordnet.AbstractWordNet;
+
 public class LayersPack {
 
 	protected HashMap<String, MetaLayer<?>>laeyrs=new HashMap<String, MetaLayer<?>>();
+	private AbstractWordNet net;
+	
+	public LayersPack(AbstractWordNet net){
+		this.net=net;
+	}
 	
 	public void store(DataOutputStream stream) throws IOException{
 		stream.writeInt(laeyrs.size());
@@ -32,6 +39,12 @@ public class LayersPack {
 		if (l instanceof IntByteLayer){
 			return 4;
 		}
+		if (l instanceof IntStringLayer){
+			return 5;
+		}
+		if (l instanceof IntMeaningLayer){
+			return 6;
+		}
 		return 0;
 	}
 
@@ -55,7 +68,13 @@ public class LayersPack {
 				break;
 			case 4:
 				l=new IntByteLayer(id, caption);
-				break;				
+				break;
+			case 5:
+				l=new IntStringLayer(id, caption);
+				break;	
+			case 6:
+				l=new IntMeaningLayer(id, caption, net);
+				break;
 			default:
 				throw new IllegalArgumentException("unknown layer kind");
 			}

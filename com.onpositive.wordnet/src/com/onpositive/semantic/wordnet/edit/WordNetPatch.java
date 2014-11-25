@@ -30,6 +30,7 @@ import com.onpositive.semantic.words3.IntBooleanLayer;
 import com.onpositive.semantic.words3.IntByteLayer;
 import com.onpositive.semantic.words3.IntDoubleLayer;
 import com.onpositive.semantic.words3.IntIntLayer;
+import com.onpositive.semantic.words3.IntMeaningLayer;
 import com.onpositive.semantic.words3.MetaLayer;
 
 public class WordNetPatch {
@@ -134,12 +135,21 @@ public class WordNetPatch {
 				if (type==Boolean.class){
 					layer=new IntBooleanLayer(layerId, caption);
 				}
+				if (type==String.class){
+					layer=new IntBooleanLayer(layerId, caption);
+				}
+				if (type==MeaningElement.class){
+					layer=new IntMeaningLayer(layerId, caption,net.getWordNet());
+				}
 				net.getWordNet().getMetaLayers().registerLayer(layer);
 			}
 		}
 
 		private Class<?> convertType(String layerType2) {
 			try {
+				if (layerType2.equals("concept")){
+					return MeaningElement.class;
+				}
 				return Class.forName("java.lang."+Character.toUpperCase(layerType2.charAt(0))+layerType2.substring(1));
 			} catch (ClassNotFoundException e) {
 				throw new IllegalStateException(e);
@@ -205,6 +215,13 @@ public class WordNetPatch {
 				}
 				if (type.equals(Boolean.class)){
 					val=Boolean.parseBoolean(value);
+				}
+				if (type.equals(String.class)){
+					val=value;
+				}
+				if (type.equals(MeaningElement.class)){
+					TextElement wordElement2 = net.getWordNet().getWordElement(value);
+					val=wordElement2.getConcepts()[0];					
 				}
 				layer2.putValue(id, val);
 			}
