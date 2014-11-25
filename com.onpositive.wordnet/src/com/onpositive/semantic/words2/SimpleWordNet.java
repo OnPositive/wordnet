@@ -380,10 +380,14 @@ public class SimpleWordNet extends WordNet implements Serializable {
 		String basicForm = w.getBasicForm();
 		if (basicForm.indexOf(' ') != -1||basicForm.indexOf('-')!=-1) {
 			String[] split = basicForm.split(" ");
-			if (split.length==1){
-				split=basicForm.split("-");
-				
+			ArrayList<String>rs=new ArrayList<String>();
+			for (String q:split){
+				String[] split2 = q.split("-");
+				for (String m:split2){
+					rs.add(m);
+				}
 			}
+			split=rs.toArray(new String[rs.size()]);
 			ArrayList<Word> sequence = new ArrayList<Word>();
 			for (String s : split) {
 				TextElement singlePossibleWord2 = getSinglePossibleWord(s);

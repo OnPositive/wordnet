@@ -15,7 +15,8 @@ public class WordSequenceHandle extends SenseElementHandle{
 		int[] words = info.words;
 		WordHandle[] hh=new WordHandle[words.length];
 		for (int a=0;a<words.length;a++){
-			hh[a]=(WordHandle) store.getWordNet().getWordElement(words[a]);
+			TextElement wordElement = store.getWordNet().getWordElement(words[a]);
+			hh[a]=(WordHandle) wordElement;
 		}
 		return hh;		
 	}

@@ -121,9 +121,6 @@ public class CompositeWordnet extends AbstractWordNet{
 	@Override
 	public TextElement[] getPossibleContinuations(TextElement startOfSequence) {
 		String basicForm = startOfSequence.getBasicForm();
-		if (basicForm.equals("метр")){
-			System.out.println("a");
-		}
 		TextElement t1= original.getWordElement(basicForm);
 		TextElement t2=additions.getWordElement(startOfSequence.getBasicForm());
 		TextElement[] possibleContinuations = t1!=null?original.getPossibleContinuations(t1):null;
