@@ -12,6 +12,10 @@
 			</tree>
 			<tree bindTo="$$.models($$.z)" property="Generalization" enablement="true" caption="Обобщение">
 			</tree>
+			<tree bindTo="$$.models($$.z)" property="Synonims" enablement="true" caption="Синонимы">
+			</tree>
+			<tree bindTo="$$.models($$.z)" property="Meronims" enablement="true" caption="Меронимы">
+			</tree>			
 		</ctab-folder>
 	</splitter>
 </form>
