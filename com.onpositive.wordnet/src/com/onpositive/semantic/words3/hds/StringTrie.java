@@ -389,8 +389,12 @@ public abstract class StringTrie<T> extends StringStorage<T> {
 			T associatedData;
 
 			public TrieNode getOrCreateChild(char c) {
+				if (useESwitch && c == 'ё') {
+					c = 'е';
+				}
+				
 				for (TrieNode q : children) {
-					if (q.ch == c) {
+					if (charEquals(q.ch,c)) {
 						return q;
 					}
 				}

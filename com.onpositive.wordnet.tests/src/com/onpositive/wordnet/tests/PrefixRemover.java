@@ -1,6 +1,11 @@
 package com.onpositive.wordnet.tests;
 
+import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.DataInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -12,6 +17,8 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
 import com.onpositive.semantic.wordnet.GrammarRelation;
+import com.onpositive.semantic.wordnet.WordNetProvider;
+import com.onpositive.semantic.words2.SimpleWordNet;
 import com.onpositive.semantic.words3.ReadOnlyMapWordNet;
 import com.onpositive.semantic.words3.ReadOnlyTrieWordNet;
 import com.onpositive.semantic.words3.ReadOnlyWordNet;
@@ -24,16 +31,19 @@ import com.onpositive.semantic.words3.hds.StringTrie.TrieBuilder;
 
 public class PrefixRemover {
 
+	private static final String RWNET_PATH = "D:/tmp/rwnet.dat";
 	private static final int COUNT = 2000000;
 
 	public static void main(String[] args) {
 //		test1();
-//		test3();
+//		findBroken(0,2000);
 //		test4();
 //		test5();
 //		test6();
 //		test7();
-		test8();
+//		test8();
+//		test9();
+		test10();
 		
 //		globalTest();
 //		timeTest();
@@ -43,7 +53,7 @@ public class PrefixRemover {
 	private static void globalTest() {
 		ReadOnlyWordNet loaded;
 		try {
-			loaded = ReadOnlyMapWordNet.load("rwnet.dat");
+			loaded = ReadOnlyMapWordNet.load(RWNET_PATH);
 //			ReadOnlyTrieWordNet trieWordNet = ReadOnlyTrieWordNet.load(new ZipFile("russian.dict"));
 			String[] keys = loaded.getAllGrammarKeys();
 //			Map<String, Byte> dataMap = new HashMap<String, Byte>();
@@ -102,7 +112,7 @@ public class PrefixRemover {
 		ReadOnlyWordNet loaded;
 		String[] keys;
 		try {
-			loaded = ReadOnlyMapWordNet.load("rwnet.dat");
+			loaded = ReadOnlyMapWordNet.load(RWNET_PATH);
 			keys = loaded.getAllGrammarKeys();
 			int step = (highBound - lowBound) / 2;
 			while (step > 2) {
@@ -138,13 +148,11 @@ public class PrefixRemover {
 			
 	}
 	
-	private static void test3() {
+	private static void findBroken(int start, int end) {
 		ReadOnlyWordNet loaded;
 		try {
-			loaded = ReadOnlyMapWordNet.load("rwnet.dat");
+			loaded = ReadOnlyMapWordNet.load(RWNET_PATH);
 			String[] keys = loaded.getAllGrammarKeys();
-			int start = 809063;
-			int end = 809078;
 			ArrayList<Integer> included = new ArrayList<Integer>();
 			for (int i = start; i < end; i++) {
 				included.add(i);
@@ -289,7 +297,7 @@ public class PrefixRemover {
 
 		
 		try {
-			ReadOnlyWordNet loaded = ReadOnlyMapWordNet.load("rwnet.dat");
+			ReadOnlyWordNet loaded = ReadOnlyMapWordNet.load(RWNET_PATH);
 			GrammarRelation[] forms = loaded.getPossibleGrammarForms(tst[0]);
 			forms = loaded.getPossibleGrammarForms(tst[0]);
 			for (String string : tst) {
@@ -329,16 +337,22 @@ public class PrefixRemover {
 	}
 	
 	private static void test8() {
-		ReadOnlyTrieWordNet instance = TrieZippedProvider.getInstance();		
-		GrammarRelation[] possibleGrammarForms = instance.getPossibleGrammarForms("вертолёт");
-		GrammarRelation[] forms1 = instance.getPossibleGrammarForms("вертолет");
+		ReadOnlyTrieWordNet instance = TrieZippedProvider.getInstance();
+		GrammarRelation[] possibleGrammarForms = instance.getPossibleGrammarForms("самолет");
+		possibleGrammarForms = instance.getPossibleGrammarForms("самолёт");
+		possibleGrammarForms = instance.getPossibleGrammarForms("фвфаыфуууыауыауы");
+		possibleGrammarForms = instance.getPossibleGrammarForms("вертолет");
+		GrammarRelation[] forms1 = instance.getPossibleGrammarForms("вертолёт");
+		System.setProperty("engineConfigDir","D:/tmp");
+		possibleGrammarForms = WordNetProvider.getInstance().getPossibleGrammarForms("самолет");
+		possibleGrammarForms = WordNetProvider.getInstance().getPossibleGrammarForms("самолёт");
 		System.out.println("PrefixRemover.test8()");
 	}
 	
 	private static void timeTest() {
 		ReadOnlyWordNet loaded;
 		try {
-			loaded = ReadOnlyMapWordNet.load("rwnet.dat");
+			loaded = ReadOnlyMapWordNet.load(RWNET_PATH);
 			String[] keys = loaded.getAllGrammarKeys();
 //			Map<String, Byte> dataMap = new HashMap<String, Byte>();
 			List<String> testList = new ArrayList<String>();
@@ -376,6 +390,35 @@ public class PrefixRemover {
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+		}
+	}
+	
+	private static void test9() {
+
+		try {
+			ReadOnlyTrieWordNet instance = TrieZippedProvider.getInstance();
+			ReadOnlyWordNet readOnlyWordNet = new ReadOnlyMapWordNet(new DataInputStream(new BufferedInputStream(new FileInputStream("D:/tmp/rwnet.dat"))));
+			SimpleWordNet simpleWordNet = new SimpleWordNet(readOnlyWordNet);
+			instance.useWordInfo(simpleWordNet);
+			instance.store(new File("newdict.dat"));
+		} catch (FileNotFoundException e) {
+			System.err.println("Wordnet is corrupted rebuilding...");
+		} catch (IOException e) {
+			System.err.println("Wordnet is corrupted rebuilding...");
+		}
+	}
+	
+	private static void test10() {
+		try {
+			ReadOnlyTrieWordNet instance = TrieZippedProvider.getInstance();
+			ReadOnlyWordNet mapWordNet = ReadOnlyMapWordNet.load(RWNET_PATH);
+			SimpleWordNet simpleWordNet = new SimpleWordNet(mapWordNet);
+			instance.initSequences(simpleWordNet.getSequenceMap());
+			instance.store(new File("newdict.dat"));
+		} catch (FileNotFoundException e) {
+			System.err.println("Wordnet is corrupted rebuilding...");
+		} catch (IOException e) {
+			System.err.println("Wordnet is corrupted rebuilding...");
 		}
 	}
 
