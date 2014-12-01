@@ -43,26 +43,48 @@ public class CompositeLayer<T> extends MetaLayer<T>{
 
 	@Override
 	public void putValue(int meaningId, T value) {
-		first.putValue(meaningId, value);
-		second.putValue(meaningId, value);
+		if(first!=null){
+			first.putValue(meaningId, value);
+		}
+		if(second!=null){
+			second.putValue(meaningId, value);
+		}
 	}
 
 	@Override
 	public void removeValue(int meaningId) {
-		first.removeValue(meaningId);
-		second.removeValue(meaningId);
+		if(first!=null){
+			first.removeValue(meaningId);
+		}
+		if(second!=null){
+			second.removeValue(meaningId);
+		}
 	}
 
 	@Override
 	public boolean hasValue(int id) {
-		return first.hasValue(id)&&second.hasValue(id);
+		return (first!=null&&first.hasValue(id))||(second!=null&&second.hasValue(id));
 	}
 
 	@Override
 	public int[] getAllIds() {
 		IntOpenHashSet ss=new IntOpenHashSet();
-		ss.add(first.getAllIds());
-		ss.add(second.getAllIds());
+		if(first!=null){
+			int[] allIds = first.getAllIds();
+			for(int id : allIds){
+				MeaningElement me = qq.original.getConceptInfo(id);
+				int newId = qq.convertMeaning(me).id();
+				ss.add(newId);
+			}
+		}
+		if(second!=null){
+			int[] allIds = second.getAllIds();
+			for(int id : allIds){
+				MeaningElement me = qq.additions.getConceptInfo(id);
+				int newId = qq.convertMeaning(me).id();
+				ss.add(newId);
+			}
+		}
 		return ss.toArray();
 	}
 
