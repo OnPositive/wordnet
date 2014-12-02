@@ -32,7 +32,7 @@ public class SeparateConceptHandle extends MeaningElement{
 		SeparateConceptHandle other = (SeparateConceptHandle) obj;
 		if (address != other.address)
 			return false;
-		if (this.store==other.store){
+		if (this.store!=other.store){
 			return false;
 		}
 		return true;

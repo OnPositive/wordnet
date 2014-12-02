@@ -154,7 +154,7 @@ public class Grammem {
 		}
 		public static void init() {			
 		}
-		public static final HashSet<Grammem>all=new HashSet<Grammem>();
+		public static final HashSet<PartOfSpeech>all=new HashSet<PartOfSpeech>();
 		
 		public static final PartOfSpeech NOUN=new PartOfSpeech(1,"NOUN", "СУЩ", "имя существительное");
 		public static final PartOfSpeech ADJF=new PartOfSpeech(2,"ADJF", "ПРИЛ", "имя прилагательное (полное)");
@@ -214,7 +214,7 @@ public class Grammem {
 			
 			
 		}
-		public static final HashSet<Grammem>all=new HashSet<Grammem>();
+		public static final HashSet<AnimateProperty>all=new HashSet<AnimateProperty>();
 		
 		public static final AnimateProperty ANim=new AnimateProperty(18,"ANim", "Од-неод", "одушевлённость / одушевлённость не выражена");
 		public static final AnimateProperty anim=new AnimateProperty(19,"anim", "од", "одушевлённое");
@@ -224,7 +224,7 @@ public class Grammem {
 	
 	public static class Gender extends Grammem{
 
-		public static final HashSet<Grammem>all=new HashSet<Grammem>();
+		public static final HashSet<Gender>all=new HashSet<Gender>();
 		
 		Gender(int ordinal,String id, String alias, String description) {
 			super(ordinal,id, alias, description);
@@ -245,7 +245,7 @@ public class Grammem {
 	
 	public static class SingularPlural extends Grammem{
 
-		public static final HashSet<Grammem>all=new HashSet<Grammem>();
+		public static final HashSet<SingularPlural>all=new HashSet<SingularPlural>();
 		
 		SingularPlural(int ordinal,String id, String alias, String description) {
 			super(ordinal,id, alias, description);
@@ -271,7 +271,7 @@ public class Grammem {
 	}
 
 	public static class Case extends  Grammem{
-		public static final HashSet<Grammem>all=new HashSet<Grammem>();
+		public static final HashSet<Case>all=new HashSet<Case>();
 		Case(int ordinal,String id, String alias, String description) {
 			super(ordinal,id, alias, description);
 			all.add(this);
@@ -299,7 +299,7 @@ public class Grammem {
 		public static final Case LOC2=new Case(42,"loc2", "пр2", "второй предложный (местный) падеж",LOCT);
 	}
 	public static class SemanGramem extends Grammem{
-		public static final HashSet<Grammem>all=new HashSet<Grammem>();
+		public static final HashSet<SemanGramem>all=new HashSet<SemanGramem>();
 		SemanGramem(int ordinal,String id, String alias, String description) {
 			super(ordinal,id, alias, description);
 			all.add(this);
@@ -317,7 +317,7 @@ public class Grammem {
 	}
 	
 	public static class FeaturesGramem extends Grammem{
-		public static final HashSet<Grammem>all=new HashSet<Grammem>();
+		public static final HashSet<FeaturesGramem>all=new HashSet<FeaturesGramem>();
 		
 		FeaturesGramem(int ordinal,String id, String alias, String description) {
 			super(ordinal,id, alias, description);
@@ -339,7 +339,7 @@ public class Grammem {
 	}
 	
 	public static class VerbKind extends Grammem{
-		public static final HashSet<Grammem>all=new HashSet<Grammem>();
+		public static final HashSet<VerbKind>all=new HashSet<VerbKind>();
 		VerbKind(int ordinal,String id, String alias, String description) {
 			super(ordinal,id, alias, description);
 			all.add(this);
@@ -353,7 +353,7 @@ public class Grammem {
 	
 	
 	public static class TransKind extends Grammem{
-		public static final HashSet<Grammem>all=new HashSet<Grammem>();
+		public static final HashSet<TransKind>all=new HashSet<TransKind>();
 		TransKind(int ordinal,String id, String alias, String description) {
 			super(ordinal,id, alias, description);
 			all.add(this);
@@ -368,7 +368,7 @@ public class Grammem {
 	
 	
 	public static class StrangeVerbStuff extends Grammem{
-		public static final HashSet<Grammem>all=new HashSet<Grammem>();
+		public static final HashSet<StrangeVerbStuff>all=new HashSet<StrangeVerbStuff>();
 		StrangeVerbStuff(int ordinal,String id, String alias, String description) {
 			super(ordinal,id, alias, description);
 			all.add(this);
@@ -384,7 +384,7 @@ public class Grammem {
 	
 	
 	public static class Personality extends Grammem{
-		public static final HashSet<Grammem>all=new HashSet<Grammem>();
+		public static final HashSet<Personality>all=new HashSet<Personality>();
 		Personality(int ordinal,String id, String alias, String description) {
 			super(ordinal,id, alias, description);
 			all.add(this);
@@ -400,7 +400,7 @@ public class Grammem {
 	
 	public static class Time extends Grammem{
 
-		public static final HashSet<Grammem>all=new HashSet<Grammem>();
+		public static final HashSet<Time>all=new HashSet<Time>();
 		Time(int ordinal,String id, String alias, String description) {
 			super(ordinal,id, alias, description);
 			all.add(this);
@@ -414,7 +414,7 @@ public class Grammem {
 	}
 	
 	public static class Mood extends Grammem{
-		public static final HashSet<Grammem>all=new HashSet<Grammem>();
+		public static final HashSet<Mood>all=new HashSet<Mood>();
 		Mood(int ordinal,String id, String alias, String description) {
 			super(ordinal,id, alias, description);
 			all.add(this);
@@ -428,7 +428,7 @@ public class Grammem {
 	}
 	
 	public static class Invl extends Grammem{
-		public static final HashSet<Grammem>all=new HashSet<Grammem>();
+		public static final HashSet<Invl>all=new HashSet<Invl>();
 		Invl(int ordinal,String id, String alias, String description) {
 			super(ordinal,id, alias, description);
 			all.add(this);
@@ -442,7 +442,7 @@ public class Grammem {
 		
 	}
 	public static class VOic extends Grammem{
-		public static final HashSet<Grammem>all=new HashSet<Grammem>();
+		public static final HashSet<VOic>all=new HashSet<VOic>();
 		VOic(int ordinal,String id, String alias, String description) {
 			super(ordinal,id, alias, description);
 			all.add(this);
@@ -456,7 +456,7 @@ public class Grammem {
 	}
 	
 	public static class Extras extends Grammem{
-		public static final HashSet<Grammem>all=new HashSet<Grammem>();
+		public static final HashSet<Extras>all=new HashSet<Extras>();
 		Extras(int ordinal,String id, String alias, String description) {
 			super(ordinal,id, alias, description);
 			all.add(this);
