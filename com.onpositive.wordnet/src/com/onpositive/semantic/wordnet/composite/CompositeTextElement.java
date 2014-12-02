@@ -54,7 +54,10 @@ public class CompositeTextElement extends TextElement {
 
 	@Override
 	public boolean isMultiWord() {
+		if (original!=null){
 		return original.isMultiWord();
+		}
+		return extra.isMultiWord();
 	}
 
 	@Override

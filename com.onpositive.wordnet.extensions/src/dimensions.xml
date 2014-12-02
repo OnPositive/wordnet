@@ -138,6 +138,7 @@
 	<meta w="фут в минуту" v="0.05468" l="relation_to_primary"/>
 	<meta w="фут в секунду" v="3.28084" l="relation_to_primary"/>
 	<meta w="кмч" v="0.27777" l="relation_to_primary"/>
+	<meta w="километр в час" v="0.27777" l="relation_to_primary"/>
 	<meta w="миля в час" v="0.44704" l="relation_to_primary"/>
 	<meta w="узел" v="0.514" l="relation_to_primary"/>
 	<meta w="мах" v="320" l="relation_to_primary"/>
