@@ -33,6 +33,9 @@ public class CompositeLayer<T> extends MetaLayer<T>{
 	@Override
 	public T getValue(int meaningId) {
 		CompositeMeaning conceptInfo = (CompositeMeaning) qq.getConceptInfo(meaningId);
+		if(conceptInfo==null){
+			return null;
+		}
 		if(conceptInfo.original instanceof AbstractRelationTarget){
 			return second!=null?second.getValue(conceptInfo.original.id()):null;
 		}
