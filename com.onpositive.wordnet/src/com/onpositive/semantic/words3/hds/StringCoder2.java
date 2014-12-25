@@ -9,7 +9,7 @@ public class StringCoder2 {
 	
 	
 	
-	protected char[] byteToCharTable = new char[2024];
+	protected char[] byteToCharTable = new char[42024];
 	
 	protected byte[] byteBuffer;
 	protected int usedBytes;
