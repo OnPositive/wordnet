@@ -8,7 +8,7 @@
 		<meta w='благодаря' v='DATV' />
 		<meta w='близ' v='GENT' />
 		<meta w='близко от' v='GENT' />
-		<meta w='в' v='ACCS DATV LOCT' />
+		<meta w='в' v='ACCS LOCT' />
 		<meta w='в виде' v='GENT' />
 		<meta w='в зависимости от' v='GENT' />
 		<meta w='в интересах' v='GENT' />
@@ -81,7 +81,7 @@
 		<meta w='меж' v='ABLT' />
 		<meta w='между' v='ABLT' />
 		<meta w='мимо' v='GENT' />
-		<meta w='на' v='ACCS DATV LOCT' />
+		<meta w='на' v='ACCS LOCT' />
 		<meta w='на благо' v='DATV' />
 		<meta w='на виду у' v='GENT' />
 		<meta w='на глазах у' v='GENT' />
