@@ -25,14 +25,14 @@ public class GrammarRelation extends AbstractRelation<TextElement> {
 
 	@Override
 	public String toString() {
-		return getWord().toString()+" - ("+owner.getGrammemSet(relation)+")";
+		return getWord().toString()+" - ("+getGrammems()+")";
 	}
 	public boolean hasGrammem(Grammem g){
-		HashSet<Grammem> grammemSet = owner.getGrammemSet(relation);
+		HashSet<Grammem> grammemSet = getGrammems();
 		return grammemSet.contains(g);
 	}
 	public boolean hasAllGrammems(Grammem...options) {
-		HashSet<Grammem> grammemSet = owner.getGrammemSet(relation);
+		HashSet<Grammem> grammemSet = getGrammems();
 		for (Grammem q:options){
 			if (!grammemSet.contains(q)){
 				return false;
@@ -41,12 +41,12 @@ public class GrammarRelation extends AbstractRelation<TextElement> {
 		return true;
 	}
 	public HashSet<Grammem>getGrammems(){
-		HashSet<Grammem> grammemSet = owner.getGrammemSet(relation);
+		HashSet<Grammem> grammemSet = getGrammems();
 		return grammemSet;
 	}
 	
 	public boolean hasArLeastOneOfGrammems(Grammem...options) {
-		HashSet<Grammem> grammemSet = owner.getGrammemSet(relation);
+		HashSet<Grammem> grammemSet = getGrammems();
 		for (Grammem q:options){
 			if (grammemSet.contains(q)){
 				return true;
