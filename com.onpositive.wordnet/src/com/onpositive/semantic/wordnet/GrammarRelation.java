@@ -41,7 +41,7 @@ public class GrammarRelation extends AbstractRelation<TextElement> {
 		return true;
 	}
 	public HashSet<Grammem>getGrammems(){
-		HashSet<Grammem> grammemSet = getGrammems();
+		HashSet<Grammem> grammemSet = owner.getGrammemSet(relation);
 		return grammemSet;
 	}
 	
