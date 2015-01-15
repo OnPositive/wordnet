@@ -1,7 +1,8 @@
 <form xmlns="http://jetface.org/JetFace1.0/" caption="WordForms">
 	<model class="com.onpositive.wordnet.viewer.views.WordFormView"
 		modelExtension="false" />
-	<splitter>
+	<ctab-folder >
+	<splitter caption="Cлова">
 		<vc>
 			<string bindTo="$$.WordForm" caption="Wordform" />
 			<list bindTo="$$.Relations" bindSelectionTo="$$.z">
@@ -18,4 +19,10 @@
 			</tree>			
 		</ctab-folder>
 	</splitter>
+	<splitter  caption="Разбор">
+	<text bindTo="$$.text"/>
+	<tree bindTo="$$.parse(text)" property="Children" enablement="true"/>
+	<text bindTo="$$.parse2(text)"  enablement="true"/>
+	</splitter>
+	</ctab-folder >
 </form>

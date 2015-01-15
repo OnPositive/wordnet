@@ -1,0 +1,131 @@
+<wnc>
+	<meta-layer id='conjunctions' caption='List of Conjunctions' type='string' />
+	<gr l='conjunctions'>
+		<meta w='а' v='' />
+		<meta w='а ведь' v='' />
+		<meta w='а именно' v='' />
+		<meta w='а то' v='' />
+		<meta w='абы' v='' />
+		<meta w='аж' v='' />
+		<meta w='ажно' v='' />
+		<meta w='ай' v='' />
+		<meta w='аки' v='' />
+		<meta w='ако' v='' />
+		<meta w='али' v='' />
+		<meta w='аль' v='' />
+		<meta w='ан' v='' />
+		<meta w='аще' v='' />
+		<meta w='благо' v='' />
+		<meta w='бо' v='' />
+		<meta w='буде' v='' />
+		<meta w='будто' v='' />
+		<meta w='ведь' v='' />
+		<meta w='впрочем' v='' />
+		<meta w='всё' v='' />
+		<meta w='всё-таки' v='' />
+		<meta w='где' v='' />
+		<meta w='где-то' v='' />
+		<meta w='да' v='' />
+		<meta w='дабы' v='' />
+		<meta w='даже' v='' />
+		<meta w='докуда' v='' />
+		<meta w='дотоле' v='' />
+		<meta w='егда' v='' />
+		<meta w='едва' v='' />
+		<meta w='еже' v='' />
+		<meta w='ежели' v='' />
+		<meta w='если' v='' />
+		<meta w='ж' v='' />
+		<meta w='же' v='' />
+		<meta w='зане' v='' />
+		<meta w='зато' v='' />
+		<meta w='зачем' v='' />
+		<meta w='значит' v='' />
+		<meta w='и' v='' />
+		<meta w='или' v='' />
+		<meta w='ибо' v='' />
+		<meta w='или' v='' />
+		<meta w='иль' v='' />
+		<meta w='именно' v='' />
+		<meta w='имже' v='' />
+		<meta w='иначе' v='' />
+		<meta w='инда' v='' />
+		<meta w='итак' v='' />
+		<meta w='кабы' v='' />
+		<meta w='как' v='' />
+		<meta w='как бы' v='' />
+		<meta w='как то' v='' />
+		<meta w='как-то' v='' />
+		<meta w='каков' v='' />
+		<meta w='какой' v='' />
+		<meta w='когда' v='' />
+		<meta w='коли' v='' />
+		<meta w='коль' v='' />
+		<meta w='который' v='' />
+		<meta w='куда' v='' />
+		<meta w='ли' v='' />
+		<meta w='либо' v='' />
+		<meta w='лишь' v='' />
+		<meta w='ль' v='' />
+		<meta w='настолько' v='' />
+		<meta w='нежели' v='' />
+		<meta w='незомь' v='' />
+		<meta w='ни' v='' />
+		<meta w='но' v='' />
+		<meta w='обаче' v='' />
+		<meta w='однако' v='' />
+		<meta w='однако же' v='' />
+		<meta w='отколь' v='' />
+		<meta w='откуда' v='' />
+		<meta w='оттого' v='' />
+		<meta w='отчего' v='' />
+		<meta w='поелику' v='' />
+		<meta w='пока' v='' />
+		<meta w='покамест' v='' />
+		<meta w='покаместь' v='' />
+		<meta w='понеже' v='' />
+		<meta w='поскольку' v='' />
+		<meta w='после того как' v='' />
+		<meta w='пота' v='' />
+		<meta w='потому' v='' />
+		<meta w='потому как' v='' />
+		<meta w='потому что' v='' />
+		<meta w='почём' v='' />
+		<meta w='почему' v='' />
+		<meta w='правда' v='' />
+		<meta w='притом' v='' />
+		<meta w='причём' v='' />
+		<meta w='просто' v='' />
+		<meta w='протеревшийся' v='' />
+		<meta w='пускай' v='' />
+		<meta w='пусть' v='' />
+		<meta w='раз' v='' />
+		<meta w='разве' v='' />
+		<meta w='ровно' v='' />
+		<meta w='с тем чтобы' v='' />
+		<meta w='сиречь' v='' />
+		<meta w='сколько' v='' />
+		<meta w='следовательно' v='' />
+		<meta w='словно' v='' />
+		<meta w='столько' v='' />
+		<meta w='так как' v='' />
+		<meta w='также' v='' />
+		<meta w='теперь' v='' />
+		<meta w='то' v='' />
+		<meta w='то есть' v='' />
+		<meta w='тож' v='' />
+		<meta w='тоже' v='' />
+		<meta w='только' v='' />
+		<meta w='только что' v='' />
+		<meta w='хоть' v='' />
+		<meta w='хотя' v='' />
+		<meta w='хуле' v='' />
+		<meta w='чем' v='' />
+		<meta w='что' v='' />
+		<meta w='чтоб' v='' />
+		<meta w='чтобы' v='' />
+		<meta w='чуть' v='' />
+		<meta w='яко' v='' />
+		<meta w='якобы' v='' />
+	</gr>
+</wnc>
