@@ -66,6 +66,7 @@ public class CompositeLayer<T> extends MetaLayer<T>{
 
 	@Override
 	public boolean hasValue(int id) {
+		MeaningElement meaningElement = qq.idTomeaning.get(id);
 		return (first!=null&&first.hasValue(id))||(second!=null&&second.hasValue(id));
 	}
 
