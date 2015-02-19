@@ -69,4 +69,24 @@ public abstract class MetaLayer<T> {
 			}
 		}
 	}
+	public final T getFirstValue(MeaningElement[] el){
+		if (el==null){
+			return null;
+		}
+		for (MeaningElement z:el){
+			if (z!=null&&hasValue(z.id())){
+				return getValue(z.id());
+			}
+		}
+		return null;
+	}
+
+	public boolean hasValue(MeaningElement[] meaningElements) {
+		for (MeaningElement z:meaningElements){
+			if (z!=null&&getValue(z.id())!=null){
+				return true;
+			}
+		}
+		return false;
+	}
 }

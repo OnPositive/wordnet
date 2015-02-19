@@ -15,7 +15,7 @@ import com.carrotsearch.hppc.ByteArrayList;
 
 public final class StringVocabulary extends StringCoder2{
 	protected IntBuffer offsets;
-	protected IntBuffer backLinks=IntBuffer.allocate(1000);
+	protected IntBuffer backLinks=IntBuffer.allocate(40000);
 	protected int backLinksSize=1;
 	protected int usedCount = 0;
 	private ByteBuffer allocateDirect;

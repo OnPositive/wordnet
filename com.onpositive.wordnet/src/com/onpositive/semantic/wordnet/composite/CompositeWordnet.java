@@ -5,11 +5,13 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 
 import com.carrotsearch.hppc.IntObjectOpenHashMap;
 import com.onpositive.semantic.wordnet.AbstractWordNet;
 import com.onpositive.semantic.wordnet.GrammarRelation;
+import com.onpositive.semantic.wordnet.Grammem;
 import com.onpositive.semantic.wordnet.MeaningElement;
 import com.onpositive.semantic.wordnet.TextElement;
 import com.onpositive.semantic.wordnet.WordNetProvider;
@@ -91,8 +93,20 @@ public class CompositeWordnet extends AbstractWordNet{
 		}
 	}
 
-	private GrammarRelation convertRelation(GrammarRelation q, AbstractWordNet oener) {
-		return new GrammarRelation(this, convertElement(q.conceptId,oener), q.relation);
+	private GrammarRelation convertRelation(GrammarRelation q, final AbstractWordNet oener) {
+		
+		return new GrammarRelation(this, convertElement(q.conceptId,oener), q.relation){
+			
+			/**
+			 * 
+			 */
+			private static final long serialVersionUID = 1L;
+
+			@Override
+			public HashSet<Grammem> getGrammems() {				
+				return oener.getGrammemSet(relation);
+			}
+		};
 	}
 
 	private int convertElement(int conceptId, AbstractWordNet oener) {
