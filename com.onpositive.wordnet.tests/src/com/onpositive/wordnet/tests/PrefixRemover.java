@@ -10,6 +10,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -19,6 +20,7 @@ import java.util.zip.ZipOutputStream;
 import com.onpositive.semantic.wordnet.GrammarRelation;
 import com.onpositive.semantic.wordnet.WordNetProvider;
 import com.onpositive.semantic.words2.SimpleWordNet;
+import com.onpositive.semantic.words3.PredictionUtil;
 import com.onpositive.semantic.words3.ReadOnlyMapWordNet;
 import com.onpositive.semantic.words3.ReadOnlyTrieWordNet;
 import com.onpositive.semantic.words3.ReadOnlyWordNet;
@@ -43,10 +45,53 @@ public class PrefixRemover {
 //		test7();
 //		test8();
 //		test9();
-		test10();
+//		test10();
 		
 //		globalTest();
 //		timeTest();
+//		testPrediction();
+		testPrefixSearch();
+	}
+	
+	public static void testPrefixSearch() {
+		StringToByteTrie trieGrammarStore = new StringToByteTrie();
+		StringTrie<Byte>.TrieBuilder newBuilder = trieGrammarStore.newBuilder();
+		int i = 35;
+		
+		String[] tst = {"надгрызает",
+				"надгрызала",
+				"надгрызали",
+				"надгрызало",
+				"надгрызать",
+				"надгрызают",
+				"надгрызена",
+				"надгрызено",
+				"надгрызены",
+				"надгрызёте",
+				"надгрызёшь",
+				"надгрызите",
+				"надгрызаетесь",
+				"надгрызшая",
+				"надгрызшее",
+				"надгрызшей",
+				"надгрызшем",
+				"надгрызшею",
+				"надгрызшие",
+				"надгрызший",
+				"надгрызшим",
+				"надгрызших",
+				"надгрызшую",
+				"надгрыз"};
+		
+		for (String string : tst) {
+			newBuilder.append(string, Byte.valueOf((byte)i++));
+		}
+		
+		trieGrammarStore.commit(newBuilder);
+        int k = 35;
+				
+		Collection<String> strings = trieGrammarStore.getStrings("надг");
+		
 	}
 
 	@SuppressWarnings("unchecked")
@@ -422,5 +467,18 @@ public class PrefixRemover {
 		}
 	}
 
-
+	private static void testPrediction() {
+		String word = "пейсатому";
+		GrammarRelation[] forms = PredictionUtil.getInstance().testSearch(word);
+		System.out.println(word + ":" + Arrays.toString(forms));
+		word = "криворогий";
+		forms = PredictionUtil.getInstance().testSearch(word);
+		System.out.println(word + ":" + Arrays.toString(forms));
+		word = "косоухого";
+		forms = PredictionUtil.getInstance().testSearch(word);
+		System.out.println(word + ":" + Arrays.toString(forms));
+		word = "рукозадым";
+		forms = PredictionUtil.getInstance().testSearch(word);
+		System.out.println(word + ":" + Arrays.toString(forms));
+	}
 }

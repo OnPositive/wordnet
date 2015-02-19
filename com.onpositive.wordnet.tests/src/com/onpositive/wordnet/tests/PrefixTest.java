@@ -1,14 +1,41 @@
 package com.onpositive.wordnet.tests;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
+import junit.framework.AssertionFailedError;
 import junit.framework.TestCase;
 
 import com.onpositive.semantic.words3.hds.StringToByteTrie;
 import com.onpositive.semantic.words3.hds.StringTrie;
 
 public class PrefixTest extends TestCase{
+	
+	private static final String[] SET1 = {"надгрызает",
+			"надгрызала",
+			"надгрызали",
+			"надгрызало",
+			"надгрызать",
+			"надгрызают",
+			"надгрызена",
+			"надгрызено",
+			"надгрызены",
+			"надгрызёте",
+			"надгрызёшь",
+			"надгрызите",
+			"надгрызаетесь",
+			"надгрызшая",
+			"надгрызшее",
+			"надгрызшей",
+			"надгрызшем",
+			"надгрызшею",
+			"надгрызшие",
+			"надгрызший",
+			"надгрызшим",
+			"надгрызших",
+			"надгрызшую",
+			"надгрыз"};
 	
 	public void test01() {
 		StringToByteTrie trieGrammarStore = new StringToByteTrie();
@@ -42,46 +69,48 @@ public class PrefixTest extends TestCase{
 	}
 	
 	public void test05() {
-		StringToByteTrie trieGrammarStore = new StringToByteTrie();
-		StringTrie<Byte>.TrieBuilder newBuilder = trieGrammarStore.newBuilder();
-		int i = 35;
-		
-		String[] tst = {"надгрызает",
-				"надгрызала",
-				"надгрызали",
-				"надгрызало",
-				"надгрызать",
-				"надгрызают",
-				"надгрызена",
-				"надгрызено",
-				"надгрызены",
-				"надгрызёте",
-				"надгрызёшь",
-				"надгрызите",
-				"надгрызаетесь",
-				"надгрызшая",
-				"надгрызшее",
-				"надгрызшей",
-				"надгрызшем",
-				"надгрызшею",
-				"надгрызшие",
-				"надгрызший",
-				"надгрызшим",
-				"надгрызших",
-				"надгрызшую",
-				"надгрыз"};
-		
-		for (String string : tst) {
-			newBuilder.append(string, Byte.valueOf((byte)i++));
-		}
-		
-		trieGrammarStore.commit(newBuilder);
+		StringToByteTrie trieGrammarStore = buildTreeSearchTest();
         int k = 35;
-		for (String string : tst) {
+		for (String string : SET1) {
 			Byte find = trieGrammarStore.get(string);
 			assertEquals(find.byteValue(), (byte)k++);
 		}
+		
+	}
+	
+	public void testTreeSearch01() {
+		StringToByteTrie trieGrammarStore = buildTreeSearchTest();
+		Collection<String> strings = trieGrammarStore.getStrings("надг");
+		assertEquals(SET1.length, strings.size());
+		for (String string : SET1) {
+			if (!strings.contains(string.replace('ё','е'))) {
+				throw new AssertionFailedError(string + " not found. Contents of source & result data sets should be equal.");
+			}
+		}
+	}
+	
+	public void testTreeSearch02() {
+		StringToByteTrie trieGrammarStore = buildTreeSearchTest();
+		Collection<String> strings = trieGrammarStore.getStrings("подг");
+		assertEquals(0, strings.size());
+	}
+	
+	public void testTreeSearch03() {
+		StringToByteTrie trieGrammarStore = buildTreeSearchTest();
+		Collection<String> strings = trieGrammarStore.getStrings("надгрызш");
+		assertEquals(10, strings.size());
+	}
 
+	
+	protected StringToByteTrie buildTreeSearchTest() {
+		StringToByteTrie trieGrammarStore = new StringToByteTrie();
+		StringTrie<Byte>.TrieBuilder newBuilder = trieGrammarStore.newBuilder();
+		int i = 35;
+		for (String string : SET1) {
+			newBuilder.append(string, Byte.valueOf((byte)i++));
+		}
+		trieGrammarStore.commit(newBuilder);
+		return trieGrammarStore;
 	}
 	
 	private void findTest(Map<String, Byte> data) {

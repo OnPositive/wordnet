@@ -9,8 +9,10 @@ import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
+import java.util.Collection;
 
 import com.carrotsearch.hppc.ByteArrayList;
+import com.carrotsearch.hppc.CharArrayList;
 import com.carrotsearch.hppc.CharByteOpenHashMap;
 
 public abstract class StringTrie<T> extends StringStorage<T> {
@@ -79,13 +81,7 @@ public abstract class StringTrie<T> extends StringStorage<T> {
 				if (onChar){
 					//read next address;
 					i++;
-					byte vl=byteBuffer[i];
-					if (vl==Byte.MIN_VALUE){
-						i+=4;
-					}
-					else{
-						i++;
-					}
+					i = makeShift(i);
 					return findRecursive(search,position+1,i);
 				}
 				else{
@@ -136,15 +132,7 @@ public abstract class StringTrie<T> extends StringStorage<T> {
 								return null;
 							}
 							if (onChar){
-								//end of constant segment
-								//read next address;
-								byte vl=byteBuffer[i];
-								if (vl==Byte.MIN_VALUE){
-									i+=4;
-								}
-								else{
-									i++;
-								}
+								i = makeShift(i);
 								return findRecursive(search,charIndex,i);			
 							}
 						}
@@ -236,13 +224,7 @@ public abstract class StringTrie<T> extends StringStorage<T> {
 					if (onChar){
 						//read next address;
 						i++;
-						byte vl=byteBuffer[i];
-						if (vl==Byte.MIN_VALUE){
-							i+=4;
-						}
-						else{
-							i++;
-						}
+						i = makeShift(i);
 						position++;
 						continue outerLoop;
 //						return find(search,position+1,i);
@@ -296,15 +278,7 @@ public abstract class StringTrie<T> extends StringStorage<T> {
 									return null;
 								}
 								if (onChar){
-									//end of constant segment
-									//read next address;
-									byte vl=byteBuffer[i];
-									if (vl==Byte.MIN_VALUE){
-										i+=4;
-									}
-									else{
-										i++;
-									}
+									i = makeShift(i);
 									position = charIndex;
 									continue outerLoop;
 //									return find(search,charIndex,i);			
@@ -358,6 +332,255 @@ public abstract class StringTrie<T> extends StringStorage<T> {
 		return null;
 	}
 
+	
+	public Collection<String> getStrings(String search) {
+		CollectingVisitor<T> visitor = new CollectingVisitor<T>();
+		visitSubtree(search, 0, 0, visitor);
+		return visitor.getWords();
+	}
+	
+	private void visitSubtree(String prefix, int position, int fromAddress, IStringTrieVisitor<T> visitor) {
+		StringBuilder builder = new StringBuilder();
+		int i = fromAddress;
+		int length = prefix.length();
+		outerLoop:while (position <= prefix.length()) {
+			int childCount = byteBuffer[i];
+			if (childCount == 0 && position < prefix.length()) { //if we have no children, but still have chars to search - return null
+				return; //TODO handle
+			}
+			i++;
+			int dataPos = i;
+			if (childCount < 0) { //Skip associated data
+				i = i + getDataSize(dataPos);
+			}
+			if (position==length){
+				//we need to decode value;
+				if (childCount<=0){
+					if (childCount < 0) {
+						i = i - getDataSize(dataPos);
+					}
+					T value = decodeValue(i);
+					visitor.visit(prefix, value);
+				}
+				visitItemChildren(i,childCount,builder.toString(), visitor);
+				return;
+			}
+			char nextChar = prefix.charAt(position);
+			if (childCount<0){
+				childCount=-childCount;
+			}
+			int currentItem=0;
+			l1:while (true) {
+				byte b = byteBuffer[i];
+				boolean onChar=false;
+				if (b<0){
+					b=(byte) -b;
+					onChar=true;
+				}
+				char currentChar = byteToCharTable[b];
+				if (charEquals(nextChar, currentChar)) {
+					builder.append(currentChar);
+					if (onChar){
+						//read next address;
+						i++;
+						i = makeShift(i);
+						position++;
+						continue outerLoop;
+					}
+					else{
+						i++;
+						int charIndex=position+1;
+						
+						while (true){
+							b = byteBuffer[i++];
+							if (b<0){
+								b=(byte) -b;
+								onChar=true;
+							}
+							currentChar = byteToCharTable[b];
+							if (charIndex>=length||  !charEquals(currentChar,prefix.charAt(charIndex))){
+								//now we can skip to end of string and go next;
+								int prevI = i;
+								while (i < byteBuffer.length && byteBuffer[i++]>=0) {
+									builder.append(byteToCharTable[byteBuffer[i]]);
+								}
+								if (i >= byteBuffer.length) {
+									return;
+								}
+								if (i > prevI) { //if at least one character was matched
+									visitRest(visitor, builder,prevI);
+									return;
+								}
+
+								if (currentItem==childCount-1){
+									
+									return;
+								}
+								builder.delete(0, builder.length());
+								currentItem++;
+								//decode address
+								byte vl=byteBuffer[i];
+								if (vl==Byte.MIN_VALUE){
+									i = makeMultibyteShift(i);
+									continue l1;
+								}
+								else{
+									int next=vl;
+									i=i+next;
+									continue l1;
+								}
+							}
+							else{
+								builder.append(currentChar);
+								charIndex++;
+								if (charIndex==length){
+									//we are at the end of string
+									if (onChar){
+										//end of constant segment
+										T value = (byteBuffer[i] == Byte.MIN_VALUE)?decodeValue(i+5):decodeValue(i+2);
+										visitor.visit(builder.toString(), value);
+									}
+									visitRest(visitor, builder, i);
+									return;
+								}
+								if (onChar){
+									i = makeShift(i);
+									position = charIndex;
+									continue outerLoop;
+								}
+							}
+						}
+					}
+				} else {
+					if (currentItem==childCount-1 || childCount == 0){
+						if (position > 0) {
+							visitRest(visitor, builder, i);
+						}
+						return;
+					}
+					currentItem++;
+					if (onChar){
+						//read next address;
+						i++;
+						byte vl=byteBuffer[i];
+						if (vl==Byte.MIN_VALUE){
+							i = makeMultibyteShift(i);
+							continue l1;
+						}
+						else{
+							int next=vl;
+							i=i+next;
+							continue l1;
+						}
+					}
+					else{
+						i++;
+						while (i<byteBuffer.length && byteBuffer[i++]>=0);//skip string
+						if (i >= byteBuffer.length) {
+							return;
+						}
+						//decode address
+						byte vl=byteBuffer[i];
+						if (vl==Byte.MIN_VALUE){
+							i = makeMultibyteShift(i);
+							continue l1;
+						}
+						else{
+							int next=vl;
+							i=i+next;
+							continue l1;
+						}
+						
+					}
+					//we need to read next sibling position;				
+				}
+			}
+		}
+		return;
+	}
+
+	protected void visitRest(IStringTrieVisitor<T> visitor, StringBuilder builder,
+			int i) {
+		String decoded = decodeRest(i);
+		builder.append(decoded);
+		int lengthIdx = i + decoded.length();
+		int childLength = byteBuffer[lengthIdx];
+		int start = lengthIdx + 1;
+		if (childLength < 0) {
+			childLength = makeInt(byteBuffer[lengthIdx+2], byteBuffer[lengthIdx+1],byteBuffer[lengthIdx]);
+			start = lengthIdx + 3;
+		}
+		visitChildTree(start, childLength, builder.toString(), visitor);
+	}
+	
+	private void visitChildTree(int start, int length, String prefix,
+			IStringTrieVisitor<T> visitor) {
+		int i = start;
+		int childCount = byteBuffer[i];
+		
+		i++;
+		int dataPos = i;
+		boolean hasData = childCount <= 0;
+		if (hasData) { //Skip associated data
+			T value = decodeValue(i);
+			i = i + getDataSize(dataPos);
+			visitor.visit(prefix, value);
+		}
+		if (childCount < 0) {
+			childCount = -childCount;
+		}
+		visitItemChildren(i, childCount, prefix, visitor);
+		
+	}
+
+	protected void visitItemChildren(int i, int childCount, String prefix,
+			IStringTrieVisitor<T> visitor) {
+		int j = 0;
+		while (j < childCount) {
+			String rest = decodeRest(i);
+			i = i + rest.length();
+			int childLength = byteBuffer[i];
+			if (childLength < 0) {
+				childLength = makeInt(byteBuffer[i+2], byteBuffer[i+1],byteBuffer[i]);
+				i = i + 3;
+			}
+			visitChildTree(i + 1, childLength, prefix + rest, visitor);
+			j++;
+			i = i + childLength;
+		}
+	}
+
+	protected final String decodeRest(int i) {
+		CharArrayList resList = new CharArrayList();
+//		i--;
+		int size = byteBuffer.length;
+		for (int a = i; a < size; a++) {
+			byte b = byteBuffer[a];
+			boolean needBreal = false;
+			if (b < 0) {
+				b = (byte) -b;
+				needBreal = true;
+			}
+			char c = byteToCharTable[b];
+			resList.add(c);
+			if (needBreal) {
+				break;
+			}
+		}
+		return new String(resList.buffer,0, resList.elementsCount);
+	}
+
+	protected int makeShift(int i) {
+		byte vl=byteBuffer[i];
+		if (vl==Byte.MIN_VALUE){
+			i+=4;
+		}
+		else{
+			i++;
+		}
+		return i;
+	}
+
 	private int makeMultibyteShift(int i) {
 		i++;
 		int next=makeInt(byteBuffer[i+2], byteBuffer[i+1],byteBuffer[i]);
@@ -404,7 +627,8 @@ public abstract class StringTrie<T> extends StringStorage<T> {
 				return newNode;
 			}
 
-			protected void store(ByteArrayList list) {
+			protected ByteArrayList doStore() {
+				ByteArrayList list = new ByteArrayList();
 				int size = children.size();
 				if (associatedData != null) {
 					size = -size;
@@ -420,6 +644,7 @@ public abstract class StringTrie<T> extends StringStorage<T> {
 					encodeLength(values.length + 1, list);
 					list.add(values);
 				}
+				return list;
 			}
 
 			private void encodeLength(int length, ByteArrayList list) {
@@ -437,15 +662,13 @@ public abstract class StringTrie<T> extends StringStorage<T> {
 				if (s.length() == 0) {
 					s += ch;
 				}
-				byte[] rs = new byte[s.length()];
-				encodeString(s, rs);
-				headers.add(rs);
-				
+				byte[] array = new byte[s.length()];
+				encodeString(s, array);
+				headers.add(array);
 			}
 
 			public byte[] store() {
-				ByteArrayList b = new ByteArrayList();
-				store(b);
+				ByteArrayList b = doStore();
 				return b.toArray();
 			}
 
