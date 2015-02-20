@@ -10,6 +10,7 @@ import java.nio.CharBuffer;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 import com.carrotsearch.hppc.ByteArrayList;
 import com.carrotsearch.hppc.CharArrayList;
@@ -333,7 +334,7 @@ public abstract class StringTrie<T> extends StringStorage<T> {
 	}
 
 	
-	public Collection<String> getStrings(String search) {
+	public List<String> getStrings(String search) {
 		CollectingVisitor<T> visitor = new CollectingVisitor<T>();
 		visitSubtree(search, 0, 0, visitor);
 		return visitor.getWords();
@@ -346,7 +347,9 @@ public abstract class StringTrie<T> extends StringStorage<T> {
 		outerLoop:while (position <= prefix.length()) {
 			int childCount = byteBuffer[i];
 			if (childCount == 0 && position < prefix.length()) { //if we have no children, but still have chars to search - return null
-				return; //TODO handle
+				T value = decodeValue(i + 1);
+				visitor.visit(builder.toString(), value);
+				return;
 			}
 			i++;
 			int dataPos = i;
@@ -355,7 +358,7 @@ public abstract class StringTrie<T> extends StringStorage<T> {
 			}
 			if (position==length){
 				//we need to decode value;
-				if (childCount<=0){
+				if (childCount<=0) {
 					if (childCount < 0) {
 						i = i - getDataSize(dataPos);
 					}
