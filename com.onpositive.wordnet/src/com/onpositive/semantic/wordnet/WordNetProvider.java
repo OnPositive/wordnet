@@ -17,6 +17,8 @@ import com.onpositive.semantic.words3.TrieZippedProvider;
 
 public class WordNetProvider {
 
+	public static final String ENGINE_CONFIG_DIR_PROP = "engineConfigDir";
+
 	private static final String HASHMAP_FILE_NAME = "rwnet.dat";
 
 	private static AbstractWordNet instance;
@@ -38,7 +40,7 @@ public class WordNetProvider {
 	
 	
 	static File getHashNetFile(){
-		String property = System.getProperty("engineConfigDir");
+		String property = System.getProperty(ENGINE_CONFIG_DIR_PROP);
 		if (property == null) {
 			property = DEFAULT_INDEX_FOLDER;
 		}
@@ -72,7 +74,7 @@ public class WordNetProvider {
 	public static AbstractWordNet getInstance() {
 		if (instance == null) {
 
-			String property = System.getProperty("engineConfigDir");
+			String property = System.getProperty(ENGINE_CONFIG_DIR_PROP);
 			if (property == null) {
 				property = DEFAULT_INDEX_FOLDER;
 			}
@@ -153,7 +155,7 @@ public class WordNetProvider {
 	}
 
 	public static void killDatabase() {
-		String property = System.getProperty("engineConfigDir");
+		String property = System.getProperty(ENGINE_CONFIG_DIR_PROP);
 		if (property == null) {
 			property = DEFAULT_INDEX_FOLDER;
 		}

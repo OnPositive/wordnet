@@ -30,6 +30,7 @@ import com.onpositive.semantic.words3.hds.StringToByteTrie;
 import com.onpositive.semantic.words3.hds.StringTrie;
 import com.onpositive.semantic.words3.hds.StringTrie.TrieBuilder;
 import com.onpositive.semantic.words3.prediction.IPredictionHelper;
+import com.onpositive.semantic.words3.prediction.PredictionUtil;
 import com.onpositive.semantic.words3.prediction.TriePredictionHelper;
 
 
@@ -392,7 +393,7 @@ public class Tester {
 		possibleGrammarForms = instance.getPossibleGrammarForms("фвфаыфуууыауыауы");
 		possibleGrammarForms = instance.getPossibleGrammarForms("вертолет");
 		GrammarRelation[] forms1 = instance.getPossibleGrammarForms("вертолёт");
-		System.setProperty("engineConfigDir","D:/tmp");
+		System.setProperty(WordNetProvider.ENGINE_CONFIG_DIR_PROP,"D:/tmp");
 		possibleGrammarForms = WordNetProvider.getInstance().getPossibleGrammarForms("самолет");
 		possibleGrammarForms = WordNetProvider.getInstance().getPossibleGrammarForms("самолёт");
 		System.out.println("PrefixRemover.test8()");
@@ -472,15 +473,17 @@ public class Tester {
 	}
 
 	private static void testPrediction() {
-		InputStream inputStream = null;
-		try {
-			ReadOnlyWordNet mapWordNet = ReadOnlyMapWordNet.load(RWNET_PATH);
-			inputStream = new BufferedInputStream(new FileInputStream(PREDICTION_TRIE_PATH));
-			StringToByteTrie basesTrie = new StringToByteTrie();
-			StringToByteTrie endingsTrie = new StringToByteTrie();
-			basesTrie.read(inputStream);
-			endingsTrie.read(inputStream);
-			IPredictionHelper helper = new TriePredictionHelper(mapWordNet, basesTrie, endingsTrie);
+//		InputStream inputStream = null;
+//		try {
+//			ReadOnlyWordNet mapWordNet = ReadOnlyMapWordNet.load(RWNET_PATH);
+//			inputStream = new BufferedInputStream(new FileInputStream(PREDICTION_TRIE_PATH));
+//			StringToByteTrie basesTrie = new StringToByteTrie();
+//			StringToByteTrie endingsTrie = new StringToByteTrie();
+//			basesTrie.read(inputStream);
+//			endingsTrie.read(inputStream);
+//			IPredictionHelper helper = new TriePredictionHelper(mapWordNet, basesTrie, endingsTrie);
+			System.setProperty(WordNetProvider.ENGINE_CONFIG_DIR_PROP,"D:/tmp");
+			TriePredictionHelper helper = PredictionUtil.getPredictionHelper();
 		
 			String word = "пейсатому";
 			GrammarRelation[] forms = helper.getForms(word);
@@ -494,11 +497,11 @@ public class Tester {
 			word = "рукозадым";
 			forms = helper.getForms(word);
 			System.out.println(word + ":" + Arrays.toString(forms));
-		} catch (IOException e) {
-			e.printStackTrace();
-		} finally {
-			if (inputStream != null)
-				try {inputStream.close();} catch (IOException e) {}
-		}
+//		} catch (IOException e) {
+//			e.printStackTrace();
+//		} finally {
+//			if (inputStream != null)
+//				try {inputStream.close();} catch (IOException e) {}
+//		}
 	}
 }
