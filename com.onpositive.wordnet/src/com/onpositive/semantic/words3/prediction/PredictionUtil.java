@@ -1,6 +1,7 @@
 package com.onpositive.semantic.words3.prediction;
 
 import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -26,8 +27,8 @@ public class PredictionUtil {
 		DataInputStream is = null;
 		try {
 			is = new DataInputStream(origStream);
-			ReadOnlyMapWordNet wordNet = new ReadOnlyMapWordNet(is); //XXX absolute path
-			rebuildPredictionVocab(destStream, wordNet); 
+			ReadOnlyMapWordNet wordNet = new ReadOnlyMapWordNet(is); 
+			rebuildPredictionVocab(destStream, wordNet, "0"); 
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
@@ -39,36 +40,16 @@ public class PredictionUtil {
 			} catch (IOException e) {}
 		}
 	}
+
 	
-	public static TriePredictionHelper getPredictionHelper() {
+	
+	public static IPredictionHelper getPredictionHelper() {
 		ReadOnlyWordNet wordNet = (ReadOnlyWordNet) WordNetProvider.getInstance();
-		DefaultPredictionDataProvider provider = new DefaultPredictionDataProvider();
-		InputStream predictionData = provider.getPredictionData();
-		OutputStream outputStream = null;
-		try {
-			if (predictionData == null) {
-				outputStream = provider.getPredictionDataOutputStream();
-				rebuildPredictionVocab(outputStream, wordNet);
-				outputStream.close();
-				predictionData = provider.getPredictionData();
-			}
-			StringToByteTrie basesTrie = new StringToByteTrie();
-			StringToByteTrie endingsTrie = new StringToByteTrie();
-			basesTrie.read(predictionData);
-			endingsTrie.read(predictionData);
-			return new TriePredictionHelper(wordNet, basesTrie, endingsTrie);
-		} catch (IOException e) {
-			e.printStackTrace();
-			return null;
-		} finally {
-			if (outputStream != null)
-				try {outputStream.close();} catch (IOException e) {}
-		}
-		
+		return new DefaultPredictionService().getPredictionHelper(wordNet);
 	}
 
 	public static void rebuildPredictionVocab(OutputStream destStream,
-			ReadOnlyWordNet wordNet) throws IOException {
+			ReadOnlyWordNet wordNet, String version) throws IOException {
 		try{ 
 			String[] grammarKeys = wordNet.getAllGrammarKeys();
 			MultiHashMap<String, String> formsMap = new MultiHashMap<String, String>();
@@ -86,6 +67,9 @@ public class PredictionUtil {
 				endingsTrie.store(ending, (byte) 1);
 			}
 			endingsTrie.commit();
+				
+			DataOutputStream dos = (destStream instanceof DataOutputStream) ? (DataOutputStream) destStream : new DataOutputStream(destStream);
+			dos.writeUTF(version);			
 			basesTrie.write(destStream);
 			endingsTrie.write(destStream);
 		} catch (FileNotFoundException e) {
@@ -188,6 +172,19 @@ public class PredictionUtil {
 			builder.append(base.charAt(i));
 		}
 		return builder.toString();
+	}
+
+	public static Object getVersion(InputStream predictionData) {
+		DataInputStream inputStream = (DataInputStream) ((predictionData instanceof DataInputStream)?predictionData: new DataInputStream(predictionData));
+		String version;
+		try {
+			version = inputStream.readUTF();
+			inputStream.reset();
+		} catch (IOException e) {
+			e.printStackTrace();
+			return null;
+		}
+		return version;
 	}
 	
 }

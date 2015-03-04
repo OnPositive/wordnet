@@ -483,7 +483,7 @@ public class Tester {
 //			endingsTrie.read(inputStream);
 //			IPredictionHelper helper = new TriePredictionHelper(mapWordNet, basesTrie, endingsTrie);
 			System.setProperty(WordNetProvider.ENGINE_CONFIG_DIR_PROP,"D:/tmp");
-			TriePredictionHelper helper = PredictionUtil.getPredictionHelper();
+			IPredictionHelper helper = PredictionUtil.getPredictionHelper();
 		
 			String word = "пейсатому";
 			GrammarRelation[] forms = helper.getForms(word);
