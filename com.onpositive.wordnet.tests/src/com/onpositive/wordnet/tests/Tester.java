@@ -482,7 +482,7 @@ public class Tester {
 //			basesTrie.read(inputStream);
 //			endingsTrie.read(inputStream);
 //			IPredictionHelper helper = new TriePredictionHelper(mapWordNet, basesTrie, endingsTrie);
-			System.setProperty(WordNetProvider.ENGINE_CONFIG_DIR_PROP,"D:/tmp");
+//			System.setProperty(WordNetProvider.ENGINE_CONFIG_DIR_PROP,"D:/tmp");
 			IPredictionHelper helper = PredictionUtil.getPredictionHelper();
 		
 			String word = "пейсатому";

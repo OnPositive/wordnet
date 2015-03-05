@@ -2,7 +2,12 @@ package com.onpositive.semantic.wordnet;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.nio.channels.Channels;
+import java.nio.channels.ReadableByteChannel;
 import java.util.ArrayList;
 
 import com.onpositive.semantic.wordnet.edit.IWordNetEditInterface;
@@ -21,7 +26,13 @@ public class WordNetProvider {
 
 	private static final String HASHMAP_FILE_NAME = "rwnet.dat";
 
+	private static final String WNET_DIR = "wordnet";
+
 	private static AbstractWordNet instance;
+	
+	private static String DEFAULT_WORDNET_URL = "https://copy.com/GC3FSkiqUoc7UZpd"; //XXX temp location
+	
+	private static boolean allowDownload = true; 
 
 	public static String DEFAULT_INDEX_FOLDER = "D:/se1";
 
@@ -75,6 +86,32 @@ public class WordNetProvider {
 		if (instance == null) {
 
 			String property = System.getProperty(ENGINE_CONFIG_DIR_PROP);
+			if (property == null && allowDownload) { 
+				String tmpDir = System.getProperty("java.io.tmpdir");
+				File dir = new File(tmpDir, WNET_DIR);
+				dir.mkdirs();
+				String fullPath = dir.getAbsolutePath() + File.separator + "rwnet.dat";
+				if (!new File(fullPath).exists()) {
+					FileOutputStream fos = null;
+					try {
+						URL website = new URL(DEFAULT_WORDNET_URL);
+						ReadableByteChannel rbc = Channels.newChannel(website.openStream());
+						fos = new FileOutputStream(fullPath);
+						fos.getChannel().transferFrom(rbc, 0, Long.MAX_VALUE);
+						property = fullPath;
+					} catch (MalformedURLException e) {
+						e.printStackTrace();
+					} catch (IOException e) {
+						System.err.println("Error downloading wordnet " + e.getMessage());
+					} finally {
+						if (fos != null) {
+							try {fos.close();} catch (IOException e) {}
+						}
+					}
+				} else {
+					property = fullPath;
+				}
+			}
 			if (property == null) {
 				property = DEFAULT_INDEX_FOLDER;
 			}
@@ -141,10 +178,13 @@ public class WordNetProvider {
 	}
 
 	private static AbstractWordNet readHashMap(File fl) {
-		File readOnly = new File(fl,HASHMAP_FILE_NAME);
-		if (readOnly.exists()) {
+		File input = fl;
+		if (!input.getAbsolutePath().endsWith(HASHMAP_FILE_NAME)) {
+			input = new File(fl,HASHMAP_FILE_NAME);
+		}
+		if (input.exists()) {
 			try {
-				instance = ReadOnlyMapWordNet.load(readOnly);
+				instance = ReadOnlyMapWordNet.load(input);
 				return instance;
 			} catch (Exception e) {
 				System.err

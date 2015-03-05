@@ -25,7 +25,7 @@ public class DefaultPredictionService implements IPredictionService {
 			}
 			StringToByteTrie basesTrie = new StringToByteTrie();
 			StringToByteTrie endingsTrie = new StringToByteTrie();
-			new DataInputStream(predictionData).readUTF();
+			new DataInputStream(predictionData).readUTF(); //Skip version
 			basesTrie.read(predictionData);
 			endingsTrie.read(predictionData);
 			return new TriePredictionHelper(wordNet, basesTrie, endingsTrie);

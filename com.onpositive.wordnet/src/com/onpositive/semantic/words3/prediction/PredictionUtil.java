@@ -178,6 +178,7 @@ public class PredictionUtil {
 		DataInputStream inputStream = (DataInputStream) ((predictionData instanceof DataInputStream)?predictionData: new DataInputStream(predictionData));
 		String version;
 		try {
+			inputStream.mark(0);
 			version = inputStream.readUTF();
 			inputStream.reset();
 		} catch (IOException e) {
