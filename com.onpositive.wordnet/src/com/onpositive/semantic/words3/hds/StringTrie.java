@@ -405,7 +405,6 @@ public abstract class StringTrie<T> extends StringStorage<T> {
 							if (charIndex>=length || !charEquals(currentChar,prefix.charAt(charIndex))){
 								//now we can skip to end of string and go next;
 								int prevI = i;
-//								builder.append(currentChar);
 								if (!onChar) {
 									while (i < byteBuffer.length && byteBuffer[i++]>=0);
 								}
