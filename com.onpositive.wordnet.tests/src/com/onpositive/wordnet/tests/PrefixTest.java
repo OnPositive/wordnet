@@ -2,6 +2,7 @@ package com.onpositive.wordnet.tests;
 
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import junit.framework.AssertionFailedError;
@@ -37,6 +38,25 @@ public class PrefixTest extends TestCase{
 			"надгрызшую",
 			"надгрыз"};
 	
+	private static final String[] SET2 = { "Ба", "Баба", "Бабай", "Бабахнуть",
+			"Бабашка", "Бабёнка", "Бабёшка", "Бабий", "Бабит", "Бабитный",
+			"Бабитовый", "Бабища", "Бабка", "Бабник", "Бабничать", "Бабочка",
+			"Бабуся", "Бабушка", "Бабьё", "Багаж", "Багажник", "Багажный",
+			"Багет", "Багетный", "Багетчик", "Багетчица", "Багор", "Багорный",
+			"Багорщик", "Багрение", "Багренный", "Багренье", "Багрец",
+			"Багрённый", "Багрить", "Багрить", "Багроветь", "Багровый",
+			"Багрянеть", "Багрянец", "Багрянить", "Багряница", "Багряный",
+			"Бадеечка", "Бадеечный", "Бадейка", "Бадья", "Бадяга", "База",
+			"Базальт", "Базальтовый", "Базар", "Базарить", "Базарный",
+			"Базаровщина", "Базедова", "Базилика", "Базировать",
+			"Базироваться", "Базис", "Базисный", "Базовый", "Баиньки", "Бай",
+			"Байбак", "Байдарка", "Байка", "Байковый", "Байронизм",
+			"Байронический", "Бак", "Бакалавр", "Бакалаврский", "Бакалейный",
+			"Бакалея", "Бакен", "Бакенбард", "Бакенщик", "Баки", "Баккара",
+			"Баклага", "Баклажан", "Баклажанный", "Баклажка", "Баклан",
+			"Баклуши", "Баклушничать", "Баковый", "Бактериальный",
+			"Бактеризованный", "Баян", "Баянист", "БНР", "Бваке", "Бивуак" };
+
 	public void test01() {
 		StringToByteTrie trieGrammarStore = new StringToByteTrie();
 		StringTrie<Byte>.TrieBuilder newBuilder = trieGrammarStore.newBuilder();
@@ -69,7 +89,7 @@ public class PrefixTest extends TestCase{
 	}
 	
 	public void test05() {
-		StringToByteTrie trieGrammarStore = buildTreeSearchTest();
+		StringToByteTrie trieGrammarStore = buildTreeSearchTest(SET1);
         int k = 35;
 		for (String string : SET1) {
 			Byte find = trieGrammarStore.get(string);
@@ -79,8 +99,8 @@ public class PrefixTest extends TestCase{
 	}
 	
 	public void testTreeSearch01() {
-		StringToByteTrie trieGrammarStore = buildTreeSearchTest();
-		Collection<String> strings = trieGrammarStore.getStrings("надг");
+		StringToByteTrie trieGrammarStore = buildTreeSearchTest(SET1);
+		Collection<String> strings = trieGrammarStore.getStrings("на");
 		assertEquals(SET1.length, strings.size());
 		for (String string : SET1) {
 			if (!strings.contains(string.replace('ё','е'))) {
@@ -90,24 +110,38 @@ public class PrefixTest extends TestCase{
 	}
 	
 	public void testTreeSearch02() {
-		StringToByteTrie trieGrammarStore = buildTreeSearchTest();
+		StringToByteTrie trieGrammarStore = buildTreeSearchTest(SET1);
 		Collection<String> strings = trieGrammarStore.getStrings("подг");
 		assertEquals(0, strings.size());
 	}
 	
 	public void testTreeSearch03() {
-		StringToByteTrie trieGrammarStore = buildTreeSearchTest();
+		StringToByteTrie trieGrammarStore = buildTreeSearchTest(SET1);
 		Collection<String> strings = trieGrammarStore.getStrings("надгрызш");
 		assertEquals(10, strings.size());
 	}
+	
+	public void testTreeSearch04() {
+		StringToByteTrie trieGrammarStore = buildTreeSearchTest(SET2);
+		Collection<String> strings = trieGrammarStore.getStrings("бнр");
+		assertEquals(1, strings.size());
+	}
+	
+	public void testTreeSearch05() {
+		StringToByteTrie trieGrammarStore = buildTreeSearchTest(SET2);
+		List<String> strings = trieGrammarStore.getStrings("баб");
+		assertEquals(18, strings.size());
+		strings = trieGrammarStore.getStrings("бнопня");
+		assertEquals(1, strings.size());
+	}
 
 	
-	protected StringToByteTrie buildTreeSearchTest() {
+	protected StringToByteTrie buildTreeSearchTest(String[] set) {
 		StringToByteTrie trieGrammarStore = new StringToByteTrie();
 		StringTrie<Byte>.TrieBuilder newBuilder = trieGrammarStore.newBuilder();
 		int i = 35;
-		for (String string : SET1) {
-			newBuilder.append(string, Byte.valueOf((byte)i++));
+		for (String string : set) {
+			newBuilder.append(string.toLowerCase(), Byte.valueOf((byte)i++));
 		}
 		trieGrammarStore.commit(newBuilder);
 		return trieGrammarStore;

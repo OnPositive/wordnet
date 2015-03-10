@@ -53,9 +53,10 @@ public class Tester {
 		
 //		globalTest();
 //		timeTest();
-		testPrediction();
 //		testPrefixSearch();
-//		PredictionUtil.rebuildPredictionVocab();
+//		testSearch();
+//		testPrediction();
+		testTrieSearch();
 	}
 	
 	public static void testPrefixSearch() {
@@ -149,6 +150,48 @@ public class Tester {
 //				}
 				
 			}
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
+	@SuppressWarnings("unchecked")
+	private static void testTrieSearch() {
+		ReadOnlyWordNet loaded;
+		try {
+			loaded = ReadOnlyMapWordNet.load(RWNET_PATH);
+//			ReadOnlyTrieWordNet trieWordNet = ReadOnlyTrieWordNet.load(new ZipFile("russian.dict"));
+			String[] keys = loaded.getAllGrammarKeys();
+			
+			GrammarRelation[] forms = loaded.getPossibleGrammarForms("бнр");
+			System.out.println(Arrays.toString(forms));
+			forms = loaded.getPossibleGrammarForms("бваке");
+			System.out.println(Arrays.toString(forms));
+//			Map<String, Byte> dataMap = new HashMap<String, Byte>();
+			StringTrie<GrammarRelation[]> trieGrammarStore = new TrieGrammarStore();
+			TrieBuilder newBuilder = trieGrammarStore.newBuilder();
+			int n = keys.length;
+			for (int i = 0; i < n; i++) {
+//				Byte b = (byte)(Math.random() * 100);
+//				dataMap.put(keys[i], b);
+				newBuilder.append(keys[i], loaded.getPossibleGrammarForms(keys[i]));
+				if (keys[i].startsWith("бнр")) {
+					System.out.println("word" + keys[i]);
+				}
+			}
+			trieGrammarStore.commit(newBuilder);
+			
+			List<String> strings = trieGrammarStore.getStrings("анфилоф");
+			System.out.println(strings);
+			strings = trieGrammarStore.getStrings("фолифна");
+			System.out.println(strings);
+			strings = trieGrammarStore.getStrings("бнр");
+			System.out.println(strings);
+			strings = trieGrammarStore.getStrings("б");
+			System.out.println(strings);
+			strings = trieGrammarStore.getStrings("бнопня");
+			System.out.println(strings);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -471,6 +514,15 @@ public class Tester {
 			System.err.println("Wordnet is corrupted rebuilding...");
 		}
 	}
+	
+	private static void testSearch() {
+		GrammarRelation[] forms1 = WordNetProvider.getInstance().getPossibleGrammarForms("вертолёт");
+		System.out.println(Arrays.toString(forms1));
+//		GrammarRelation[] forms2 = WordNetProvider.getInstance().getPossibleGrammarForms("километр");
+//		System.out.println(forms2);
+		forms1 = WordNetProvider.getInstance().getPossibleGrammarForms("законфузиться");
+		System.out.println(Arrays.toString(forms1));
+	}
 
 	private static void testPrediction() {
 //		InputStream inputStream = null;
@@ -495,6 +547,12 @@ public class Tester {
 			forms = helper.getForms(word);
 			System.out.println(word + ":" + Arrays.toString(forms));
 			word = "рукозадым";
+			forms = helper.getForms(word);
+			System.out.println(word + ":" + Arrays.toString(forms));
+			word = "фут";
+			forms = helper.getForms(word);
+			System.out.println(word + ":" + Arrays.toString(forms));
+			word = "килофут";
 			forms = helper.getForms(word);
 			System.out.println(word + ":" + Arrays.toString(forms));
 //		} catch (IOException e) {
