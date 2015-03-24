@@ -18,8 +18,10 @@ import java.util.Map;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
+import com.onpositive.semantic.wordnet.AbstractWordNet;
 import com.onpositive.semantic.wordnet.GrammarRelation;
 import com.onpositive.semantic.wordnet.WordNetProvider;
+import com.onpositive.semantic.wordnet.edit.WordNetAutoPatcher;
 import com.onpositive.semantic.words2.SimpleWordNet;
 import com.onpositive.semantic.words3.ReadOnlyMapWordNet;
 import com.onpositive.semantic.words3.ReadOnlyTrieWordNet;
@@ -56,7 +58,8 @@ public class Tester {
 //		testPrefixSearch();
 //		testSearch();
 //		testPrediction();
-		testTrieSearch();
+//		testTrieSearch();
+		testRebuid();
 	}
 	
 	public static void testPrefixSearch() {
@@ -561,5 +564,11 @@ public class Tester {
 //			if (inputStream != null)
 //				try {inputStream.close();} catch (IOException e) {}
 //		}
+	}
+	
+	private static void testRebuid() {
+		ReadOnlyWordNet wnet = WordNetAutoPatcher.obtainWordNet("D:/tmp/vocab/rwnet.dat");
+		GrammarRelation[] forms1 = wnet.getPossibleGrammarForms("вертолёт");
+		System.out.println(Arrays.toString(forms1));
 	}
 }
