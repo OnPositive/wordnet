@@ -24,7 +24,7 @@ public class WordNetProvider {
 
 	public static final String ENGINE_CONFIG_DIR_PROP = "engineConfigDir";
 
-	private static final String HASHMAP_FILE_NAME = "rwnet.dat";
+	public static final String MAP_WORDNET_FILE_NAME = "rwnet.dat";
 
 	private static final String WNET_DIR = "wordnet";
 
@@ -59,7 +59,7 @@ public class WordNetProvider {
 		if (!fl.exists()){
 			fl.mkdirs();
 		}
-		File readOnly = new File(fl,HASHMAP_FILE_NAME);
+		File readOnly = new File(fl,MAP_WORDNET_FILE_NAME);
 		return readOnly;
 	}
 
@@ -90,7 +90,7 @@ public class WordNetProvider {
 				String tmpDir = System.getProperty("java.io.tmpdir");
 				File dir = new File(tmpDir, WNET_DIR);
 				dir.mkdirs();
-				String fullPath = dir.getAbsolutePath() + File.separator + "rwnet.dat";
+				String fullPath = dir.getAbsolutePath() + File.separator + MAP_WORDNET_FILE_NAME;
 				if (!new File(fullPath).exists()) {
 					FileOutputStream fos = null;
 					try {
@@ -129,7 +129,7 @@ public class WordNetProvider {
 					if (read != null) {
 						ReadOnlyWordNet readOnlyWordNet = new ReadOnlyMapWordNet(
 								(SimpleWordNet) read);
-						readOnlyWordNet.store(new File(fl, HASHMAP_FILE_NAME));
+						readOnlyWordNet.store(new File(fl, MAP_WORDNET_FILE_NAME));
 						instance = readOnlyWordNet;
 					} else {
 						System.err
@@ -162,7 +162,7 @@ public class WordNetProvider {
 						(SimpleWordNet) wnet);
 				try {
 					// wnet.write(ind.getAbsolutePath());
-					readOnlyWordNet.store(new File(fl, HASHMAP_FILE_NAME));
+					readOnlyWordNet.store(new File(fl, MAP_WORDNET_FILE_NAME));
 				} catch (FileNotFoundException e) {
 					System.err.println("Can not store read only wordnet...");
 					e.printStackTrace();
@@ -179,8 +179,8 @@ public class WordNetProvider {
 
 	private static AbstractWordNet readHashMap(File fl) {
 		File input = fl;
-		if (!input.getAbsolutePath().endsWith(HASHMAP_FILE_NAME)) {
-			input = new File(fl,HASHMAP_FILE_NAME);
+		if (!input.getAbsolutePath().endsWith(MAP_WORDNET_FILE_NAME)) {
+			input = new File(fl,MAP_WORDNET_FILE_NAME);
 		}
 		if (input.exists()) {
 			try {
@@ -200,7 +200,7 @@ public class WordNetProvider {
 			property = DEFAULT_INDEX_FOLDER;
 		}
 		File fl = new File(property);
-		File readOnly = new File(fl, HASHMAP_FILE_NAME);
+		File readOnly = new File(fl, MAP_WORDNET_FILE_NAME);
 		if (readOnly.exists()) {
 			readOnly.delete();
 		}

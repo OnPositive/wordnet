@@ -22,13 +22,55 @@ import com.onpositive.semantic.words3.ReadOnlyWordNet;
 public class WordNetAutoPatcher {
 	
 	private static final String PATCHED_WORDNET_HEADER = "PATCHED_WORDNET";
-
+	
+	/**
+	 * Obtains wordnet from location specified in System Properties in "engineConfigDir"
+	 * property & patches it with xml's located in same folder with it
+	 * @return Resulting wordnet
+	 */
+	public static ReadOnlyWordNet obtainWordNet() {
+		String property = System.getProperty(WordNetProvider.ENGINE_CONFIG_DIR_PROP);
+		if (property != null) {
+			File file = new File(property, WordNetProvider.MAP_WORDNET_FILE_NAME);
+			File parentDir = new File(property);
+			if (!file.exists() && parentDir.exists() && parentDir.isDirectory()) {
+				File[] files = parentDir.listFiles(new FilenameFilter() {
+					
+					@Override
+					public boolean accept(File dir, String name) {
+						return name.endsWith(".dat");
+					}
+				});
+				for (File curFile : files) {
+					if (curFile.isFile()) {
+						file = files[0];
+						break;
+					}
+				}
+			}
+			if (file.exists()) {
+				return obtainWordNet(file);
+			}
+		}
+		return null;
+	}
+	
 	public static ReadOnlyWordNet obtainWordNet(File file) {
 		if (file == null || !file.exists() || !file.isFile()) {
-			throw new IllegalArgumentException("Argument shouldn't be null & should point to existing file");
+			throw new IllegalArgumentException("File argument shouldn't be null & should point to existing file");
 		}
-		File dir = file.getParentFile();
-		File[] modifiers = dir.listFiles(new FilenameFilter() {
+		return obtainWordNet(file, file.getParentFile());
+	}
+	
+
+	public static ReadOnlyWordNet obtainWordNet(File file, File xmlDir) {
+		if (file == null || !file.exists() || !file.isFile()) {
+			throw new IllegalArgumentException("File argument shouldn't be null & should point to existing file");
+		}
+		if (xmlDir == null || !xmlDir.exists() || !xmlDir.isDirectory()) {
+			throw new IllegalArgumentException("xmlDir argument shouldn't be null & should point to existing folder");
+		}
+		File[] modifiers = xmlDir.listFiles(new FilenameFilter() {
 			
 			@Override
 			public boolean accept(File dir, String name) {
