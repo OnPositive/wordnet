@@ -5,12 +5,6 @@ Bundle-SymbolicName: com.onpositive.wordnet
 Bundle-Version: 1.0.1.qualifier
 Bundle-Vendor: ONPOSITIVE
 Export-Package: com.carrotsearch.hppc,
- com.carrotsearch.hppc.cursors,
- com.carrotsearch.hppc.hash,
- com.carrotsearch.hppc.mutables,
- com.carrotsearch.hppc.predicates,
- com.carrotsearch.hppc.procedures,
- com.carrotsearch.hppc.sorting,
  com.onpositive.semantic.wordnet,
  com.onpositive.semantic.wordnet.composite,
  com.onpositive.semantic.wordnet.edit,
