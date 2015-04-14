@@ -10,6 +10,7 @@ import java.nio.CharBuffer;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 import com.carrotsearch.hppc.ByteArrayList;
 import com.carrotsearch.hppc.CharArrayList;
@@ -333,7 +334,7 @@ public abstract class StringTrie<T> extends StringStorage<T> {
 	}
 
 	
-	public Collection<String> getStrings(String search) {
+	public List<String> getStrings(String search) {
 		CollectingVisitor<T> visitor = new CollectingVisitor<T>();
 		visitSubtree(search, 0, 0, visitor);
 		return visitor.getWords();
@@ -346,7 +347,9 @@ public abstract class StringTrie<T> extends StringStorage<T> {
 		outerLoop:while (position <= prefix.length()) {
 			int childCount = byteBuffer[i];
 			if (childCount == 0 && position < prefix.length()) { //if we have no children, but still have chars to search - return null
-				return; //TODO handle
+				T value = decodeValue(i + 1);
+				visitor.visit(builder.toString(), value);
+				return;
 			}
 			i++;
 			int dataPos = i;
@@ -355,7 +358,7 @@ public abstract class StringTrie<T> extends StringStorage<T> {
 			}
 			if (position==length){
 				//we need to decode value;
-				if (childCount<=0){
+				if (childCount<=0) {
 					if (childCount < 0) {
 						i = i - getDataSize(dataPos);
 					}
@@ -369,6 +372,7 @@ public abstract class StringTrie<T> extends StringStorage<T> {
 			if (childCount<0){
 				childCount=-childCount;
 			}
+			int prevBuilderPos = builder.length();
 			int currentItem=0;
 			l1:while (true) {
 				byte b = byteBuffer[i];
@@ -398,25 +402,25 @@ public abstract class StringTrie<T> extends StringStorage<T> {
 								onChar=true;
 							}
 							currentChar = byteToCharTable[b];
-							if (charIndex>=length||  !charEquals(currentChar,prefix.charAt(charIndex))){
+							if (charIndex>=length || !charEquals(currentChar,prefix.charAt(charIndex))){
 								//now we can skip to end of string and go next;
 								int prevI = i;
-								while (i < byteBuffer.length && byteBuffer[i++]>=0) {
-									builder.append(byteToCharTable[byteBuffer[i]]);
+								if (!onChar) {
+									while (i < byteBuffer.length && byteBuffer[i++]>=0);
 								}
 								if (i >= byteBuffer.length) {
 									return;
 								}
 								if (i > prevI) { //if at least one character was matched
+									builder.append(currentChar);
 									visitRest(visitor, builder,prevI);
 									return;
 								}
 
 								if (currentItem==childCount-1){
-									
 									return;
 								}
-								builder.delete(0, builder.length());
+								builder.delete(prevBuilderPos, builder.length());
 								currentItem++;
 								//decode address
 								byte vl=byteBuffer[i];
@@ -437,10 +441,12 @@ public abstract class StringTrie<T> extends StringStorage<T> {
 									//we are at the end of string
 									if (onChar){
 										//end of constant segment
-										T value = (byteBuffer[i] == Byte.MIN_VALUE)?decodeValue(i+5):decodeValue(i+2);
-										visitor.visit(builder.toString(), value);
+										byte shiftValue = byteBuffer[i];
+										T value = (shiftValue == Byte.MIN_VALUE)?decodeValue(i+5):decodeValue(i+2);
+										visitor.visit(builder.toString(), value);										
+									} else {
+										visitRest(visitor, builder, i);
 									}
-									visitRest(visitor, builder, i);
 									return;
 								}
 								if (onChar){
@@ -557,6 +563,9 @@ public abstract class StringTrie<T> extends StringStorage<T> {
 		for (int a = i; a < size; a++) {
 			byte b = byteBuffer[a];
 			boolean needBreal = false;
+			if (b == Byte.MIN_VALUE) {
+				return new String(resList.buffer,0, resList.elementsCount);		
+			}
 			if (b < 0) {
 				b = (byte) -b;
 				needBreal = true;

@@ -1,8 +1,6 @@
 package com.onpositive.semantic.words3;
 
 import java.io.BufferedOutputStream;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.File;
@@ -15,9 +13,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Set;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipOutputStream;
-
 import com.carrotsearch.hppc.ByteArrayList;
 import com.carrotsearch.hppc.IntIntOpenHashMapSerialable;
 import com.carrotsearch.hppc.IntOpenHashSetSerializable;
@@ -47,6 +42,7 @@ public abstract class ReadOnlyWordNet extends AbstractWordNet {
 	protected IntIntOpenHashMapSerialable sequences = new IntIntOpenHashMapSerialable();
 	protected byte[] store;
 	protected String version = "0";
+	
 	protected String descripton = "Russian";
 
 	public final class WordStore extends StringToDataHashMap<SenseElementInfo> {
@@ -500,6 +496,10 @@ public abstract class ReadOnlyWordNet extends AbstractWordNet {
 		StringToDataHashMap.writeMap(stream, sequences);
 		storeGrammems(stream);		
 		meta.store(stream);
+	}
+	
+	public String getVersion() {
+		return version;
 	}
 
 	@Override
