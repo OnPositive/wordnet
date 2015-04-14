@@ -121,7 +121,7 @@ public class MultiHashMap<A,B> extends HashMap
         return false;
     }
     
-    public Object remove( Object key, Object item )
+    public Object removeObject( Object key, Object item )
     {
         ArrayList valuesForKey = (ArrayList) super.get( key );
         
