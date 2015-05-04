@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.onpositive</groupId>
 	<artifactId>wordnet</artifactId>
-	<version>0.0.1</version>
+	<version>0.0.1-SNAPSHOT</version>
 	<name>${project.groupId}:${project.artifactId}</name>
 	<licenses>
 		<license>
@@ -14,7 +14,7 @@
 	<developers>
 		<developer>
 			<name>Dmitry Karpenko</name>
-			<email>ditry.karpenko@onpositive.com</email>
+			<email>dmitry.karpenko@onpositive.com</email>
 			<organization>OnPositive</organization>
 		</developer>
 	</developers>
@@ -22,8 +22,15 @@
 	    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	    <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 	</properties>
+	<distributionManagement>
+		<snapshotRepository>
+			<id>ossrh</id>
+			<url>https://oss.sonatype.org/content/repositories/snapshots</url>
+		</snapshotRepository>
+	</distributionManagement>
 	<build>
 		<sourceDirectory>src</sourceDirectory>
+		<testSourceDirectory>src-test</testSourceDirectory>
 		<resources>
 			<resource>
 				<directory>src</directory>
@@ -31,7 +38,26 @@
 					<exclude>**/*.java</exclude>
 				</excludes>
 			</resource>
+			<resource>
+				<directory>src-test</directory>
+				<excludes>
+					<exclude>**/*.java</exclude>
+				</excludes>
+				<includes>
+	                <include> **/*.txt</include>
+	                <include> **/*.xml</include>
+	            </includes>
+			</resource>
 		</resources>
+		<testResources>
+			<testResource>
+				<directory>src-test</directory>
+				<includes>
+	                <include> **/*.txt</include>
+	                <include> **/*.xml</include>
+	            </includes>
+			</testResource>
+		</testResources>
 		<plugins>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
@@ -80,6 +106,12 @@
 			<groupId>com.carrotsearch</groupId>
 			<artifactId>hppc</artifactId>
 			<version>0.6.1</version>
+		</dependency>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>4.11</version>
+			<scope>test</scope>
 		</dependency>
 	</dependencies>
 	<organization>
