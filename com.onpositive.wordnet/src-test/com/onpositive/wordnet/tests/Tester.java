@@ -54,13 +54,14 @@ public class Tester {
 //		test9();
 //		test10();
 		
-//		globalTest();
+		globalTest();
 //		timeTest();
 //		testPrefixSearch();
 //		testSearch();
 //		testPrediction();
 //		testTrieSearch();
-		testRebuid();
+//		testRebuid();
+//		test13();
 	}
 	
 	public static void testPrefixSearch() {
@@ -106,9 +107,9 @@ public class Tester {
 
 	@SuppressWarnings("unchecked")
 	private static void globalTest() {
-		ReadOnlyWordNet loaded;
+		AbstractWordNet loaded;
 		try {
-			loaded = ReadOnlyMapWordNet.load(RWNET_PATH);
+			loaded = WordNetProvider.getInstance();
 //			ReadOnlyTrieWordNet trieWordNet = ReadOnlyTrieWordNet.load(new ZipFile("russian.dict"));
 			String[] keys = loaded.getAllGrammarKeys();
 //			Map<String, Byte> dataMap = new HashMap<String, Byte>();
@@ -563,6 +564,138 @@ public class Tester {
 //			if (inputStream != null)
 //				try {inputStream.close();} catch (IOException e) {}
 //		}
+	}
+	
+	private static void test11() {
+		int lowBound = 0;
+		int highBound = 1000000;
+		int start = lowBound;
+//		ReadOnlyWordNet instance;
+		String search = "сурьезнейшая";
+		String[] keys;
+		AbstractWordNet instance = WordNetProvider.getInstance();
+		keys = instance.getAllGrammarKeys();
+		highBound = keys.length;
+		int step = (highBound - lowBound) / 2;
+		while (step > 2) {
+			if (searchBroken(search, keys, lowBound, highBound, (ReadOnlyWordNet) instance)) {
+				lowBound += step;
+			} else {
+				lowBound -= step;
+			}
+			step /= 2;
+		}
+		while (!searchBroken(search, keys, lowBound, highBound, (ReadOnlyWordNet) instance)) {
+			lowBound--;
+		}
+		step = (highBound - lowBound) / 2;
+		while (step > 2) {
+			if (searchBroken(search, keys, lowBound, highBound, (ReadOnlyWordNet) instance)) {
+				highBound -= step;
+			} else {
+				highBound += step;
+			}
+			step /= 2;
+		}
+		while (!searchBroken(search, keys, lowBound, highBound, (ReadOnlyWordNet) instance)) {
+			highBound++;
+		}
+
+		System.out.println(String.format("[ %d, %d ]", lowBound, highBound));
+	}
+	
+	private static void test12() {
+		String search = "сурьезнейшая";
+		AbstractWordNet instance = WordNetProvider.getInstance();
+		findSearchBroken(search, 47538, 2122392, (ReadOnlyWordNet) instance);
+
+	}
+	
+	private static void test13() {
+		ReadOnlyTrieWordNet instance = TrieZippedProvider.getInstance();
+		GrammarRelation[] possibleGrammarForms = instance.getPossibleGrammarForms("пеaревалившемся");
+		possibleGrammarForms = instance.getPossibleGrammarForms("сурьезнейшая");
+		System.out.println("Forms: " + Arrays.toString(possibleGrammarForms));
+	}
+	
+	private static boolean searchBroken(String search, String[] keys, ArrayList<Integer> included, ReadOnlyWordNet loaded) {
+		try {
+			StringTrie<GrammarRelation[]> trieGrammarStore = new TrieGrammarStore();
+			TrieBuilder newBuilder = trieGrammarStore.newBuilder();
+			for (int i = 0; i < included.size(); i++) {
+				int index = included.get(i);
+				newBuilder.append(keys[index], loaded.getPossibleGrammarForms(keys[index]));
+			}
+			trieGrammarStore.commit(newBuilder);
+			for (int i = 0; i < included.size(); i++) {
+				int index = included.get(i);
+				GrammarRelation[] found = trieGrammarStore.get(keys[index]);
+				return false;
+//				if (!Arrays.equals(found, loaded.getPossibleGrammarForms(keys[index]))) {
+//					return true;
+//				}
+//				found = trieGrammarStore.get(keys[index] + "aaa");
+//				if (found != null) {
+//					return true;
+//				}
+			}
+		} catch (Throwable e) {
+			return true;
+		}
+		return false;
+	}
+	
+	private static void findSearchBroken(String search, int start, int end, ReadOnlyWordNet loaded) {
+		String[] keys = loaded.getAllGrammarKeys();
+		ArrayList<Integer> included = new ArrayList<Integer>();
+		for (int i = start; i < end; i++) {
+			included.add(i);
+		}
+		for (int i = 0; i < included.size(); i++) {
+			Integer removed = included.remove(i);
+			if (!searchBroken(search, keys, included, loaded)) {
+				included.add(i,removed);
+			} else {
+				System.out.println(removed + "is not necessary to reproduce");
+				i--;
+			}
+		}
+		
+		boolean a = searchBroken(search, keys, included, loaded);
+		System.out.println("Search is broken: " + a);
+		
+		for (int i = 0; i < included.size(); i++) {
+			Integer removed = included.remove(i);
+			if (!searchBroken(search, keys, included, loaded)) {
+				included.add(i,removed);
+			} else {
+				i--;
+			}
+		}
+		
+//			while (broken(keys, start, COUNT)) {
+//				start++;
+//			}
+		for (Integer integer : included) {
+			System.out.println(keys[integer]);
+		}
+	}
+	
+	private static boolean searchBroken(String search, String[] keys, int start, int end, ReadOnlyWordNet loaded) {
+		try {
+			StringTrie<GrammarRelation[]> trieGrammarStore = new TrieGrammarStore();
+			TrieBuilder newBuilder = trieGrammarStore.newBuilder();
+			for (int i = start; i < end; i++) {
+				Byte b = (byte)(Math.random() * 100);
+	//			dataMap.put(keys[i], b);
+				newBuilder.append(keys[i], loaded.getPossibleGrammarForms(keys[i]));
+			}
+			trieGrammarStore.commit(newBuilder);
+			GrammarRelation[] relations = trieGrammarStore.get(search);
+			return false;
+		} catch (Throwable e) {
+			return true;
+		}
 	}
 	
 	private static void testRebuid() {

@@ -98,7 +98,9 @@ public abstract class StringTrie<T> extends StringStorage<T> {
 						currentChar = byteToCharTable[b];
 						if (charIndex>=length|| !charEquals(currentChar,search.charAt(charIndex))){
 							//no we can skip to end of string and go next;
-							while (i < byteBuffer.length && byteBuffer[i++]>=0);//skip string
+							while (i < byteBuffer.length && byteBuffer[i]>=0){
+								i++;//skip string
+							}
 							if (i >= byteBuffer.length) {
 								return null;
 							}
@@ -161,7 +163,9 @@ public abstract class StringTrie<T> extends StringStorage<T> {
 				}
 				else{
 					i++;
-					while (i < byteBuffer.length && byteBuffer[i++]>=0);//skip string
+					while (i < byteBuffer.length && byteBuffer[i]>=0){
+						i++;//skip string
+					}
 					if (i >= byteBuffer.length) {
 						return null;
 					}
@@ -242,8 +246,10 @@ public abstract class StringTrie<T> extends StringStorage<T> {
 							}
 							currentChar = byteToCharTable[b];
 							if (charIndex>=length||  !charEquals(currentChar,search.charAt(charIndex))){
-								//no we can skip to end of string and go next;
-								while (i < byteBuffer.length && byteBuffer[i++]>=0);//skip string
+								//now we can skip to end of string and go next;
+								while (i < byteBuffer.length && byteBuffer[i]>=0) {
+									i++;//skip string
+								}
 								if (i >= byteBuffer.length) {
 									return null;
 								}
@@ -309,7 +315,9 @@ public abstract class StringTrie<T> extends StringStorage<T> {
 					}
 					else{
 						i++;
-						while (i<byteBuffer.length && byteBuffer[i++]>=0);//skip string
+						while (i<byteBuffer.length && byteBuffer[i]>=0){
+							i++;//skip string
+						}
 						if (i >= byteBuffer.length) {
 							return null;
 						}
@@ -406,7 +414,9 @@ public abstract class StringTrie<T> extends StringStorage<T> {
 								//now we can skip to end of string and go next;
 								int prevI = i;
 								if (!onChar) {
-									while (i < byteBuffer.length && byteBuffer[i++]>=0);
+									while (i < byteBuffer.length && byteBuffer[i]>=0){
+										i++;
+									}
 								}
 								if (i >= byteBuffer.length) {
 									return;
@@ -481,7 +491,9 @@ public abstract class StringTrie<T> extends StringStorage<T> {
 					}
 					else{
 						i++;
-						while (i<byteBuffer.length && byteBuffer[i++]>=0);//skip string
+						while (i<byteBuffer.length && byteBuffer[i]>=0){
+							i++;//skip string
+						}
 						if (i >= byteBuffer.length) {
 							return;
 						}
