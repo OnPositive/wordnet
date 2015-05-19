@@ -45,7 +45,7 @@ public class Tester {
 
 	public static void main(String[] args) {
 //		test1();
-//		findBroken(0,2000);
+//		findBroken(3036596, 3036600);
 //		test4();
 //		test5();
 //		test6();
@@ -62,6 +62,7 @@ public class Tester {
 //		testTrieSearch();
 //		testRebuid();
 //		test13();
+//		test14();
 	}
 	
 	public static void testPrefixSearch() {
@@ -202,91 +203,84 @@ public class Tester {
 	}
 	
 	private static void test4() {
-		int lowBound = 31667;
-		int highBound = 1000000;
-		int start = lowBound;
-		ReadOnlyWordNet loaded;
+		AbstractWordNet loaded;
 		String[] keys;
-		try {
-			loaded = ReadOnlyMapWordNet.load(RWNET_PATH);
-			keys = loaded.getAllGrammarKeys();
-			int step = (highBound - lowBound) / 2;
-			while (step > 2) {
-				if (broken(keys, lowBound, highBound, loaded)) {
-					lowBound += step;
-				} else {
-					lowBound -= step;
-				}
-				step /= 2;
+		loaded = WordNetProvider.getInstance();
+		keys = loaded.getAllGrammarKeys();
+		int lowBound = 0;
+		int highBound = keys.length;
+		int step = (highBound - lowBound) / 2;
+		while (step > 2) {
+			if (broken(keys, lowBound, highBound, loaded)) {
+				lowBound += step;
+			} else {
+				lowBound -= step;
 			}
-			while (!broken(keys, lowBound, highBound, loaded)) {
-				lowBound--;
-			}
-			step = (highBound - lowBound) / 2;
-			while (step > 2) {
-				if (broken(keys, lowBound, highBound, loaded)) {
-					highBound -= step;
-				} else {
-					highBound += step;
-				}
-				step /= 2;
-			}
-			while (!broken(keys, lowBound, highBound, loaded)) {
-				highBound++;
-			}
-
-			System.out.println(String.format("[ %d, %d ]", lowBound, highBound));
-			
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			step /= 2;
 		}
-			
+		while (!broken(keys, lowBound, highBound, loaded)) {
+			lowBound--;
+		}
+		step = (highBound - lowBound) / 2;
+		while (step > 2) {
+			if (broken(keys, lowBound, highBound, loaded)) {
+				highBound -= step;
+			} else {
+				highBound += step;
+			}
+			step /= 2;
+		}
+		while (!broken(keys, lowBound, highBound, loaded)) {
+			highBound++;
+		}
+
+		System.out.println(String.format("[ %d, %d ]", lowBound, highBound));
+		if (highBound - lowBound < 20) {
+			System.out.println("Reproduce dataset:");
+			for (int i = lowBound; i < highBound; i++) {
+				System.out.println(keys[i]);
+			}
+		}
 	}
 	
 	private static void findBroken(int start, int end) {
-		ReadOnlyWordNet loaded;
-		try {
-			loaded = ReadOnlyMapWordNet.load(RWNET_PATH);
-			String[] keys = loaded.getAllGrammarKeys();
-			ArrayList<Integer> included = new ArrayList<Integer>();
-			for (int i = start; i < end; i++) {
-				included.add(i);
+		AbstractWordNet loaded;
+		loaded = WordNetProvider.getInstance();
+		String[] keys = loaded.getAllGrammarKeys();
+		ArrayList<Integer> included = new ArrayList<Integer>();
+		for (int i = start; i < end; i++) {
+			included.add(i);
+		}
+		for (int i = 0; i < included.size(); i++) {
+			Integer removed = included.remove(i);
+			if (!broken(keys, included, loaded)) {
+				included.add(i,removed);
+			} else {
+				i--;
 			}
-			for (int i = 0; i < included.size(); i++) {
-				Integer removed = included.remove(i);
-				if (!broken(keys, included, loaded)) {
-					included.add(i,removed);
-				} else {
-					i--;
-				}
+		}
+		
+		boolean a = broken(keys, included, loaded);
+		System.out.println("test3() is broken: " + a);
+		
+		for (int i = 0; i < included.size(); i++) {
+			Integer removed = included.remove(i);
+			if (!broken(keys, included, loaded)) {
+				included.add(i,removed);
+			} else {
+				i--;
 			}
-			
-			boolean a = broken(keys, included, loaded);
-			System.out.println("test3() is broken: " + a);
-			
-			for (int i = 0; i < included.size(); i++) {
-				Integer removed = included.remove(i);
-				if (!broken(keys, included, loaded)) {
-					included.add(i,removed);
-				} else {
-					i--;
-				}
-			}
-			
+		}
+		
 //			while (broken(keys, start, COUNT)) {
 //				start++;
 //			}
-			for (Integer integer : included) {
-				System.out.println(keys[integer]);
-			}
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		for (Integer integer : included) {
+			System.out.println(keys[integer]);
 		}
 	}
 	
-	private static boolean broken(String[] keys, int start, int end, ReadOnlyWordNet loaded) {
+	private static boolean broken(String[] keys, int start, int end, AbstractWordNet loaded) {
 //		Map<String, Byte> dataMap = new HashMap<String, Byte>();
 		StringTrie<GrammarRelation[]> trieGrammarStore = new TrieGrammarStore();
 		TrieBuilder newBuilder = trieGrammarStore.newBuilder();
@@ -314,7 +308,7 @@ public class Tester {
 		return false;
 	}
 	
-	private static boolean broken(String[] keys, ArrayList<Integer> included, ReadOnlyWordNet loaded) {
+	private static boolean broken(String[] keys, ArrayList<Integer> included, AbstractWordNet loaded) {
 		try {
 			StringTrie<GrammarRelation[]> trieGrammarStore = new TrieGrammarStore();
 			TrieBuilder newBuilder = trieGrammarStore.newBuilder();
@@ -616,6 +610,28 @@ public class Tester {
 		GrammarRelation[] possibleGrammarForms = instance.getPossibleGrammarForms("пеaревалившемся");
 		possibleGrammarForms = instance.getPossibleGrammarForms("сурьезнейшая");
 		System.out.println("Forms: " + Arrays.toString(possibleGrammarForms));
+	}
+	
+	private static void test14() {
+		StringToByteTrie trieGrammarStore = new StringToByteTrie();
+		StringTrie<Byte>.TrieBuilder newBuilder = trieGrammarStore.newBuilder();
+		int i = 35;
+		
+		String[] tst = {"захламливающемся",
+						"подседлаю",
+						};
+		
+		for (String string : tst) {
+			newBuilder.append(string, Byte.valueOf((byte)i++));
+		}
+		
+		trieGrammarStore.commit(newBuilder);
+        
+		for (String string : tst) {
+			Byte find = trieGrammarStore.get(string);
+			System.out.println(string + " = " + find);
+		}
+
 	}
 	
 	private static boolean searchBroken(String search, String[] keys, ArrayList<Integer> included, ReadOnlyWordNet loaded) {

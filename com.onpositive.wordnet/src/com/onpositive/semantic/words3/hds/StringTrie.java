@@ -101,6 +101,9 @@ public abstract class StringTrie<T> extends StringStorage<T> {
 							while (i < byteBuffer.length && byteBuffer[i]>=0){
 								i++;//skip string
 							}
+							if (!onChar){
+								i++;
+							}
 							if (i >= byteBuffer.length) {
 								return null;
 							}
@@ -163,9 +166,7 @@ public abstract class StringTrie<T> extends StringStorage<T> {
 				}
 				else{
 					i++;
-					while (i < byteBuffer.length && byteBuffer[i]>=0){
-						i++;//skip string
-					}
+					while (i < byteBuffer.length && byteBuffer[i++]>=0); //skip the rest of string
 					if (i >= byteBuffer.length) {
 						return null;
 					}
@@ -250,6 +251,9 @@ public abstract class StringTrie<T> extends StringStorage<T> {
 								while (i < byteBuffer.length && byteBuffer[i]>=0) {
 									i++;//skip string
 								}
+								if (!onChar) {
+									i++;
+								}
 								if (i >= byteBuffer.length) {
 									return null;
 								}
@@ -315,9 +319,7 @@ public abstract class StringTrie<T> extends StringStorage<T> {
 					}
 					else{
 						i++;
-						while (i<byteBuffer.length && byteBuffer[i]>=0){
-							i++;//skip string
-						}
+						while (i<byteBuffer.length && byteBuffer[i++]>=0); //skip the rest of string
 						if (i >= byteBuffer.length) {
 							return null;
 						}
@@ -491,9 +493,7 @@ public abstract class StringTrie<T> extends StringStorage<T> {
 					}
 					else{
 						i++;
-						while (i<byteBuffer.length && byteBuffer[i]>=0){
-							i++;//skip string
-						}
+						while (i<byteBuffer.length && byteBuffer[i++]>=0); //skip the rest of string
 						if (i >= byteBuffer.length) {
 							return;
 						}

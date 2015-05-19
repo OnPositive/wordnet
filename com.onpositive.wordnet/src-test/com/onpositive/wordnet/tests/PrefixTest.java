@@ -57,6 +57,10 @@ public class PrefixTest extends TestCase{
 			"Баклага", "Баклажан", "Баклажанный", "Баклажка", "Баклан",
 			"Баклуши", "Баклушничать", "Баковый", "Бактериальный",
 			"Бактеризованный", "Баян", "Баянист", "БНР", "Бваке", "Бивуак" };
+	
+	private static final String[] SET3 = {
+		"захламливающемся",
+		"подседлаю" };
 
 	public void test01() {
 		StringToByteTrie trieGrammarStore = new StringToByteTrie();
@@ -96,7 +100,15 @@ public class PrefixTest extends TestCase{
 			Byte find = trieGrammarStore.get(string);
 			assertEquals(find.byteValue(), (byte)k++);
 		}
-		
+	}
+	
+	public void test06() {
+		StringToByteTrie trieGrammarStore = buildTreeSearchTest(SET3);
+        int k = 35;
+		for (String string : SET3) {
+			Byte find = trieGrammarStore.get(string);
+			assertEquals(find.byteValue(), (byte)k++);
+		}
 	}
 	
 	public void testTreeSearch01() {

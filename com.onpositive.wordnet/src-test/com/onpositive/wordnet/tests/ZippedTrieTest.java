@@ -17,6 +17,8 @@ public class ZippedTrieTest extends TestCase{
 		assertNull(possibleGrammarForms);
 		possibleGrammarForms = instance.getPossibleGrammarForms("сурьезнейшая");
 		assertNull(possibleGrammarForms);
+		possibleGrammarForms = instance.getPossibleGrammarForms("пеaревалившемся");
+		assertNull(possibleGrammarForms);
 	}
 	
 }
