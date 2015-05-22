@@ -70,6 +70,10 @@ public abstract class MeaningElement extends RelationTarget {
 	public Set<Grammem>getGrammems(){
 		return owner.getGrammemSet(getGrammemCode());
 	}
+	
+	public PartOfSpeech getPartOfSpeech() {
+		return owner.getPartOfSpeech(getGrammemCode());
+	}
 
 	public abstract short getGrammemCode();
 
