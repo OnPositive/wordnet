@@ -1,5 +1,6 @@
 package com.onpositive.wordnet.tests;
 
+
 import java.io.BufferedInputStream;
 import java.io.DataInputStream;
 import java.io.File;
@@ -71,11 +72,11 @@ public class WordNetEditTest extends TestCase{
 			String basicForm = r.getWord().getBasicForm();
 			TestCase.assertTrue(basicForm.equals("вертолёт"));
 		}
-//		System.out.println(Arrays.toString(possibleGrammarForms));
+		System.out.println(Arrays.toString(possibleGrammarForms));
 		TestCase.assertTrue(possibleGrammarForms.length==1);
 		TextElement wordElement = possibleGrammarForms[0].getWord();
 		HashSet<Grammem> grammemSet = possibleGrammarForms[0].getOwner().getGrammemSet(possibleGrammarForms[0].relation);
-//		System.out.println(grammemSet);
+		System.out.println(grammemSet);
 		AbstractRelation<MeaningElement>[] semanticRelations = wordElement.getConcepts()[0].getAllRelations();
 		TestCase.assertTrue(semanticRelations.length>0);
 	}
@@ -170,10 +171,10 @@ public class WordNetEditTest extends TestCase{
 			TestCase.assertTrue(wordElement3!=null);
 			TextElement[] possibleContinuations = editable.getWordNet().getPossibleContinuations(wordElement3);
 			parse.execute(editable);
-//			if (possibleContinuations!=null&&possibleContinuations.length>0)
-//			{
-//				System.out.println("Continuations already here");
-//			}
+			if (possibleContinuations!=null&&possibleContinuations.length>0)
+			{
+				System.out.println("Continuations already here");
+			}
 			TextElement wordElement = editable.getWordNet().getWordElement("_ALL_DIMENSION_UNITS".toLowerCase());
 			SemanticRelation[] semanticRelations = wordElement.getConcepts()[0].getSemanticRelations();
 			for (SemanticRelation q:semanticRelations){
@@ -202,7 +203,7 @@ public class WordNetEditTest extends TestCase{
 			HashSet<String>ss=new HashSet<String>();
 			for (TextElement q:possibleContinuations){
 				TextElement[] parts = q.getParts();
-//				System.out.println(Arrays.toString(parts));
+				System.out.println(Arrays.toString(parts));
 				ss.add(q.getBasicForm());
 			}
 			TestCase.assertTrue(ss.contains("метр в секунду"));

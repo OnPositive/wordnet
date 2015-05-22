@@ -21,7 +21,6 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
-import com.carrotsearch.hppc.IntIntOpenHashMap;
 import com.carrotsearch.hppc.IntIntOpenHashMapSerialable;
 import com.carrotsearch.hppc.IntObjectOpenHashMapSerialzable;
 import com.carrotsearch.hppc.ObjectIntOpenHashMap;
@@ -33,7 +32,6 @@ import com.onpositive.semantic.wordnet.MeaningElement;
 import com.onpositive.semantic.wordnet.RelationTarget;
 import com.onpositive.semantic.wordnet.SemanticRelation;
 import com.onpositive.semantic.wordnet.TextElement;
-import com.onpositive.semantic.words3.IntMeaningLayer;
 import com.onpositive.semantic.words3.MetaLayer;
 import com.onpositive.semantic.words3.SenseElementHandle;
 import com.onpositive.semantic.words3.WordHandle;

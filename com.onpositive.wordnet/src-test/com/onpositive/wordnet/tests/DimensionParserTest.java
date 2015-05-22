@@ -1,5 +1,7 @@
 package com.onpositive.wordnet.tests;
 
+
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import com.onpositive.semantic.wordnet.TextElement;
 import com.onpositive.semantic.wordnet.WordNetProvider;
@@ -16,7 +18,9 @@ public class DimensionParserTest extends TestCase{
 	public void testAA() {
 		
 		try {
-			InputStreamReader isr = new InputStreamReader(DimensionParserTest.class.getResourceAsStream("tst.xml"),"UTF-8");
+			InputStream stream = DimensionParserTest.class.getResourceAsStream("tst.xml");
+			System.out.println("Stream " + stream);
+			InputStreamReader isr = new InputStreamReader(stream,"UTF-8");
 //			URL is = Thread.currentThread().getContextClassLoader().getResource("tst.xml");			
 //			InputStreamReader isr = new InputStreamReader(is.openStream(),"UTF-8");
 			WordNetPatch parse = WordNetPatch.parse(isr);
