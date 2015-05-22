@@ -8,6 +8,7 @@ import java.util.LinkedHashSet;
 
 import com.carrotsearch.hppc.IntObjectOpenHashMapSerialzable;
 import com.carrotsearch.hppc.ObjectIntOpenHashMap;
+import com.onpositive.semantic.wordnet.Grammem.PartOfSpeech;
 import com.onpositive.semantic.words3.LayersPack;
 import com.onpositive.semantic.words3.suggestions.GuessedGrammarRelation;
 import com.onpositive.semantic.words3.suggestions.GuessedTextElement;
@@ -92,6 +93,9 @@ public abstract class AbstractWordNet extends WordLookupEngine{
 	protected IntObjectOpenHashMapSerialzable<LinkedHashSet<Grammem>>set=new IntObjectOpenHashMapSerialzable<LinkedHashSet<Grammem>>();
 	protected ObjectIntOpenHashMap<LinkedHashSet<Grammem>>iset=new ObjectIntOpenHashMap<LinkedHashSet<Grammem>>();
 	
+	protected IntObjectOpenHashMapSerialzable<PartOfSpeech>posset = new IntObjectOpenHashMapSerialzable<PartOfSpeech>();	
+	
+	
 	protected void loadGrammems(AbstractWordNet other){
 		this.set=other.set;
 		this.iset=other.iset;
@@ -147,5 +151,20 @@ public abstract class AbstractWordNet extends WordLookupEngine{
 			return noGrammemSet;
 		}
 		return linkedHashSet;
+	}
+	
+	
+	public PartOfSpeech getPartOfSpeech(short grammemCode) {
+		if (grammemCode == 0) return null;
+		
+		if (posset.containsKey(grammemCode)) return posset.get(grammemCode);
+		
+		for (Grammem g: getGrammemSet(grammemCode)) {
+			if (g instanceof PartOfSpeech) {
+				posset.put(grammemCode, (PartOfSpeech) g);
+				return (PartOfSpeech) g;
+			}
+		}
+		return null;
 	}
 }
