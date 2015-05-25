@@ -2,7 +2,7 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.onpositive</groupId>
-	<artifactId>wordnet</artifactId>
+	<artifactId>wordnet-all</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>OnPositive Wordnet</name>
 	<packaging>pom</packaging>
