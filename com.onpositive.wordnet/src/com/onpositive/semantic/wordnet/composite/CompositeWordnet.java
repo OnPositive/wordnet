@@ -219,4 +219,7 @@ public class CompositeWordnet extends AbstractWordNet{
 		}
 		return convertMeaning.id();
 	}
+	
+	public AbstractWordNet getOriginal() { return this.original; }
+	public AbstractWordNet getAdditions() { return this.additions; }
 }
