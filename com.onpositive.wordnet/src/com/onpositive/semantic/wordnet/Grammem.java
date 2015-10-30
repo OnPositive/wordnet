@@ -10,13 +10,21 @@ public class Grammem {
 	public final byte intId;
 	public final String id;
 	
+	public final String alias;
+	public final String description;
+	static byte lastId=0;
+	static Grammem[]idToGrammem=new Grammem[124];
+	static HashMap<String, Grammem>stringMap=new HashMap<String, Grammem>();
+	public static final HashSet<Grammem>all=new HashSet<Grammem>();
+	public final Grammem parent;
 	static HashSet<Class<? extends Grammem>>allGrammemClasses=new HashSet<Class<? extends Grammem>>();
 	
+	static final Grammem NO_GRAMEM=new Grammem(0,"VOID","VOID","пусто");
+
 	public static LinkedHashSet<Grammem> getGrammemSet(Grammem... a) {
 		return new LinkedHashSet<Grammem>(Arrays.asList(a));
 	}
 	
-	public final Grammem parent;
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -41,19 +49,12 @@ public class Grammem {
 		return true;
 	}
 	
-	public final String alias;
-	public final String description;
-	
-	
-	static byte lastId=0;
-	static Grammem[]idToGrammem=new Grammem[124];
-	static HashMap<String, Grammem>stringMap=new HashMap<String, Grammem>();
-	
-	
-	public static final HashSet<Grammem>all=new HashSet<Grammem>();
-	
 	public static Grammem get(String  id){
 		return stringMap.get(id);
+	}
+	
+	public int getInitialId() {
+		return 0;
 	}
 	
 	Grammem(int ordinal,String id, String alias, String description,Grammem parent) {
@@ -106,9 +107,6 @@ public class Grammem {
 		this.alias = alias;
 		this.description = description;
 	}
-	static final Grammem NO_GRAMEM=new Grammem(0,"VOID","VOID","пусто"); 
-	
-	
 	static{
 		 allGrammemClasses.add(PartOfSpeech.class);
 		 PartOfSpeech.init();
@@ -145,7 +143,7 @@ public class Grammem {
 	}
 	public static class PartOfSpeech extends Grammem{
 		
-		
+		private static final int FIRST = 1;
 
 		PartOfSpeech(int ordinal,String id, String alias,
 				String description) {
@@ -202,9 +200,15 @@ public class Grammem {
 			}
 			return false;
 		}
+		
+		public int getInitialId() {
+			return FIRST;
+		}
 	}
 	
 	public static class AnimateProperty extends Grammem{
+		
+		private static final int FIRST = 18;
 
 		AnimateProperty(int ordinal,String id, String alias, String description) {
 			super(ordinal,id, alias, description);
@@ -219,10 +223,17 @@ public class Grammem {
 		public static final AnimateProperty ANim=new AnimateProperty(18,"ANim", "Од-неод", "одушевлённость / одушевлённость не выражена");
 		public static final AnimateProperty anim=new AnimateProperty(19,"anim", "од", "одушевлённое");
 		public static final AnimateProperty inan=new AnimateProperty(20,"inan", "неод", "неодушевлённое");
+		
+		public int getInitialId() {
+			return FIRST;
+		}
+
 	}
 
 	
 	public static class Gender extends Grammem{
+		
+		private static final int FIRST = 21;
 
 		public static final HashSet<Gender>all=new HashSet<Gender>();
 		
@@ -241,9 +252,15 @@ public class Grammem {
 		public static final Gender NEUT=new Gender(24,"neut", "ср", "средний род");
 		public static final Gender COMMON=new Gender(25,"Ms-f", "ор", "общий род");
 		
+		public int getInitialId() {
+			return FIRST;
+		}
+
 	}
 	
 	public static class SingularPlural extends Grammem{
+		
+		private static final int FIRST = 26;
 
 		public static final HashSet<SingularPlural>all=new HashSet<SingularPlural>();
 		
@@ -268,9 +285,17 @@ public class Grammem {
 		
 		public static final SingularPlural SG1=new SingularPlural(29,"Sgtm", "sg", "singularia tantum",SINGULAR);
 		public static final SingularPlural Pl1=new SingularPlural(30,"Pltm", "pl", "pluralia tantum",PLURAL);
+		
+		public int getInitialId() {
+			return FIRST;
+		}
+
 	}
 
 	public static class Case extends  Grammem{
+		
+		private static final int FIRST = 31;
+		
 		public static final HashSet<Case>all=new HashSet<Case>();
 		Case(int ordinal,String id, String alias, String description) {
 			super(ordinal,id, alias, description);
@@ -297,8 +322,16 @@ public class Grammem {
 		public static final Case ACC2=new Case(40,"acc2", "вн2", "второй винительный падеж",ACCS);
 		public static final Case LOC1=new Case(41,"loc1", "пр1", "первый предложный падеж",LOCT);
 		public static final Case LOC2=new Case(42,"loc2", "пр2", "второй предложный (местный) падеж",LOCT);
+		
+		public int getInitialId() {
+			return FIRST;
+		}
+
 	}
 	public static class SemanGramem extends Grammem{
+		
+		private static final int FIRST = 43;
+		
 		public static final HashSet<SemanGramem>all=new HashSet<SemanGramem>();
 		SemanGramem(int ordinal,String id, String alias, String description) {
 			super(ordinal,id, alias, description);
@@ -314,9 +347,17 @@ public class Grammem {
 		public static final SemanGramem TOPONIM=new SemanGramem(47,"Geox", "гео","топоним");
 		public static final SemanGramem ORGN=new SemanGramem(48,"Orgn", "орг","организация");
 		public static final SemanGramem TRADE_MARK=new SemanGramem(49,"Trad", "tm","торговая марка");
+		
+		public int getInitialId() {
+			return FIRST;
+		}
+
 	}
 	
 	public static class FeaturesGramem extends Grammem{
+		
+		private static final int FIRST = 50;
+		
 		public static final HashSet<FeaturesGramem>all=new HashSet<FeaturesGramem>();
 		
 		FeaturesGramem(int ordinal,String id, String alias, String description) {
@@ -336,9 +377,17 @@ public class Grammem {
 		public static final FeaturesGramem V_oy=new FeaturesGramem(57,"V-oy", "*ою", "форма на -ою");
 		public static final FeaturesGramem Cmp2=new FeaturesGramem(58,"Cmp2", "сравн2", "сравнительная степень на по-");
 		public static final FeaturesGramem V_ej=new FeaturesGramem(59,"V-ej", "*ей", "форма компаратива на -ей");
+		
+		public int getInitialId() {
+			return FIRST;
+		}
+
 	}
 	
 	public static class VerbKind extends Grammem{
+		
+		private static final int FIRST = 60;
+		
 		public static final HashSet<VerbKind>all=new HashSet<VerbKind>();
 		VerbKind(int ordinal,String id, String alias, String description) {
 			super(ordinal,id, alias, description);
@@ -349,10 +398,18 @@ public class Grammem {
 		}
 		public static final VerbKind PERFECT=new VerbKind(60,"perf", "сов", "совершенный вид");
 		public static final VerbKind IMPERFECT=new VerbKind(61,"impf", "несов", "несовершенный вид");
+		
+		public int getInitialId() {
+			return FIRST;
+		}
+
 	}
 	
 	
 	public static class TransKind extends Grammem{
+		
+		private static final int FIRST = 62;
+		
 		public static final HashSet<TransKind>all=new HashSet<TransKind>();
 		TransKind(int ordinal,String id, String alias, String description) {
 			super(ordinal,id, alias, description);
@@ -363,11 +420,19 @@ public class Grammem {
 		}
 		public static final TransKind tran=new TransKind(62,"tran", "перех", "переходный");
 		public static final TransKind intr=new TransKind(63,"intr", "неперех", "непереходный");
+		
+		public int getInitialId() {
+			return FIRST;
+		}
+
 	}
 	
 	
 	
 	public static class StrangeVerbStuff extends Grammem{
+		
+		private static final int FIRST = 64;
+		
 		public static final HashSet<StrangeVerbStuff>all=new HashSet<StrangeVerbStuff>();
 		StrangeVerbStuff(int ordinal,String id, String alias, String description) {
 			super(ordinal,id, alias, description);
@@ -380,10 +445,18 @@ public class Grammem {
 		public static final StrangeVerbStuff Impx=new StrangeVerbStuff(65,"Impx", "безл?", "возможно безличное употребление");
 		public static final StrangeVerbStuff Mult=new StrangeVerbStuff(66,"Mult", "мног", "многократный");
 		public static final StrangeVerbStuff Refl=new StrangeVerbStuff(67,"Refl", "возвр", "возвратный");
+		
+		public int getInitialId() {
+			return FIRST;
+		}
+
 	}
 	
 	
 	public static class Personality extends Grammem{
+		
+		private static final int FIRST = 68;
+		
 		public static final HashSet<Personality>all=new HashSet<Personality>();
 		Personality(int ordinal,String id, String alias, String description) {
 			super(ordinal,id, alias, description);
@@ -396,9 +469,15 @@ public class Grammem {
 		public static final Personality PERS2=new Personality(69,"2per", "2л", "2 лицо");
 		public static final Personality PERS3=new Personality(70,"3per", "3л", "3 лицо");
 
+		public int getInitialId() {
+			return FIRST;
+		}
+
 	}
 	
 	public static class Time extends Grammem{
+		
+		private static final int FIRST = 71;
 
 		public static final HashSet<Time>all=new HashSet<Time>();
 		Time(int ordinal,String id, String alias, String description) {
@@ -411,9 +490,17 @@ public class Grammem {
 		public static final Time PRESENT=new Time(71,"pres", "наст", "настоящее время");
 		public static final Time PAST=new Time(72,"past", "прош", "прошедшее время");
 		public static final Time FUTURE=new Time(73,"futr", "буд", "будущее время");
+		
+		public int getInitialId() {
+			return FIRST;
+		}
+
 	}
 	
 	public static class Mood extends Grammem{
+		
+		private static final int FIRST = 74;
+		
 		public static final HashSet<Mood>all=new HashSet<Mood>();
 		Mood(int ordinal,String id, String alias, String description) {
 			super(ordinal,id, alias, description);
@@ -425,9 +512,16 @@ public class Grammem {
 		public static final Mood indc=new Mood(74,"indc", "изъяв", "изъявительное наклонение");
 		public static final Mood impr=new Mood(75,"impr", "повел", "повелительное наклонение");
 		
+		public int getInitialId() {
+			return FIRST;
+		}
+		
 	}
 	
 	public static class Invl extends Grammem{
+		
+		private static final int FIRST = 76;
+		
 		public static final HashSet<Invl>all=new HashSet<Invl>();
 		Invl(int ordinal,String id, String alias, String description) {
 			super(ordinal,id, alias, description);
@@ -440,8 +534,15 @@ public class Grammem {
 		public static final Invl incl=new Invl(76,"incl", "вкл", "говорящий включён (идем, идемте) ");
 		public static final Invl excl=new Invl(77,"excl", "выкл", "говорящий не включён в действие (иди, идите)");
 		
+		public int getInitialId() {
+			return FIRST;
+		}
+
 	}
 	public static class VOic extends Grammem{
+		
+		private static final int FIRST = 78;
+		
 		public static final HashSet<VOic>all=new HashSet<VOic>();
 		VOic(int ordinal,String id, String alias, String description) {
 			super(ordinal,id, alias, description);
@@ -453,9 +554,16 @@ public class Grammem {
 		public static final VOic actv=new VOic(78,"actv", "действ", "действительный залог");
 		public static final VOic pssv=new VOic(79,"pssv", "страд", "страдательный залог");
 		
+		public int getInitialId() {
+			return FIRST;
+		}
+
 	}
 	
 	public static class Extras extends Grammem{
+		
+		private static final int FIRST = 80;
+		
 		public static final HashSet<Extras>all=new HashSet<Extras>();
 		Extras(int ordinal,String id, String alias, String description) {
 			super(ordinal,id, alias, description);
@@ -490,6 +598,11 @@ public class Grammem {
 		public static final Extras Anph=new Extras(101,"Anph", "Анаф", "Анафорическое (местоимение)");
 		public static final Extras Init=new Extras(102,"Init", "иниц", "Инициал");
 		public static final Extras Adjx=new Extras(103,"Adjx", "прил?", "может выступать в роли прилагательного");
+		
+		public int getInitialId() {
+			return FIRST;
+		}
+
 	}
 	public static Grammem get(int i) {
 		return idToGrammem[i];
