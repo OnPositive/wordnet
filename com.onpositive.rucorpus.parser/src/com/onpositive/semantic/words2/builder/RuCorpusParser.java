@@ -168,7 +168,11 @@ public class RuCorpusParser extends WordNetContributor{
 		for (String s:formElements){
 			Grammem grammem = Grammem.get(s);
 			if (grammem==null){
-				throw new IllegalStateException(s);
+				grammem = Grammem.get(s.toLowerCase());
+				if (grammem==null) {
+					continue;
+					//throw new IllegalStateException(s);
+				}
 			}
 			mmm.add(grammem);
 		}

@@ -181,7 +181,12 @@ public final class StringVocabulary extends StringCoder2{
 
 	
 	public StringVocabulary(File createTempFile) throws IOException {
-		read(new FileInputStream(createTempFile).getChannel());
+		FileInputStream fileInputStream = new FileInputStream(createTempFile);
+		try {
+		read(fileInputStream.getChannel());
+		}finally {
+			fileInputStream.close();
+		}
 	}
 	public int store(String string) {
 		int hashCode = hashCode(string);

@@ -211,11 +211,16 @@ public abstract class ReadOnlyWordNet extends AbstractWordNet {
 						}
 					}
 				}
+				if (!canStore(basicForm)) {
+					return;
+				}
 				store(basicForm, toWordInfo((Word) t));
 			}
 			if (t instanceof SimpleSequence) {
 				SimpleSequence basicForm = ((SimpleSequence) t);
-				store(basicForm.getBasicForm(), toWordInfo(basicForm));
+				if (canStore(basicForm.getBasicForm())) {
+					store(basicForm.getBasicForm(), toWordInfo(basicForm));
+				}
 			}
 		}
 
@@ -387,6 +392,17 @@ public abstract class ReadOnlyWordNet extends AbstractWordNet {
 
 	public String[] getAllGrammarKeys() {
 		throw new UnsupportedOperationException();
+	}
+
+	public boolean canStore(String basicForm) {
+		// TODO Auto-generated method stub
+		try {
+			this.wordsData.encodeString(basicForm,new byte[basicForm.length()]);
+			return true;
+		}catch (Exception e) {
+			// TODO: handle exception
+		}
+		return false;
 	}
 
 	public ReadOnlyWordNet(SimpleWordNet original) {

@@ -31,7 +31,6 @@ import static com.carrotsearch.hppc.HashContainerUtils.*;
  * @author This code is inspired by the collaboration and implementation in the <a
  *         href="http://fastutil.dsi.unimi.it/">fastutil</a> project.
  */
- @javax.annotation.Generated(date = "2014-09-08T10:42:29+0200", value = "HPPC generated from: IntOpenHashSet.java") 
 public class IntOpenHashSetSerializable
     extends AbstractIntCollection 
     implements IntLookupContainer, IntSet, Cloneable,Serializable

@@ -393,6 +393,9 @@ public class SimpleWordNet extends WordNet implements Serializable {
 				}
 			}
 			split=rs.toArray(new String[rs.size()]);
+			if (split.length==0) {
+				return;
+			}
 			ArrayList<Word> sequence = new ArrayList<Word>();
 			for (String s : split) {
 				TextElement singlePossibleWord2 = getSinglePossibleWord(s);

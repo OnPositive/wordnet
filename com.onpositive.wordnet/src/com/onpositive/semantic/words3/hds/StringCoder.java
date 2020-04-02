@@ -52,7 +52,7 @@ public class StringCoder {
 		return true;
 	}
 	
-	protected final void encodeString(String string, byte[] rs) {
+	public final void encodeString(String string, byte[] rs) {
 		int length = string.length();
 		for (int a = 0; a < length; a++) {
 			char c = string.charAt(a);

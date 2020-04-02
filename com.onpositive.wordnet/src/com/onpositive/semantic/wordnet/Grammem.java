@@ -250,7 +250,7 @@ public class Grammem {
 		public static final Gender MASC=new Gender(22,"masc", "мр", "мужской род");
 		public static final Gender FEMN=new Gender(23,"femn", "жр", "женский род");
 		public static final Gender NEUT=new Gender(24,"neut", "ср", "средний род");
-		public static final Gender COMMON=new Gender(25,"Ms-f", "ор", "общий род");
+		public static final Gender COMMON=new Gender(25,"ms-f", "ор", "общий род");
 		
 		public int getInitialId() {
 			return FIRST;
@@ -325,6 +325,13 @@ public class Grammem {
 		
 		public int getInitialId() {
 			return FIRST;
+		}
+		
+		public static final int NOMN_ID=NOMN.intId;
+		public static final int DATV_ID=DATV.intId;
+
+		public int id() {
+			return this.intId;
 		}
 
 	}

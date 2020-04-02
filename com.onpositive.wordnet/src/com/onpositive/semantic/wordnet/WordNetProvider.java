@@ -32,7 +32,7 @@ public class WordNetProvider {
 	
 	private static String DEFAULT_WORDNET_URL = "https://copy.com/GC3FSkiqUoc7UZpd"; //XXX temp location
 	
-	private static boolean allowDownload = true; 
+	private static boolean allowDownload = false; 
 
 	public static String DEFAULT_INDEX_FOLDER = "D:/se1";
 

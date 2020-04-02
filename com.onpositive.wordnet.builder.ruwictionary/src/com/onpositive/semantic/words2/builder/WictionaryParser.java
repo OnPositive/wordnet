@@ -9,7 +9,6 @@ import java.io.InputStreamReader;
 import java.io.StringReader;
 import java.io.UnsupportedEncodingException;
 import java.net.URL;
-import java.util.HashMap;
 import java.util.HashSet;
 
 import com.onpositive.semantic.wordnet.Grammem;
@@ -68,6 +67,9 @@ public class WictionaryParser extends WordNetContributor {
 			BufferedReader rs = createReader(model);
 			boolean areWeParsingKnownRelation = false;
 			int kind = -1;
+			if (wi.getWordElement(model.getTitle().toLowerCase())==null) {
+				System.out.println(model.getTitle().toLowerCase());
+			}
 			Word orCreate = (Word) wi.getOrCreateWord(model
 					.getTitle().toLowerCase());
 			boolean inRuPart=true;
